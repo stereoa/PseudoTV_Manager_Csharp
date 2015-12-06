@@ -112,9 +112,7 @@ namespace PseudoTV_Manager
             this.ExitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Label24 = new System.Windows.Forms.Label();
             this.Label23 = new System.Windows.Forms.Label();
-            this.LunaDonatePic = new System.Windows.Forms.PictureBox();
             this.Label22 = new System.Windows.Forms.Label();
-            this.PeppyDonatePic = new System.Windows.Forms.PictureBox();
             this.PeppyDonate = new System.Windows.Forms.Label();
             this.AaaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -167,12 +165,13 @@ namespace PseudoTV_Manager
             this.MovieLocation = new System.Windows.Forms.TextBox();
             this.MovieLabel = new System.Windows.Forms.Label();
             this.Button15 = new System.Windows.Forms.Button();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             this.TabPage4.SuspendLayout();
             this.TabPage3.SuspendLayout();
             this.TabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MoviePicture)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LunaDonatePic)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PeppyDonatePic)).BeginInit();
             this.MenuStrip1.SuspendLayout();
             this.TabPage6.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
@@ -1072,47 +1071,26 @@ namespace PseudoTV_Manager
             this.Label23.Name = "Label23";
             this.Label23.Size = new System.Drawing.Size(512, 84);
             this.Label23.TabIndex = 7;
-            this.Label23.Text = "Many hours have been put into PseudoTVLive and PseudoTVLive Manager. Donate?";
+            this.Label23.Text = "CREDITS:";
             this.Label23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // LunaDonatePic
-            // 
-            this.LunaDonatePic.ImageLocation = "https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif";
-            this.LunaDonatePic.InitialImage = null;
-            this.LunaDonatePic.Location = new System.Drawing.Point(696, 136);
-            this.LunaDonatePic.Name = "LunaDonatePic";
-            this.LunaDonatePic.Size = new System.Drawing.Size(134, 28);
-            this.LunaDonatePic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.LunaDonatePic.TabIndex = 6;
-            this.LunaDonatePic.TabStop = false;
             // 
             // Label22
             // 
             this.Label22.AutoSize = true;
             this.Label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
             this.Label22.ForeColor = System.Drawing.Color.Navy;
-            this.Label22.Location = new System.Drawing.Point(721, 109);
+            this.Label22.Location = new System.Drawing.Point(561, 123);
             this.Label22.Name = "Label22";
             this.Label22.Size = new System.Drawing.Size(79, 24);
             this.Label22.TabIndex = 5;
             this.Label22.Text = "Lunatixz";
-            // 
-            // PeppyDonatePic
-            // 
-            this.PeppyDonatePic.ImageLocation = "https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif";
-            this.PeppyDonatePic.Location = new System.Drawing.Point(388, 136);
-            this.PeppyDonatePic.Name = "PeppyDonatePic";
-            this.PeppyDonatePic.Size = new System.Drawing.Size(134, 29);
-            this.PeppyDonatePic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.PeppyDonatePic.TabIndex = 4;
-            this.PeppyDonatePic.TabStop = false;
             // 
             // PeppyDonate
             // 
             this.PeppyDonate.AutoSize = true;
             this.PeppyDonate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
             this.PeppyDonate.ForeColor = System.Drawing.Color.Navy;
-            this.PeppyDonate.Location = new System.Drawing.Point(401, 109);
+            this.PeppyDonate.Location = new System.Drawing.Point(550, 95);
             this.PeppyDonate.Name = "PeppyDonate";
             this.PeppyDonate.Size = new System.Drawing.Size(104, 24);
             this.PeppyDonate.TabIndex = 3;
@@ -1186,11 +1164,12 @@ namespace PseudoTV_Manager
             // TabPage6
             // 
             this.TabPage6.BackColor = System.Drawing.Color.Gray;
+            this.TabPage6.Controls.Add(this.label27);
+            this.TabPage6.Controls.Add(this.label26);
+            this.TabPage6.Controls.Add(this.label25);
             this.TabPage6.Controls.Add(this.Label24);
             this.TabPage6.Controls.Add(this.Label23);
-            this.TabPage6.Controls.Add(this.LunaDonatePic);
             this.TabPage6.Controls.Add(this.Label22);
-            this.TabPage6.Controls.Add(this.PeppyDonatePic);
             this.TabPage6.Controls.Add(this.PeppyDonate);
             this.TabPage6.Controls.Add(this.HelpLink);
             this.TabPage6.Controls.Add(this.Label21);
@@ -1672,6 +1651,39 @@ namespace PseudoTV_Manager
             this.Button15.Text = "Del";
             this.Button15.UseVisualStyleBackColor = true;
             // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label25.ForeColor = System.Drawing.Color.Navy;
+            this.label25.Location = new System.Drawing.Point(514, 147);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(172, 24);
+            this.label25.TabIndex = 9;
+            this.label25.Text = "computergeek1507";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label26.ForeColor = System.Drawing.Color.Navy;
+            this.label26.Location = new System.Drawing.Point(564, 171);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(72, 24);
+            this.label26.TabIndex = 10;
+            this.label26.Text = "stereoa";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label27.ForeColor = System.Drawing.Color.Navy;
+            this.label27.Location = new System.Drawing.Point(538, 195);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(133, 24);
+            this.label27.TabIndex = 11;
+            this.label27.Text = "Messiadbunny";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1689,8 +1701,6 @@ namespace PseudoTV_Manager
             this.TabPage3.ResumeLayout(false);
             this.TabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MoviePicture)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LunaDonatePic)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PeppyDonatePic)).EndInit();
             this.MenuStrip1.ResumeLayout(false);
             this.MenuStrip1.PerformLayout();
             this.TabPage6.ResumeLayout(false);
@@ -1802,9 +1812,7 @@ namespace PseudoTV_Manager
         internal System.Windows.Forms.ToolStripMenuItem ExitToolStripMenuItem;
         internal System.Windows.Forms.Label Label24;
         internal System.Windows.Forms.Label Label23;
-        internal System.Windows.Forms.PictureBox LunaDonatePic;
         internal System.Windows.Forms.Label Label22;
-        internal System.Windows.Forms.PictureBox PeppyDonatePic;
         internal System.Windows.Forms.Label PeppyDonate;
         internal System.Windows.Forms.ToolStripMenuItem AaaToolStripMenuItem;
         internal System.Windows.Forms.ToolStripMenuItem FileToolStripMenuItem;
@@ -1857,6 +1865,9 @@ namespace PseudoTV_Manager
         internal System.Windows.Forms.TextBox MovieLocation;
         internal System.Windows.Forms.Label MovieLabel;
         internal System.Windows.Forms.Button Button15;
+        internal System.Windows.Forms.Label label27;
+        internal System.Windows.Forms.Label label26;
+        internal System.Windows.Forms.Label label25;
     }
 }
 
