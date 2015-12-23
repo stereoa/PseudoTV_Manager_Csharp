@@ -10,22 +10,16 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using NLog;
 using MySql.Data;
+using PseudoTV_Manager.Enum;
+using PseudoTV_Manager.Forms;
 
 namespace PseudoTV_Manager
 {
-    public enum KodiVersion
-    {
-        Gotham = 13,
-        Helix = 14,
-        Isengard = 15,
-        Jarvis = 16
-    }
-
     public static class PseudoTvUtils
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static object GetKodiVersion(string videoDbFileName)
+        public static KodiVersion GetKodiVersion(string videoDbFileName)
         {
             Regex regex = new Regex("(MyVideos)(\\d+).db");
             Match match = regex.Match(videoDbFileName);
@@ -177,7 +171,7 @@ namespace PseudoTV_Manager
             //Connect to the data-base
 
             //Dim VideoDatabaseData As String = "Data Source=" & MainWindow.VideoDatabaseLocation
-            //Dim PluginDatabaseData As String = "Data Source=" & MainWindow.AddonDatabaseLocation
+            //Dim PluginDatabaseData As String = "Data Source=" & MainWindow.TxtAddonDatabaseLocation
 
             string[] arrayResponse = { "" };
 
@@ -242,7 +236,7 @@ namespace PseudoTV_Manager
                 //This is for MySQL Databases, just slight syntax differences.
                 var sqlConnect = new MySqlConnection();
                 MySqlCommand sqlCommand = null;
-                sqlConnect.ConnectionString = MainWindow.MySQLConnectionString;
+                sqlConnect.ConnectionString = MainWindow.MySqlConnectionString;
                 try
                 {
                     sqlConnect.Open();
@@ -340,7 +334,7 @@ namespace PseudoTV_Manager
                 //Open the connection.
                 MySqlConnection sqlConnect = new MySqlConnection();
                 MySqlCommand sqlCommand = null;
-                sqlConnect.ConnectionString = MainWindow.MySQLConnectionString;
+                sqlConnect.ConnectionString = MainWindow.MySqlConnectionString;
                 try
                 {
                     sqlConnect.Open();
@@ -397,7 +391,7 @@ namespace PseudoTV_Manager
             return ConnectSuccessful;
         }
 
-        public static object TestMYSQLite(string connectionstring)
+        public static bool TestMYSQLite(string connectionstring)
         {
             var ConnectSuccessful = false;
 
@@ -467,6 +461,55 @@ namespace PseudoTV_Manager
 
 
             return ArrayResponse;
+        }
+
+        public static InputDialogResponse ShowInputDialog(string question, string inputTxt = null)
+        {
+            System.Drawing.Size size = new System.Drawing.Size(200, 70);
+            Form inputBox = new Form();
+
+            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            inputBox.ClientSize = size;
+            inputBox.Text = inputTxt ?? question;
+
+            System.Windows.Forms.TextBox textBox = new TextBox
+            {
+                Size = new System.Drawing.Size(size.Width - 10, 23),
+                Location = new System.Drawing.Point(5, 5),
+                Text = question
+            };
+            inputBox.Controls.Add(textBox);
+
+            Button okButton = new Button
+            {
+                DialogResult = System.Windows.Forms.DialogResult.OK,
+                Name = "okButton",
+                Size = new System.Drawing.Size(75, 23),
+                Text = "&OK",
+                Location = new System.Drawing.Point(size.Width - 80 - 80, 39)
+            };
+            inputBox.Controls.Add(okButton);
+
+            Button cancelButton = new Button
+            {
+                DialogResult = System.Windows.Forms.DialogResult.Cancel,
+                Name = "cancelButton",
+                Size = new System.Drawing.Size(75, 23),
+                Text = "&Cancel",
+                Location = new System.Drawing.Point(size.Width - 80, 39)
+            };
+            inputBox.Controls.Add(cancelButton);
+
+            inputBox.AcceptButton = okButton;
+            inputBox.CancelButton = cancelButton;
+
+            DialogResult result = inputBox.ShowDialog();
+
+            return new InputDialogResponse
+            {
+                DialogResult = result,
+                Input = textBox.Text
+            };
         }
 
         public static bool IsNumeric(string input)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NLog;
+using PseudoTV_Manager.Forms;
 
 namespace PseudoTV_Manager
 {

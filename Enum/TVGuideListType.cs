@@ -1,6 +1,6 @@
-namespace PseudoTV_Manager
+namespace PseudoTV_Manager.Enum
 {
-    public enum TVGuideListEnum
+    public enum TVGuideListType
     {
         Playlist = 0,
         TvNetwork = 1,

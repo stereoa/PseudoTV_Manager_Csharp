@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PseudoTV_Manager
+namespace PseudoTV_Manager.Forms
 {
 	partial class MainWindow
 	{
@@ -30,7 +30,7 @@ namespace PseudoTV_Manager
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.DelExcludeBtn = new System.Windows.Forms.Button();
             this.AddExcludeBtn = new System.Windows.Forms.Button();
             this.TabPage4 = new System.Windows.Forms.TabPage();

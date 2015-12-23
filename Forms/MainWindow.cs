@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-//Import the SQLite DLL file.
-//C:\SQLite\THERE!
-
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using NLog;
+using PseudoTV_Manager.Enum;
 
-namespace PseudoTV_Manager
+//Import the SQLite DLL file.
+//C:\SQLite\THERE!
+
+namespace PseudoTV_Manager.Forms
 {
     public partial class MainWindow : Form
     {
@@ -23,13 +21,13 @@ namespace PseudoTV_Manager
         }
 
         //For sorting columns in listviews
-        private ColumnHeader m_SortingColumn;
+        private ColumnHeader _mSortingColumn;
 
-        private ColumnHeader m_SortingColumn2;
+        private ColumnHeader _mSortingColumn2;
         public static int DatabaseType;
-        public static string MySQLConnectionString;
+        public static string MySqlConnectionString;
         public static string VideoDatabaseLocation;
-        public string PseudoTvSettingsLocation;
+        public static string PseudoTvSettingsLocation;
         public static string AddonDatabaseLocation;
         public int XbmcVersion;
         public string UserDataFolder;
@@ -37,108 +35,108 @@ namespace PseudoTV_Manager
         public string YouTubeMulti;
         private int _resetHours;
 
-        public KodiVersion KodiVersion = KodiVersion.Helix;
+        public static KodiVersion KodiVersion = KodiVersion.Helix;
 
         protected Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public object LookUpGenre(string GenreName)
+        public string LookUpGenre(string genreName)
         {
             //This looks up the Genre based on the name and returns the proper Genre ID
 
-            string GenreID = null;
+            string genreId = null;
 
-            var SelectArray = new[] { 0 };
+            var selectArray = new[] { 0 };
 
-            string genrePar = "name";
+            var genrePar = "name";
             if ((KodiVersion < KodiVersion.Isengard))
             {
                 genrePar = "strGenre";
             }
 
             //Shoot it over to the ReadRecord sub
-            string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                "SELECT * FROM genre where " + genrePar + "='" + GenreName + "'", SelectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                "SELECT * FROM genre where " + genrePar + "='" + genreName + "'", selectArray);
 
             //The ID # is all we need.
             //Just make sure it's not a null reference.
-            if (ReturnArray == null)
+            if (returnArray == null)
             {
                 MessageBox.Show("nothing!");
             }
             else
             {
-                GenreID = ReturnArray[0];
+                genreId = returnArray[0];
             }
 
-            return GenreID;
+            return genreId;
         }
 
-        public object LookUpNetwork(string Network)
+        public string LookUpNetwork(string network)
         {
             //This looks up the Network name and returns the proper Network ID
 
-            string NetworkID = null;
+            string networkId = null;
 
-            var SelectArray = new[] { 0 };
+            var selectArray = new[] { 0 };
 
-            string studioPar = "name";
+            var studioPar = "name";
             if ((KodiVersion < KodiVersion.Isengard))
             {
                 studioPar = "strStudio";
             }
 
             //Shoot it over to the ReadRecord sub
-            var ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                "SELECT * FROM studio where " + studioPar + "='" + Network + "'", SelectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                "SELECT * FROM studio where " + studioPar + "='" + network + "'", selectArray);
 
             //The ID # is all we need.
             //Just make sure it's not a null reference.
-            if (ReturnArray == null)
+            if (returnArray == null)
             {
             }
             else
             {
-                NetworkID = ReturnArray[0];
+                networkId = returnArray[0];
             }
-            return NetworkID;
+            return networkId;
 
         }
 
-        public void RefreshTVGuide()
+        public static void RefreshTvGuide()
         {
             //Clear the TV name and the List items
             TVGuideShowName.Text = "";
             TVGuideList.Items.Clear();
 
-            int TotalChannels = 0;
+            var totalChannels = 0;
 
             //This will hold an array of our channel #s
-            string[] ChannelArray = null;
-            int ChannelNum = 0;
+            string[] channelArray = null;
+            var channelNum = 0;
 
-            string FILE_LOCATION = PseudoTvSettingsLocation;
+            var fileLocation = PseudoTvSettingsLocation;
 
             if (System.IO.File.Exists(PseudoTvSettingsLocation) == true)
             {
                 //Load everything into the FullFile string
-                var FullFile = PseudoTvUtils.ReadFile(PseudoTvSettingsLocation);
+                var fullFile = PseudoTvUtils.ReadFile(PseudoTvSettingsLocation);
 
-                System.IO.StreamReader objReader = new System.IO.StreamReader(FILE_LOCATION);
+                var objReader = new System.IO.StreamReader(fileLocation);
 
                 //Loop through each line individually, then add the channel # to an array
 
                 while (objReader.Peek() != -1)
                 {
-                    var SingleLine = objReader.ReadLine();
+                    var singleLine = objReader.ReadLine();
 
-                    if (SingleLine.Contains("_type" + (char)34 + " value="))
+                    if (singleLine.Contains("_type" + (char)34 + " value="))
                     {
-                        var Part1 = SingleLine.Split(Convert.ToChar("_type"))[0];
-                        var Part2 = Part1.Split('_')[1];
+                        var part1 = singleLine.Split(Convert.ToChar("_type"))[0];
+                        var part2 = part1.Split('_')[1];
 
-                        Array.Resize(ref ChannelArray, ChannelNum + 1);
-                        ChannelNum = ChannelNum + 1;
-                        ChannelArray[ChannelArray.Length] = Part2;
+                        Array.Resize(ref channelArray, channelNum + 1);
+                        channelNum = channelNum + 1;
+                        channelArray[channelArray.Length] = part2;
 
                     }
 
@@ -147,93 +145,93 @@ namespace PseudoTV_Manager
                 objReader.Close();
 
 
-                for (var x = 0; x <= ChannelArray.Length; x++)
+                for (var x = 0; x <= channelArray.Length; x++)
                 {
-                    string[] ChannelInfo = null;
+                    string[] channelInfo = null;
 
-                    string ChannelRules = "";
-                    string ChannelRulesAdvanced = "";
-                    string ChannelRulesCount = "";
-                    string ChannelType = "";
-                    string ChannelTypeDetail = "";
-                    string ChannelTime = "";
-                    string ChannelTypeDetail2 = "";
-                    string ChannelTypeDetail3 = "";
-                    string ChannelTypeDetail4 = "";
+                    var channelRules = "";
+                    var channelRulesAdvanced = "";
+                    var channelRulesCount = "";
+                    var channelType = "";
+                    var channelTypeDetail = "";
+                    var channelTime = "";
+                    var channelTypeDetail2 = "";
+                    var channelTypeDetail3 = "";
+                    var channelTypeDetail4 = "";
 
                     //Grab everything that says setting id = Channel #
-                    ChannelInfo = FullFile.Split(
-                        new[] { "<setting id=" + (char)34 + "Channel_" + ChannelArray[x] + "_" },
+                    channelInfo = fullFile.Split(
+                        new[] { "<setting id=" + (char)34 + "Channel_" + channelArray[x] + "_" },
                         StringSplitOptions.RemoveEmptyEntries);
 
                     //Now loop through everything it returned.
-                    for (var y = 1; y <= ChannelInfo.Length - 1; y++)
+                    for (var y = 1; y <= channelInfo.Length - 1; y++)
                     {
-                        string RuleType = null;
-                        string RuleValue = null;
+                        string ruleType = null;
+                        string ruleValue = null;
 
-                        RuleType = ChannelInfo[y].Split((char)34)[0];
+                        ruleType = channelInfo[y].Split((char)34)[0];
 
-                        RuleValue = ChannelInfo[y].Split(Convert.ToChar("value=" + (char)34))[1];
-                        RuleValue = RuleValue.Split((char)34)[0];
+                        ruleValue = channelInfo[y].Split(Convert.ToChar("value=" + (char)34))[1];
+                        ruleValue = ruleValue.Split((char)34)[0];
 
 
-                        if (RuleType == "changed")
+                        if (ruleType == "changed")
                         {
                         }
-                        else if (RuleType == "rulecount")
+                        else if (ruleType == "rulecount")
                         {
-                            ChannelRulesCount = RuleValue;
+                            channelRulesCount = ruleValue;
                         }
-                        else if (RuleType == "time")
+                        else if (ruleType == "time")
                         {
-                            ChannelTime = RuleValue;
+                            channelTime = ruleValue;
                         }
-                        else if (RuleType == "type")
+                        else if (ruleType == "type")
                         {
                             //Update the Channel type to the value of that.
-                            ChannelType = RuleValue;
+                            channelType = ruleValue;
                         }
-                        else if (RuleType == "1")
+                        else if (ruleType == "1")
                         {
                             //Gets more information on what type the channel is, playlist location/genre/zap2it/etc.
-                            ChannelTypeDetail = RuleValue;
+                            channelTypeDetail = ruleValue;
                         }
-                        else if (RuleType == "2")
+                        else if (ruleType == "2")
                         {
                             //Gets (LiveTV-8)stream source/(IPTV-9)iptv source/(Youtube-10)youtube channel type/
                             //(Rss-11)reserved/(LastFM-13)LastFM User/(BTP/Cinema Experience14)filter types or smart playlist/
                             //(Direct/SF-15, Direct Playon-16)exclude list/
-                            ChannelTypeDetail2 = RuleValue;
+                            channelTypeDetail2 = ruleValue;
                         }
-                        else if (RuleType == "3")
+                        else if (ruleType == "3")
                         {
                             //Gets (LiveTV-8)xmltv filename/(IPTV-9)show titles/(Youtube-10, Rss-11, LastFM-13)media limits/
                             //(BTP/Cinema Experience-14)parsing resolution/(Direct/SF-15, Direct Playon-16)file limit
-                            ChannelTypeDetail3 = RuleValue;
+                            channelTypeDetail3 = ruleValue;
                         }
-                        else if (RuleType == "4")
+                        else if (ruleType == "4")
                         {
                             //Gets (IPTV-9)show description/(Youtube-10, Rss-11, LastFM-13)sort ordering/
                             //(BTP/Cinema Experience-14)years to parse by or unused/(Direct/SF-15, Direct Playon-16)sort ordering
-                            ChannelTypeDetail4 = RuleValue;
+                            channelTypeDetail4 = ruleValue;
                         }
-                        else if (RuleType.Contains("rule"))
+                        else if (ruleType.Contains("rule"))
                         {
                             //Okay, It's rule information.
 
                             //Get the rule number.
-                            string RuleNumber = null;
-                            RuleNumber = RuleType.Split(Convert.ToChar("rule_"))[1];
-                            RuleNumber = RuleNumber.Split('_')[0];
+                            string ruleNumber = null;
+                            ruleNumber = ruleType.Split(Convert.ToChar("rule_"))[1];
+                            ruleNumber = ruleNumber.Split('_')[0];
 
-                            if (RuleType.Contains("opt"))
+                            if (ruleType.Contains("opt"))
                             {
                                 //Okay, it's an actual option tied to another rule.
 
-                                var OptNumber = RuleType.Split(Convert.ToChar("_opt_"))[1];
-                                RuleNumber = RuleType.Split(Convert.ToChar("_opt_"))[0];
-                                RuleNumber = RuleNumber.Split(Convert.ToChar("rule_"))[1];
+                                var optNumber = ruleType.Split(Convert.ToChar("_opt_"))[1];
+                                ruleNumber = ruleType.Split(Convert.ToChar("_opt_"))[0];
+                                ruleNumber = ruleNumber.Split(Convert.ToChar("rule_"))[1];
 
                                 //MsgBox("Opt : " & RuleNumber & " | " & OptNumber & " | " & RuleValue)
                                 //ChannelRulesAdvanced = ChannelRulesAdvanced & "~" & RuleNumber & "|" & OptNumber & "|" & RuleValue
@@ -241,11 +239,11 @@ namespace PseudoTV_Manager
 
                                 //Add this to the previous rule, remove the ending 
                                 //Then add this rule as Rule#:RuleValue
-                                ChannelRules = ChannelRules + "|" + OptNumber + "^" + RuleValue;
+                                channelRules = channelRules + "|" + optNumber + "^" + ruleValue;
                             }
                             else
                             {
-                                ChannelRules = ChannelRules + "~" + RuleNumber + "|" + RuleValue;
+                                channelRules = channelRules + "~" + ruleNumber + "|" + ruleValue;
                             }
 
                         }
@@ -258,20 +256,20 @@ namespace PseudoTV_Manager
 
                     }
 
-                    string[] str = new string[11];
+                    var str = new string[11];
 
-                    str[0] = ChannelArray[x];
+                    str[0] = channelArray[x];
                     //Channel #.  
-                    str[1] = ChannelType;
-                    str[2] = ChannelTypeDetail;
-                    str[3] = ChannelTime;
-                    str[4] = ChannelRules;
-                    str[5] = ChannelRulesCount;
-                    str[6] = ChannelTypeDetail2;
-                    str[7] = ChannelTypeDetail3;
-                    str[8] = ChannelTypeDetail4;
+                    str[1] = channelType;
+                    str[2] = channelTypeDetail;
+                    str[3] = channelTime;
+                    str[4] = channelRules;
+                    str[5] = channelRulesCount;
+                    str[6] = channelTypeDetail2;
+                    str[7] = channelTypeDetail3;
+                    str[8] = channelTypeDetail4;
 
-                    ListViewItem itm = default(ListViewItem);
+                    var itm = default(ListViewItem);
                     itm = new ListViewItem(str);
                     //Add to list
                     TVGuideList.Items.Add(itm);
@@ -289,20 +287,20 @@ namespace PseudoTV_Manager
         public void RefreshGenres()
         {
             GenresList.Items.Clear();
-            var SelectArrayMain = new[] { 0, 1 };
+            var selectArrayMain = new[] { 0, 1 };
 
 
             //Shoot it over to the ReadRecord sub
-            string[] ReturnArrayMain = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre",
-                SelectArrayMain);
+            var returnArrayMain = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre",
+                selectArrayMain);
 
             //Loop through and read the name
 
 
-            for (var x = 0; x <= ReturnArrayMain.Length; x++)
+            for (var x = 0; x <= returnArrayMain.Length; x++)
             {
                 //Sort them into an array
-                var splitItem = ReturnArrayMain[x].Split('~');
+                var splitItem = returnArrayMain[x].Split('~');
                 //Position 0 = genre ID
                 //Position 1 = genre name
 
@@ -325,43 +323,43 @@ namespace PseudoTV_Manager
                 }
 
                 //This will grab the number of movies.
-                string[] ReturnArray2 = null;
+                string[] returnArray2 = null;
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
-                    ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" + splitItem[0] + "' AND media_type = 'movie'",
                         selectArray);
                 }
                 else
                 {
-                    ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genrelinkmovie WHERE idGenre='" + splitItem[0] + "'", selectArray);
                 }
 
-                int ShowNum;
-                int MovieNum;
+                int showNum;
+                int movieNum;
 
                 //This is the total number of shows that match this genre.
                 //Also, verify the returning array is something, not null before proceeding.
                 if (returnArray == null)
                 {
-                    ShowNum = 0;
+                    showNum = 0;
                 }
                 else
                 {
-                    ShowNum = returnArray.Length;
+                    showNum = returnArray.Length;
                 }
 
-                if (ReturnArray2 == null)
+                if (returnArray2 == null)
                 {
-                    MovieNum = 0;
+                    movieNum = 0;
                 }
                 else
                 {
-                    MovieNum = ReturnArray2.Length;
+                    movieNum = returnArray2.Length;
                 }
 
-                string[] str = new string[5];
+                var str = new string[5];
                 //Genre Name
                 //# of shows in genre
                 //# of movies in genre
@@ -369,13 +367,13 @@ namespace PseudoTV_Manager
                 //Genre ID
 
                 str[0] = splitItem[1];
-                str[1] = ShowNum.ToString();
-                str[2] = MovieNum.ToString();
-                str[3] = (ShowNum + MovieNum).ToString();
+                str[1] = showNum.ToString();
+                str[2] = movieNum.ToString();
+                str[3] = (showNum + movieNum).ToString();
                 str[4] = splitItem[0];
 
 
-                ListViewItem itm = default(ListViewItem);
+                var itm = default(ListViewItem);
                 itm = new ListViewItem(str);
                 //Add to list
                 GenresList.Items.Add(itm);
@@ -386,27 +384,27 @@ namespace PseudoTV_Manager
         }
 
 
-        public void RefreshTVShows()
+        public void RefreshTvShows()
         {
             TVShowList.Items.Clear();
 
             //Set an array with the columns you want returned
-            var SelectArray = new[] { 1, 15, 0 };
+            var selectArray = new[] { 1, 15, 0 };
 
             //Shoot it over to the ReadRecord sub, 
-            string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM tvshow ORDER BY c00",
-                SelectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM tvshow ORDER BY c00",
+                selectArray);
 
             //Now, read the output of the array.
             //Loop through each of the Array items.
 
-            for (var x = 0; x <= ReturnArray.Length - 1; x++)
+            for (var x = 0; x <= returnArray.Length - 1; x++)
             {
                 //Split them by ~'s.  This is how we seperate the rows in the single-element.
-                string[] str = ReturnArray[x].Split('~');
+                var str = returnArray[x].Split('~');
 
                 //Now take that split string and make it an item.
-                ListViewItem itm = default(ListViewItem);
+                var itm = default(ListViewItem);
                 itm = new ListViewItem(str);
 
                 //Add the item to the TV show list.
@@ -418,18 +416,18 @@ namespace PseudoTV_Manager
         {
             PluginType.Items.Clear();
 
-            string addonLike = "plugin.video";
-            var SelectArray = new[] { 1 };
+            var addonLike = "plugin.video";
+            var selectArray = new[] { 1 };
 
             //Grab the Plugin List
-            var ReturnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
+            var returnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
                 "SELECT DISTINCT addon.addonID, addon.name FROM addon, package WHERE addon.addonID = package.addonID and addon.addonID LIKE '" +
-                addonLike + "%'", SelectArray);
+                addonLike + "%'", selectArray);
 
-            for (var x = 0; x <= ReturnArray.Length - 1; x++)
+            for (var x = 0; x <= returnArray.Length - 1; x++)
             {
                 //Split them by ~'s.  This is how we seperate the rows in the single-element.
-                var str = ReturnArray[x].Split('~');
+                var str = returnArray[x].Split('~');
 
                 //Add the item to the Plugins List
                 PluginType.Items.Add(str[0]);
@@ -442,22 +440,22 @@ namespace PseudoTV_Manager
             MovieList.Items.Clear();
 
             //Set an array with the columns you want returned
-            var SelectArray = new[] { 2, 0 };
+            var selectArray = new[] { 2, 0 };
 
             //Shoot it over to the ReadRecord sub, 
-            string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM movie ORDER BY c00",
-                SelectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM movie ORDER BY c00",
+                selectArray);
 
             //Now, read the output of the array.
             //Loop through each of the Array items.
 
-            for (var x = 0; x <= ReturnArray.Length - 1; x++)
+            for (var x = 0; x <= returnArray.Length - 1; x++)
             {
                 //Split them by ~'s.  This is how we seperate the rows in the single-element.
-                string[] str = ReturnArray[x].Split('~');
+                var str = returnArray[x].Split('~');
 
                 //Now take that split string and make it an item.
-                ListViewItem itm = default(ListViewItem);
+                var itm = default(ListViewItem);
                 itm = new ListViewItem(str);
 
                 //Add the item to the TV show list.
@@ -536,15 +534,15 @@ namespace PseudoTV_Manager
             //                    'This is for a standard SQLite Entry.
             //                    DatabaseType = 0
             //                    VideoDatabaseLocation = FileLocations[1]
-            //                    PseudoTvSettingsLocation = FileLocations[2]
-            //		AddonDatabaseLocation = FileLocations[3]
+            //                    TxtPseudoTvSettingsLocation = FileLocations[2]
+            //		TxtAddonDatabaseLocation = FileLocations[3]
             //		'get Kodi KodiVersion based on video db KodiVersion
             //		Version = GetKodiVersion(VideoDatabaseLocation)
             //                Else
             //                    DatabaseType = 1
             //                    MySQLConnectionString = FileLocations[1]
-            //                    PseudoTvSettingsLocation = FileLocations[2]
-            //                    AddonDatabaseLocation = FileLocations[3]
+            //                    TxtPseudoTvSettingsLocation = FileLocations[2]
+            //                    TxtAddonDatabaseLocation = FileLocations[3]
             //	End If
 
             //End If
@@ -555,16 +553,16 @@ namespace PseudoTV_Manager
             //        End If
             //if (!(My.Settings.VideoDatabaseLocation == "False") &
             //    !string.IsNullOrEmpty(My.Settings.VideoDatabaseLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.PseudoTvSettingsLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.AddonDatabaseLocation))
+            //    !string.IsNullOrEmpty(My.Settings.TxtPseudoTvSettingsLocation) &
+            //    !string.IsNullOrEmpty(My.Settings.TxtAddonDatabaseLocation))
             //{
             //    DatabaseType = 0;
             //    VideoDatabaseLocation = My.Settings.VideoDatabaseLocation;
             //    _logger.Debug(VideoDatabaseLocation);
-            //    PseudoTvSettingsLocation = My.Settings.PseudoTvSettingsLocation;
-            //    _logger.Debug(PseudoTvSettingsLocation);
-            //    AddonDatabaseLocation = My.Settings.AddonDatabaseLocation;
-            //    _logger.Debug(AddonDatabaseLocation);
+            //    TxtPseudoTvSettingsLocation = My.Settings.TxtPseudoTvSettingsLocation;
+            //    _logger.Debug(TxtPseudoTvSettingsLocation);
+            //    TxtAddonDatabaseLocation = My.Settings.TxtAddonDatabaseLocation;
+            //    _logger.Debug(TxtAddonDatabaseLocation);
             //    this.Version = My.Settings.Version;
             //    _logger.Debug(this.Version);
             //    RefreshALL();
@@ -572,16 +570,16 @@ namespace PseudoTV_Manager
             //}
             //else if (!(My.Settings.VideoDatabaseLocation == "False") &
             //         !string.IsNullOrEmpty(My.Settings.MySQLConnectionString) &
-            //         !string.IsNullOrEmpty(My.Settings.PseudoTvSettingsLocation) &
-            //         !string.IsNullOrEmpty(My.Settings.AddonDatabaseLocation))
+            //         !string.IsNullOrEmpty(My.Settings.TxtPseudoTvSettingsLocation) &
+            //         !string.IsNullOrEmpty(My.Settings.TxtAddonDatabaseLocation))
             //{
             //    DatabaseType = 1;
             //    MySQLConnectionString = My.Settings.MySQLConnectionString;
             //    _logger.Debug(MySQLConnectionString);
-            //    PseudoTvSettingsLocation = My.Settings.PseudoTvSettingsLocation;
-            //    _logger.Debug(PseudoTvSettingsLocation);
-            //    AddonDatabaseLocation = My.Settings.AddonDatabaseLocation;
-            //    _logger.Debug(AddonDatabaseLocation);
+            //    TxtPseudoTvSettingsLocation = My.Settings.TxtPseudoTvSettingsLocation;
+            //    _logger.Debug(TxtPseudoTvSettingsLocation);
+            //    TxtAddonDatabaseLocation = My.Settings.TxtAddonDatabaseLocation;
+            //    _logger.Debug(TxtAddonDatabaseLocation);
             //    this.Version = My.Settings.Version;
             //    _logger.Debug(this.Version);
             //    RefreshALL();
@@ -605,7 +603,7 @@ namespace PseudoTV_Manager
 
         private void ListTVBanners_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
-            int x = ListTVBanners.SelectedIndex;
+            var x = ListTVBanners.SelectedIndex;
             if (x < 0)
             {
                 return;
@@ -623,9 +621,9 @@ namespace PseudoTV_Manager
 
         private void TVBannerSelect_Click(System.Object sender, System.EventArgs e)
         {
-            int x = ListTVBanners.SelectedIndex;
-            string Type = "tvshow";
-            string MediaType = "banner";
+            var x = ListTVBanners.SelectedIndex;
+            var type = "tvshow";
+            var mediaType = "banner";
 
             if (txtShowLocation.TextLength >= 6)
             {
@@ -638,26 +636,26 @@ namespace PseudoTV_Manager
 
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to TVBannerSelect.
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            var saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.InitialDirectory = txtShowLocation.Text;
             saveFileDialog1.Filter = "JPeg Image|*.jpg";
             saveFileDialog1.Title = "Save an Image File";
             saveFileDialog1.FileName = "banner.jpg";
             saveFileDialog1.ShowDialog();
 
-            string FileToSaveAs = System.IO.Path.Combine(txtShowLocation.Text, saveFileDialog1.FileName);
-            TVBannerPictureBox.Image.Save(FileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
+            var fileToSaveAs = System.IO.Path.Combine(txtShowLocation.Text, saveFileDialog1.FileName);
+            TVBannerPictureBox.Image.Save(fileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
 
             PseudoTvUtils.DbExecute("UPDATE art SET url = '" + ListTVBanners.Items[x].ToString() +
                                     "' WHERE media_id = '" +
-                                    TVShowLabel.Text + "' and type = '" + Type + "' and type = '" + MediaType + "'");
+                                    TVShowLabel.Text + "' and type = '" + type + "' and type = '" + mediaType + "'");
             //TODO: VisualStyleElement.Status.Text = "Updated " + TxtShowName.Text + " Successfully with " +
             //                                 ListTVBanners.Items[x].ToString() + "";
         }
 
         private void ListTVPosters_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
-            int x = ListTVPosters.SelectedIndex;
+            var x = ListTVPosters.SelectedIndex;
             if (x < 0)
             {
                 return;
@@ -676,8 +674,8 @@ namespace PseudoTV_Manager
 
         private void TVPosterSelect_Click(System.Object sender, System.EventArgs e)
         {
-            int x = ListTVPosters.SelectedIndex;
-            string MediaType = "poster";
+            var x = ListTVPosters.SelectedIndex;
+            var mediaType = "poster";
 
 
             if (txtShowLocation.TextLength >= 6)
@@ -691,7 +689,7 @@ namespace PseudoTV_Manager
 
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to TVPosterSelect.
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            var saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.InitialDirectory = txtShowLocation.Text;
             saveFileDialog1.Filter = "JPeg Image|*.jpg";
             saveFileDialog1.Title = "Save an Image File";
@@ -703,7 +701,7 @@ namespace PseudoTV_Manager
 
             PseudoTvUtils.DbExecute("UPDATE art SET url = '" + ListTVPosters.Items[x].ToString() +
                                     "' WHERE media_id = '" +
-                                    TVShowLabel.Text + "' and type = '" + MediaType + "'");
+                                    TVShowLabel.Text + "' and type = '" + mediaType + "'");
             //VisualStyleElement.Status.Text = "Updated " + TxtShowName.Text + " Successfully with " +
             //                                 ListTVPosters.Items[x].ToString() + "";
 
@@ -714,16 +712,16 @@ namespace PseudoTV_Manager
 
             if (TVShowList.SelectedItems.Count > 0)
             {
-                ListViewItem ListItem = default(ListViewItem);
-                ListItem = TVShowList.SelectedItems[0];
+                var listItem = default(ListViewItem);
+                listItem = TVShowList.SelectedItems[0];
 
-                string TVShowName = null;
-                string TVShowID = null;
+                string tvShowName = null;
+                string tvShowId = null;
 
-                TVShowID = ListItem.SubItems[2].Text;
-                TVShowName = ListItem.SubItems[0].Text;
+                tvShowId = listItem.SubItems[2].Text;
+                tvShowName = listItem.SubItems[0].Text;
 
-                TVShowLabel.Text = TVShowID;
+                TVShowLabel.Text = tvShowId;
 
                 var tvShowArray = new int[5];
                 tvShowArray[0] = 1;
@@ -734,36 +732,36 @@ namespace PseudoTV_Manager
 
                 //Shoot it over to the ReadRecord sub, 
                 var tvShowReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                    "SELECT * FROM tvshow WHERE idShow='" + TVShowID + "'", tvShowArray);
+                    "SELECT * FROM tvshow WHERE idShow='" + tvShowId + "'", tvShowArray);
 
                 string[] tvShowReturnArraySplit = null;
 
                 //We only have 1 response, since it searches by ID. So, just break it into parts. 
                 tvShowReturnArraySplit = tvShowReturnArray[0].Split('~');
 
-                var TVPathArray = new[] { 0, 1 };
+                var tvPathArray = new[] { 0, 1 };
 
 
                 //Shoot it over to the ReadRecord sub, 
-                string[] TVidPathArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                    "SELECT * FROM tvshowlinkpath WHERE idShow='" + TVShowID + "'", TVPathArray);
+                var vidPathArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    "SELECT * FROM tvshowlinkpath WHERE idShow='" + tvShowId + "'", tvPathArray);
 
-                string[] TVidPathArraySplit = null;
+                string[] vidPathArraySplit = null;
 
-                TVidPathArraySplit = TVidPathArray[0].Split('~');
+                vidPathArraySplit = vidPathArray[0].Split('~');
 
-                var TVShowLocationArray = new[] { 0, 1 };
+                var tvShowLocationArray = new[] { 0, 1 };
 
-                string[] TVShowLocationArrayReturn = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                    "SELECT * FROM path WHERE idPath='" + TVidPathArraySplit[1] + "'", TVShowLocationArray);
+                var tvShowLocationArrayReturn = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    "SELECT * FROM path WHERE idPath='" + vidPathArraySplit[1] + "'", tvShowLocationArray);
 
-                string[] TVShowLocationSplit = null;
+                string[] tvShowLocationSplit = null;
 
-                TVShowLocationSplit = TVShowLocationArrayReturn[0].Split('~');
+                tvShowLocationSplit = tvShowLocationArrayReturn[0].Split('~');
 
                 TxtShowName.Text = tvShowReturnArraySplit[0];
 
-                string TVGenres = tvShowReturnArraySplit[1];
+                var tvGenres = tvShowReturnArraySplit[1];
                 if (string.IsNullOrEmpty(tvShowReturnArraySplit[2]))
                 {
                     txtShowNetwork.SelectedIndex = -1;
@@ -773,23 +771,23 @@ namespace PseudoTV_Manager
                     txtShowNetwork.Text = tvShowReturnArraySplit[2];
                 }
 
-                txtShowLocation.Text = TVShowLocationSplit[1];
+                txtShowLocation.Text = tvShowLocationSplit[1];
 
-                string TVPoster = tvShowReturnArraySplit[4];
+                var tvPoster = tvShowReturnArraySplit[4];
                 ListTVPosters.Items.Clear();
 
-                string TVBanner = tvShowReturnArraySplit[4];
+                var tvBanner = tvShowReturnArraySplit[4];
                 ListTVBanners.Items.Clear();
 
-                if (TVPoster.Contains("<thumb aspect=\"poster\">"))
+                if (tvPoster.Contains("<thumb aspect=\"poster\">"))
                 {
-                    string[] TVPosterSplit = TVPoster.Split(Convert.ToChar("<thumb aspect=\"poster\">"));
+                    var tvPosterSplit = tvPoster.Split(Convert.ToChar("<thumb aspect=\"poster\">"));
 
-                    for (var x = 1; x <= TVPosterSplit.Length; x++)
+                    for (var x = 1; x <= tvPosterSplit.Length; x++)
                     {
-                        int i = TVPosterSplit[x].IndexOf("<thumb aspect=\"poster\">");
-                        TVPosterSplit[x] = TVPosterSplit[x].Substring(i + 1, TVPosterSplit[x].IndexOf("</thumb>"));
-                        ListTVPosters.Items.Add(TVPosterSplit[x]);
+                        var i = tvPosterSplit[x].IndexOf("<thumb aspect=\"poster\">");
+                        tvPosterSplit[x] = tvPosterSplit[x].Substring(i + 1, tvPosterSplit[x].IndexOf("</thumb>"));
+                        ListTVPosters.Items.Add(tvPosterSplit[x]);
                     }
                 }
                 else
@@ -797,15 +795,15 @@ namespace PseudoTV_Manager
                     ListTVPosters.Items.Add("Nothing Found");
                 }
 
-                if (TVBanner.Contains("<thumb aspect=\"banner\">"))
+                if (tvBanner.Contains("<thumb aspect=\"banner\">"))
                 {
-                    string[] TVBannerSplit = TVBanner.Split(Convert.ToChar("<thumb aspect=\"banner\">"));
+                    var tvBannerSplit = tvBanner.Split(Convert.ToChar("<thumb aspect=\"banner\">"));
 
-                    for (var x = 1; x <= TVBannerSplit.Length; x++)
+                    for (var x = 1; x <= tvBannerSplit.Length; x++)
                     {
-                        int i = TVBannerSplit[x].IndexOf("<thumb aspect=\"banner\">");
-                        TVBannerSplit[x] = TVBannerSplit[x].Substring(i + 1, TVBannerSplit[x].IndexOf("</thumb>"));
-                        ListTVBanners.Items.Add(TVBannerSplit[x]);
+                        var i = tvBannerSplit[x].IndexOf("<thumb aspect=\"banner\">");
+                        tvBannerSplit[x] = tvBannerSplit[x].Substring(i + 1, tvBannerSplit[x].IndexOf("</thumb>"));
+                        ListTVBanners.Items.Add(tvBannerSplit[x]);
                     }
                 }
                 else
@@ -815,18 +813,18 @@ namespace PseudoTV_Manager
 
                 //Loop through each TV Genre, if there more than one.
                 ListTVGenres.Items.Clear();
-                if (TVGenres.Contains(" / "))
+                if (tvGenres.Contains(" / "))
                 {
-                    string[] TVGenresSplit = TVGenres.Split(Convert.ToChar(" / "));
+                    var tvGenresSplit = tvGenres.Split(Convert.ToChar(" / "));
 
-                    for (var x = 0; x <= TVGenresSplit.Length; x++)
+                    for (var x = 0; x <= tvGenresSplit.Length; x++)
                     {
-                        ListTVGenres.Items.Add(TVGenresSplit[x]);
+                        ListTVGenres.Items.Add(tvGenresSplit[x]);
                     }
                 }
-                else if (!string.IsNullOrEmpty(TVGenres))
+                else if (!string.IsNullOrEmpty(tvGenres))
                 {
-                    ListTVGenres.Items.Add(TVGenres);
+                    ListTVGenres.Items.Add(tvGenres);
                 }
 
                 if (txtShowLocation.TextLength >= 6)
@@ -864,82 +862,82 @@ namespace PseudoTV_Manager
         private void TVShowList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
         {
             // Get the new sorting column. 
-            ColumnHeader new_sorting_column = TVShowList.Columns[e.Column];
+            var newSortingColumn = TVShowList.Columns[e.Column];
             // Figure out the new sorting order. 
-            System.Windows.Forms.SortOrder sort_order = default(System.Windows.Forms.SortOrder);
-            if (m_SortingColumn == null)
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn == null)
             {
                 // New column. Sort ascending. 
-                sort_order = SortOrder.Ascending;
+                sortOrder = SortOrder.Ascending;
                 // See if this is the same column. 
             }
             else
             {
-                if (new_sorting_column.Equals(m_SortingColumn))
+                if (newSortingColumn.Equals(_mSortingColumn))
                 {
                     // Same column. Switch the sort order. 
-                    if (m_SortingColumn.Text.StartsWith("> "))
+                    if (_mSortingColumn.Text.StartsWith("> "))
                     {
-                        sort_order = SortOrder.Descending;
+                        sortOrder = SortOrder.Descending;
                     }
                     else
                     {
-                        sort_order = SortOrder.Ascending;
+                        sortOrder = SortOrder.Ascending;
                     }
                 }
                 else
                 {
                     // New column. Sort ascending. 
-                    sort_order = SortOrder.Ascending;
+                    sortOrder = SortOrder.Ascending;
                 }
                 // Remove the old sort indicator. 
-                m_SortingColumn.Text = m_SortingColumn.Text.Substring(2);
+                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
             }
             // Display the new sort order. 
-            m_SortingColumn = new_sorting_column;
-            if (sort_order == SortOrder.Ascending)
+            _mSortingColumn = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
             {
-                m_SortingColumn.Text = "> " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
             }
             else
             {
-                m_SortingColumn.Text = "< " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            TVShowList.ListViewItemSorter = new ClsListviewSorter(e.Column, sort_order);
+            TVShowList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
             // Sort. 
             TVShowList.Sort();
         }
 
-        public object ConvertGenres(ListBox Genrelist)
+        public object ConvertGenres(ListBox genrelist)
         {
             //Converts the existing ListTVGenre's contents to the proper format.
 
-            string TVGenresString = "";
-            for (var x = 0; x <= Genrelist.Items.Count - 1; x++)
+            var tvGenresString = "";
+            for (var x = 0; x <= genrelist.Items.Count - 1; x++)
             {
                 if (x == 0)
                 {
-                    TVGenresString = Genrelist.Items[x].ToString();
+                    tvGenresString = genrelist.Items[x].ToString();
                 }
                 else
                 {
-                    TVGenresString = TVGenresString + " / " + Genrelist.Items[x].ToString();
+                    tvGenresString = tvGenresString + " / " + genrelist.Items[x].ToString();
                 }
             }
 
-            return TVGenresString;
+            return tvGenresString;
         }
 
         public void RefreshAllGenres()
         {
-            var SavedText = Option2.Text;
+            var savedText = Option2.Text;
             Option2.Items.Clear();
             //Set an array with the columns you want returned
             var selectArray = new[] { 1 };
 
             //Shoot it over to the ReadRecord sub, 
-            string[] returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
 
             //Now, read the output of the array.
 
@@ -949,12 +947,12 @@ namespace PseudoTV_Manager
                 Option2.Items.Add(returnArray[x]);
             }
             Option2.Sorted = true;
-            Option2.Text = SavedText;
+            Option2.Text = savedText;
         }
 
         public void RefreshAllStudios()
         {
-            var SavedText = Option2.Text;
+            var savedText = Option2.Text;
 
             //Clear all
             Option2.Items.Clear();
@@ -967,7 +965,7 @@ namespace PseudoTV_Manager
             var selectArray = new[] { 1 };
 
             //Shoot it over to the ReadRecord sub, 
-            string[] returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
 
             //Now, read the output of the array.
 
@@ -987,56 +985,56 @@ namespace PseudoTV_Manager
             //TODO: Form8.ListBox1.Sorted = true;
             txtShowNetwork.Sorted = true;
             txtMovieNetwork.Sorted = true;
-            Option2.Text = SavedText;
+            Option2.Text = savedText;
 
         }
 
         private void NetworkList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
         {
             // Get the new sorting column. 
-            ColumnHeader new_sorting_column = NetworkList.Columns[e.Column];
+            var newSortingColumn = NetworkList.Columns[e.Column];
             // Figure out the new sorting order. 
-            System.Windows.Forms.SortOrder sort_order = default(System.Windows.Forms.SortOrder);
-            if (m_SortingColumn == null)
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn == null)
             {
                 // New column. Sort ascending. 
-                sort_order = SortOrder.Ascending;
+                sortOrder = SortOrder.Ascending;
                 // See if this is the same column. 
             }
             else
             {
-                if (new_sorting_column.Equals(m_SortingColumn))
+                if (newSortingColumn.Equals(_mSortingColumn))
                 {
                     // Same column. Switch the sort order. 
-                    if (m_SortingColumn.Text.StartsWith("> "))
+                    if (_mSortingColumn.Text.StartsWith("> "))
                     {
-                        sort_order = SortOrder.Descending;
+                        sortOrder = SortOrder.Descending;
                     }
                     else
                     {
-                        sort_order = SortOrder.Ascending;
+                        sortOrder = SortOrder.Ascending;
                     }
                 }
                 else
                 {
                     // New column. Sort ascending. 
-                    sort_order = SortOrder.Ascending;
+                    sortOrder = SortOrder.Ascending;
                 }
                 // Remove the old sort indicator. 
-                m_SortingColumn.Text = m_SortingColumn.Text.Substring(2);
+                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
             }
             // Display the new sort order. 
-            m_SortingColumn = new_sorting_column;
-            if (sort_order == SortOrder.Ascending)
+            _mSortingColumn = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
             {
-                m_SortingColumn.Text = "> " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
             }
             else
             {
-                m_SortingColumn.Text = "< " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            NetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sort_order);
+            NetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
             // Sort. 
             NetworkList.Sort();
         }
@@ -1078,7 +1076,7 @@ namespace PseudoTV_Manager
             if (ListTVGenres.SelectedIndex >= 0)
             {
                 //Grab the 3rd column from the TVShowList, which is the TVShowID
-                var GenreID = LookUpGenre(ListTVGenres.Items[ListTVGenres.SelectedIndex].ToString());
+                var genreId = LookUpGenre(ListTVGenres.Items[ListTVGenres.SelectedIndex].ToString());
 
                 //Now, remove the link in the database.
                 //PseudoTvUtils.DbExecute("DELETE FROM genrelinktvshow WHERE idGenre = '" & GenreID & "' AND idShow ='" & TVShowList.Items(TVShowList.SelectedIndices[0]).SubItems[2].Text & "'")
@@ -1092,16 +1090,16 @@ namespace PseudoTV_Manager
 
         private void Button1_Click(System.Object sender, System.EventArgs e)
         {
-            RefreshALL();
+            RefreshAll();
         }
 
-        public void RefreshALL()
+        public static void RefreshAll()
         {
             if (!string.IsNullOrEmpty(VideoDatabaseLocation) |
-                !string.IsNullOrEmpty(MySQLConnectionString) & !string.IsNullOrEmpty(PseudoTvSettingsLocation))
+                !string.IsNullOrEmpty(MySqlConnectionString) & !string.IsNullOrEmpty(PseudoTvSettingsLocation))
             {
                 RefreshMovieList();
-                RefreshTVShows();
+                RefreshTvShows();
                 RefreshPlugins();
                 RefreshAllStudios();
                 RefreshNetworkList();
@@ -1118,49 +1116,49 @@ namespace PseudoTV_Manager
         private void GenresList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
         {
             // Get the new sorting column. 
-            ColumnHeader new_sorting_column = GenresList.Columns[e.Column];
+            var newSortingColumn = GenresList.Columns[e.Column];
             // Figure out the new sorting order. 
-            System.Windows.Forms.SortOrder sort_order = default(System.Windows.Forms.SortOrder);
-            if (m_SortingColumn2 == null)
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn2 == null)
             {
                 // New column. Sort ascending. 
-                sort_order = SortOrder.Ascending;
+                sortOrder = SortOrder.Ascending;
                 // See if this is the same column. 
             }
             else
             {
-                if (new_sorting_column.Equals(m_SortingColumn2))
+                if (newSortingColumn.Equals(_mSortingColumn2))
                 {
                     // Same column. Switch the sort order. 
-                    if (m_SortingColumn2.Text.StartsWith("> "))
+                    if (_mSortingColumn2.Text.StartsWith("> "))
                     {
-                        sort_order = SortOrder.Descending;
+                        sortOrder = SortOrder.Descending;
                     }
                     else
                     {
-                        sort_order = SortOrder.Ascending;
+                        sortOrder = SortOrder.Ascending;
                     }
                 }
                 else
                 {
                     // New column. Sort ascending. 
-                    sort_order = SortOrder.Ascending;
+                    sortOrder = SortOrder.Ascending;
                 }
                 // Remove the old sort indicator. 
-                m_SortingColumn2.Text = m_SortingColumn2.Text.Substring(2);
+                _mSortingColumn2.Text = _mSortingColumn2.Text.Substring(2);
             }
             // Display the new sort order. 
-            m_SortingColumn2 = new_sorting_column;
-            if (sort_order == SortOrder.Ascending)
+            _mSortingColumn2 = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
             {
-                m_SortingColumn2.Text = "> " + m_SortingColumn2.Text;
+                _mSortingColumn2.Text = "> " + _mSortingColumn2.Text;
             }
             else
             {
-                m_SortingColumn2.Text = "< " + m_SortingColumn2.Text;
+                _mSortingColumn2.Text = "< " + _mSortingColumn2.Text;
             }
             // Create a comparer. 
-            GenresList.ListViewItemSorter = new ClsListviewSorter(e.Column, sort_order);
+            GenresList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
             // Sort. 
             GenresList.Sort();
         }
@@ -1172,76 +1170,76 @@ namespace PseudoTV_Manager
 
             if (GenresList.SelectedIndices.Count > 0)
             {
-                var SelectArray = new[] { 1 };
+                var selectArray = new[] { 1 };
 
                 //Now, gather a list of all the show IDs that match the genreID
-                string[] ReturnArray = null;
+                string[] returnArray = null;
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
-                    ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "' AND media_type = 'tvshow'",
-                        SelectArray);
+                        selectArray);
                 }
                 else
                 {
-                    ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genrelinktvshow WHERE idGenre='" +
-                        GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", SelectArray);
+                        GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", selectArray);
                 }
 
                 //Now loop through each one individually.
 
-                if (ReturnArray == null)
+                if (returnArray == null)
                 {
                 }
                 else
                 {
-                    for (var x = 0; x <= ReturnArray.Length - 1; x++)
+                    for (var x = 0; x <= returnArray.Length - 1; x++)
                     {
-                        string[] ShowNameArray = new string[1];
-                        SelectArray[0] = 1;
+                        var showNameArray = new string[1];
+                        selectArray[0] = 1;
 
-                        string[] ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM tvshow WHERE idShow='" + ReturnArray[x] + "'", SelectArray);
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", selectArray);
 
                         //Now add that name to the list.
-                        GenresListSubList.Items.Add(ReturnArray2[0]);
+                        GenresListSubList.Items.Add(returnArray2[0]);
                     }
                 }
 
                 //MOVIES REPEAT THIS PROCESS.
-                string[] ReturnArrayMovies = null;
+                string[] returnArrayMovies = null;
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
-                    ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "' AND media_type = 'movie'",
-                        SelectArray);
+                        selectArray);
                 }
                 else
                 {
-                    ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                         "SELECT * FROM genrelinkmovie WHERE idGenre='" +
-                        GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", SelectArray);
+                        GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", selectArray);
                 }
 
                 //Now loop through each one individually 
-                if (ReturnArrayMovies == null)
+                if (returnArrayMovies == null)
                 {
                 }
                 else
                 {
-                    for (var x = 0; x <= ReturnArrayMovies.Length - 1; x++)
+                    for (var x = 0; x <= returnArrayMovies.Length - 1; x++)
                     {
-                        string[] ShowNameArray = new string[1];
-                        SelectArray[0] = 1;
+                        var showNameArray = new string[1];
+                        selectArray[0] = 1;
 
-                        string[] ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM movie WHERE idMovie='" + ReturnArrayMovies[x] + "'", SelectArray);
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", selectArray);
 
                         //Now add that name to the list.
-                        GenresListSubListMovies.Items.Add(ReturnArray2[0]);
+                        GenresListSubListMovies.Items.Add(returnArray2[0]);
                     }
                 }
             }
@@ -1255,29 +1253,29 @@ namespace PseudoTV_Manager
             if (TVShowList.SelectedItems.Count > 0)
             {
                 // Fix any issues with shows and 's.
-                string TvShowName = TxtShowName.Text;
+                var tvShowName = TxtShowName.Text;
                 //Convert show genres into the format ex:  genre1 / genre2 / etc.
-                var ShowGenres = ConvertGenres(ListTVGenres);
-                TvShowName = TvShowName.Replace("'", "''");
+                var showGenres = ConvertGenres(ListTVGenres);
+                tvShowName = tvShowName.Replace("'", "''");
                 //Grab the Network ID based on the name
-                var NetworkID = LookUpNetwork(txtShowNetwork.Text);
+                var networkId = LookUpNetwork(txtShowNetwork.Text);
 
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
                     PseudoTvUtils.DbExecute("DELETE FROM studio_link WHERE media_id = '" + TVShowLabel.Text + "'");
                     PseudoTvUtils.DbExecute("INSERT INTO studio_link(studio_id, media_id, media_type) VALUES ('" +
-                                            NetworkID + "', '" +
+                                            networkId + "', '" +
                                             TVShowLabel.Text + "', 'tvshow')");
                 }
                 else
                 {
                     PseudoTvUtils.DbExecute("DELETE FROM studiolinktvshow WHERE idShow = '" + TVShowLabel.Text + "'");
-                    PseudoTvUtils.DbExecute("INSERT INTO studiolinktvshow (idStudio, idShow) VALUES ('" + NetworkID +
+                    PseudoTvUtils.DbExecute("INSERT INTO studiolinktvshow (idStudio, idShow) VALUES ('" + networkId +
                                             "', '" +
                                             TVShowLabel.Text + "')");
                 }
 
-                PseudoTvUtils.DbExecute("UPDATE tvshow SET c00 = '" + TvShowName + "', c08 = '" + ShowGenres +
+                PseudoTvUtils.DbExecute("UPDATE tvshow SET c00 = '" + tvShowName + "', c08 = '" + showGenres +
                                         "', c14 ='" +
                                         txtShowNetwork.Text + "' WHERE idShow = '" + TVShowLabel.Text + "'");
                 //TODO: VisualStyleElement.Status.Text = "Updated " + TxtShowName.Text + " Successfully";
@@ -1289,9 +1287,9 @@ namespace PseudoTV_Manager
                     //add each one.  one by one.
                     for (var x = 0; x <= ListTVGenres.Items.Count - 1; x++)
                     {
-                        var GenreID = LookUpGenre(ListTVGenres.Items[x].ToString());
+                        var genreId = LookUpGenre(ListTVGenres.Items[x].ToString());
                         PseudoTvUtils.DbExecute("INSERT INTO genre_link (genre_id, media_id, media_type) VALUES ('" +
-                                                GenreID + "', '" +
+                                                genreId + "', '" +
                                                 TVShowLabel.Text + "', 'tvshow')");
                     }
                 }
@@ -1303,8 +1301,8 @@ namespace PseudoTV_Manager
                     //add each one.  one by one.
                     for (var x = 0; x <= ListTVGenres.Items.Count - 1; x++)
                     {
-                        var GenreID = LookUpGenre(ListTVGenres.Items[x].ToString());
-                        PseudoTvUtils.DbExecute("INSERT INTO genrelinktvshow (idGenre, idShow) VALUES ('" + GenreID +
+                        var genreId = LookUpGenre(ListTVGenres.Items[x].ToString());
+                        PseudoTvUtils.DbExecute("INSERT INTO genrelinktvshow (idGenre, idShow) VALUES ('" + genreId +
                                                 "', '" +
                                                 TVShowLabel.Text + "')");
                     }
@@ -1312,7 +1310,7 @@ namespace PseudoTV_Manager
 
                 //Now update the tv show table
 
-                var SavedName = txtShowNetwork.Text;
+                var savedName = txtShowNetwork.Text;
 
                 //Refresh Things
                 RefreshNetworkList();
@@ -1322,41 +1320,38 @@ namespace PseudoTV_Manager
                 //txtShowNetwork.Text = SavedName
 
                 var returnindex = TVShowList.SelectedIndices[0];
-                RefreshALL();
+                RefreshAll();
                 TVShowList.Items[returnindex].Selected = true;
             }
         }
 
-        public void RefreshTVGuideSublist(int ListType, string ListValue)
+        public void RefreshTvGuideSublist(int listType, string listValue)
         {
             TVGuideSubMenu.Items.Clear();
 
-            var TVChannelTypeValue = ListValue;
+            var tvChannelTypeValue = listValue;
 
-            if (ListType == (int)TVGuideListEnum.Playlist)
+            if (listType == (int)TVGuideListType.Playlist)
             {
                 //Playlist
 
                 //Add Info for PlayList editing/loading.
 
             }
-            else if (ListType == (int)TVGuideListEnum.TvNetwork)
+            else if (listType == (int)TVGuideListType.TvNetwork)
             {
                 //This is a TV Network.
 
                 //Make sure there's a value in this box.
-                if (!string.IsNullOrEmpty(TVChannelTypeValue))
+                if (!string.IsNullOrEmpty(tvChannelTypeValue))
                 {
                     var channelPreview = new[] { 1 };
 
-                    string[] returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                        "SELECT * FROM tvshow WHERE c14='" + TVChannelTypeValue + "'", channelPreview);
+                    var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        "SELECT * FROM tvshow WHERE c14='" + tvChannelTypeValue + "'", channelPreview);
 
                     //Make sure the Array is not null.
-                    if (returnArray == null)
-                    {
-                    }
-                    else
+                    if (returnArray != null)
                     {
                         for (var x = 0; x <= returnArray.Length - 1; x++)
                         {
@@ -1367,25 +1362,22 @@ namespace PseudoTV_Manager
                 }
 
             }
-            else if (ListType == (int)TVGuideListEnum.MovieStudio)
+            else if (listType == (int)TVGuideListType.MovieStudio)
             {
                 //Movie Studio
 
                 //Make sure there's a value in this box.
-                if (!string.IsNullOrEmpty(TVChannelTypeValue))
+                if (!string.IsNullOrEmpty(tvChannelTypeValue))
                 {
-                    var SelectArray = new[] { 2 };
+                    var selectArray = new[] { 2 };
 
 
                     //Now, gather a list of all the show IDs that match the genreID
-                    string[] returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                        "SELECT * FROM movie WHERE c18='" + TVChannelTypeValue + "'", SelectArray);
+                    var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        "SELECT * FROM movie WHERE c18='" + tvChannelTypeValue + "'", selectArray);
 
                     //Now loop through each one individually.
-                    if (returnArray == null)
-                    {
-                    }
-                    else
+                    if (returnArray != null)
                     {
                         for (var x = 0; x <= returnArray.Length - 1; x++)
                         {
@@ -1396,14 +1388,14 @@ namespace PseudoTV_Manager
                 }
 
             }
-            else if (ListType == (int)TVGuideListEnum.TvGenre)
+            else if (listType == (int)TVGuideListType.TvGenre)
             {
                 //TV Genre
 
                 //Make sure there's a value in this box.
-                if (!string.IsNullOrEmpty(TVChannelTypeValue))
+                if (!string.IsNullOrEmpty(tvChannelTypeValue))
                 {
-                    var SelectArray = new[] { 1 };
+                    var selectArray = new[] { 1 };
 
 
                     //Now, gather a list of all the show IDs that match the genreID
@@ -1411,105 +1403,105 @@ namespace PseudoTV_Manager
                     if ((KodiVersion >= KodiVersion.Isengard))
                     {
                         returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(TVChannelTypeValue) +
-                            "' AND media_type = 'tvshow'", SelectArray);
+                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
+                            "' AND media_type = 'tvshow'", selectArray);
                     }
                     else
                     {
                         returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(TVChannelTypeValue) + "'",
-                            SelectArray);
+                            "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
+                            selectArray);
                     }
 
 
                     //Now loop through each one individually.
                     for (var x = 0; x <= returnArray.Length - 1; x++)
                     {
-                        var ShowNameArray = new[] { 1 };
+                        var showNameArray = new[] { 1 };
 
-                        string[] ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", ShowNameArray);
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", showNameArray);
 
                         //Now add that name to the list.
-                        TVGuideSubMenu.Items.Add(ReturnArray2[0]);
+                        TVGuideSubMenu.Items.Add(returnArray2[0]);
                     }
                 }
             }
-            else if (ListType == (int)TVGuideListEnum.MovieGenre)
+            else if (listType == (int)TVGuideListType.MovieGenre)
             {
                 //Movie Genre
 
                 var selectArrayMovies = new[] { 1 };
 
-                string[] ReturnArrayMovies = null;
+                string[] returnArrayMovies = null;
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
-                    ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                        "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(TVChannelTypeValue) +
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
                         "' AND media_type = 'movie'", selectArrayMovies);
                 }
                 else
                 {
-                    ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                        "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(TVChannelTypeValue) + "'",
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
                         selectArrayMovies);
                 }
 
                 //Now loop through each one individually.
-                if (ReturnArrayMovies == null)
+                if (returnArrayMovies == null)
                 {
                 }
                 else
                 {
 
-                    for (var x = 0; x <= ReturnArrayMovies.Length; x++)
+                    for (var x = 0; x <= returnArrayMovies.Length; x++)
                     {
-                        var ShowArray = new[] { 2 };
+                        var showArray = new[] { 2 };
 
-                        string[] ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM movie WHERE idMovie='" + ReturnArrayMovies[x] + "'", ShowArray);
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", showArray);
 
                         //Now add that name to the list.
-                        TVGuideSubMenu.Items.Add(ReturnArray2[0]);
+                        TVGuideSubMenu.Items.Add(returnArray2[0]);
                     }
                 }
             }
-            else if (ListType == (int)TVGuideListEnum.MixedGenre)
+            else if (listType == (int)TVGuideListType.MixedGenre)
             {
                 //Mixed Genre
 
                 //Make sure there's a value in this box.
-                if (!string.IsNullOrEmpty(TVChannelTypeValue))
+                if (!string.IsNullOrEmpty(tvChannelTypeValue))
                 {
-                    var SelectArray = new[] { 1 };
+                    var selectArray = new[] { 1 };
 
                     //Now, gather a list of all the show IDs that match the genreID
-                    string[] ReturnArray = null;
+                    string[] returnArray = null;
                     if ((KodiVersion >= KodiVersion.Isengard))
                     {
-                        ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(TVChannelTypeValue) +
-                            "' AND media_type = 'tvshow'", SelectArray);
+                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
+                            "' AND media_type = 'tvshow'", selectArray);
                     }
                     else
                     {
-                        ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(TVChannelTypeValue) + "'",
-                            SelectArray);
+                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
+                            selectArray);
                     }
 
                     //Now loop through each one individually.
-                    if (ReturnArray == null)
+                    if (returnArray == null)
                     {
                     }
                     else
                     {
-                        for (var x = 0; x <= ReturnArray.Length; x++)
+                        for (var x = 0; x <= returnArray.Length; x++)
                         {
                             var showArray = new[] { 1 };
 
                             var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                                "SELECT * FROM tvshow WHERE idShow='" + ReturnArray[x] + "'", showArray);
+                                "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", showArray);
 
                             //Now add that name to the list.
                             TVGuideSubMenu.Items.Add(returnArray2[0]);
@@ -1518,39 +1510,39 @@ namespace PseudoTV_Manager
                     //------------------------------------
                     //Repeat this step for the Movies now.
 
-                    var SelectArrayMovies = new[] { 1 };
+                    var selectArrayMovies = new[] { 1 };
 
-                    string[] ReturnArrayMovies = null;
+                    string[] returnArrayMovies = null;
                     if ((KodiVersion >= KodiVersion.Isengard))
                     {
-                        ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(TVChannelTypeValue) +
-                            "' AND media_type = 'movie'", SelectArrayMovies);
+                        returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
+                            "' AND media_type = 'movie'", selectArrayMovies);
                     }
                     else
                     {
-                        ReturnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                            "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(TVChannelTypeValue) + "'",
-                            SelectArrayMovies);
+                        returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
+                            selectArrayMovies);
                     }
 
 
                     //Now loop through each one individually.
                     //Verify it's not NULL.
-                    if (ReturnArrayMovies == null)
+                    if (returnArrayMovies == null)
                     {
                     }
                     else
                     {
-                        for (var x = 0; x <= ReturnArrayMovies.Length; x++)
+                        for (var x = 0; x <= returnArrayMovies.Length; x++)
                         {
-                            var ShowArray = new[] { 2 };
+                            var showArray = new[] { 2 };
 
-                            string[] ReturnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                                "SELECT * FROM movie WHERE idMovie='" + ReturnArrayMovies[x] + "'", ShowArray);
+                            var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                                "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", showArray);
 
                             //Now add that name to the list.
-                            TVGuideSubMenu.Items.Add(ReturnArray2[0]);
+                            TVGuideSubMenu.Items.Add(returnArray2[0]);
                         }
                     }
 
@@ -1558,11 +1550,11 @@ namespace PseudoTV_Manager
                 }
 
             }
-            else if (ListType == (int)TVGuideListEnum.TvShow)
+            else if (listType == (int)TVGuideListType.TvShow)
             {
                 //TV Show
             }
-            else if (ListType == (int)TVGuideListEnum.Directory)
+            else if (listType == (int)TVGuideListType.Directory)
             {
                 //Directory
 
@@ -1571,11 +1563,11 @@ namespace PseudoTV_Manager
             //Now loop through all the shows listed to NOT show, compare them to the list of shows and make any of them have a red background if they match.
             for (var x = 0; x <= NotShows.Items.Count - 1; x++)
             {
-                string NotShow = NotShows.Items[x].ToString();
+                var notShow = NotShows.Items[x].ToString();
 
                 for (var y = 0; y <= TVGuideSubMenu.Items.Count - 1; y++)
                 {
-                    if (!NotShow.Equals(TVGuideSubMenu.Items[y].SubItems[0].Text))
+                    if (!notShow.Equals(TVGuideSubMenu.Items[y].SubItems[0].Text))
                     {
                         TVGuideSubMenu.Items[y].BackColor = Color.Red;
                     }
@@ -1588,49 +1580,49 @@ namespace PseudoTV_Manager
         private void TVGuideList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
         {
             // Get the new sorting column. 
-            ColumnHeader new_sorting_column = TVGuideList.Columns[e.Column];
+            var newSortingColumn = TVGuideList.Columns[e.Column];
             // Figure out the new sorting order. 
-            System.Windows.Forms.SortOrder sort_order = default(System.Windows.Forms.SortOrder);
-            if (m_SortingColumn == null)
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn == null)
             {
                 // New column. Sort ascending. 
-                sort_order = SortOrder.Ascending;
+                sortOrder = SortOrder.Ascending;
                 // See if this is the same column. 
             }
             else
             {
-                if (new_sorting_column.Equals(m_SortingColumn))
+                if (newSortingColumn.Equals(_mSortingColumn))
                 {
                     // Same column. Switch the sort order. 
-                    if (m_SortingColumn.Text.StartsWith("> "))
+                    if (_mSortingColumn.Text.StartsWith("> "))
                     {
-                        sort_order = SortOrder.Descending;
+                        sortOrder = SortOrder.Descending;
                     }
                     else
                     {
-                        sort_order = SortOrder.Ascending;
+                        sortOrder = SortOrder.Ascending;
                     }
                 }
                 else
                 {
                     // New column. Sort ascending. 
-                    sort_order = SortOrder.Ascending;
+                    sortOrder = SortOrder.Ascending;
                 }
                 // Remove the old sort indicator. 
-                m_SortingColumn.Text = m_SortingColumn.Text.Substring(2);
+                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
             }
             // Display the new sort order. 
-            m_SortingColumn = new_sorting_column;
-            if (sort_order == SortOrder.Ascending)
+            _mSortingColumn = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
             {
-                m_SortingColumn.Text = "> " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
             }
             else
             {
-                m_SortingColumn.Text = "< " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            TVGuideList.ListViewItemSorter = new ClsListviewSorter(e.Column, sort_order);
+            TVGuideList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
             // Sort. 
             TVGuideList.Sort();
         }
@@ -1660,7 +1652,7 @@ namespace PseudoTV_Manager
 
                 //Clear other form items.
                 TVGuideSubMenu.Items.Clear();
-                var PlayListNumber = Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[1].Text);
+                var playListNumber = Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[1].Text);
                 Option2.Items.Clear();
                 InterleavedList.Items.Clear();
                 SchedulingList.Items.Clear();
@@ -1670,23 +1662,23 @@ namespace PseudoTV_Manager
                 TVGuideShowName.Text = "Channel " + TVGuideList.SelectedItems[0].SubItems[0].Text;
 
 
-                if (PlayListNumber != 9999)
+                if (playListNumber != 9999)
                 {
-                    PlayListType.SelectedIndex = PlayListNumber;
+                    PlayListType.SelectedIndex = playListNumber;
 
-                    int Option1 = 0;
+                    var option1 = 0;
 
-                    var TVChannelTypeValue = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                    var tvChannelTypeValue = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
 
-                    if (PlayListNumber == 0)
+                    if (playListNumber == 0)
                     {
                         //Playlist
-                        Option1 = 1;
+                        option1 = 1;
 
                         //Add Info for PlayList editing/loading.
 
                     }
-                    else if (PlayListNumber == 1)
+                    else if (playListNumber == 1)
                     {
                         //This is a TV Network.
 
@@ -1696,19 +1688,19 @@ namespace PseudoTV_Manager
                         }
 
                         //Make sure there's a value in this box.
-                        if (!string.IsNullOrEmpty(TVChannelTypeValue))
+                        if (!string.IsNullOrEmpty(tvChannelTypeValue))
                         {
-                            RefreshTVGuideSublist(PlayListNumber, TVChannelTypeValue);
+                            RefreshTvGuideSublist(playListNumber, tvChannelTypeValue);
                         }
 
                     }
-                    else if (PlayListNumber == 2)
+                    else if (playListNumber == 2)
                     {
                         //Movie Studio
                         RefreshAllStudios();
 
                     }
-                    else if (PlayListNumber == 3)
+                    else if (playListNumber == 3)
                     {
                         //TV Genre
                         for (var x = 0; x <= GenresList.Items.Count - 1; x++)
@@ -1717,19 +1709,19 @@ namespace PseudoTV_Manager
                         }
 
                     }
-                    else if (PlayListNumber == 4)
+                    else if (playListNumber == 4)
                     {
                         //Movie Genre
                         RefreshAllGenres();
 
                     }
-                    else if (PlayListNumber == 5)
+                    else if (playListNumber == 5)
                     {
                         //Mixed Genre
                         RefreshAllGenres();
 
                     }
-                    else if (PlayListNumber == 6)
+                    else if (playListNumber == 6)
                     {
                         //TV Show
                         for (var x = 0; x <= TVShowList.Items.Count - 1; x++)
@@ -1737,99 +1729,99 @@ namespace PseudoTV_Manager
                             Option2.Items.Add(TVShowList.Items[x].SubItems[0].Text);
                         }
                     }
-                    else if (PlayListNumber == 7)
+                    else if (playListNumber == 7)
                     {
                         //Directory
-                        Option1 = 1;
+                        option1 = 1;
                     }
-                    else if (PlayListNumber == 8)
+                    else if (playListNumber == 8)
                     {
                         //LiveTV
-                        Option1 = 2;
+                        option1 = 2;
                     }
-                    else if (PlayListNumber == 9)
+                    else if (playListNumber == 9)
                     {
                         //InternetTV
-                        Option1 = 3;
+                        option1 = 3;
                     }
-                    else if (PlayListNumber == 10 | PlayListNumber == 11)
+                    else if (playListNumber == 10 | playListNumber == 11)
                     {
                         //YoutubeTV or RSS
-                        Option1 = 4;
+                        option1 = 4;
                     }
-                    else if (PlayListNumber == 13)
+                    else if (playListNumber == 13)
                     {
                         //Music Videos
-                        Option1 = 5;
+                        option1 = 5;
                     }
-                    else if (PlayListNumber == 14)
+                    else if (playListNumber == 14)
                     {
                         //Extras
-                        Option1 = 6;
+                        option1 = 6;
                     }
-                    else if (PlayListNumber == 15)
+                    else if (playListNumber == 15)
                     {
                         //Direct Plugin Type
-                        Option1 = 7;
+                        option1 = 7;
                     }
 
                     //Now, we loop through the advanced rules to populate those properly.
 
                     //break this array into all the rules for this channel.
-                    var AllRules = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[4].Text.Split('~');
+                    var allRules = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[4].Text.Split('~');
 
                     //Loop through all of them.
                     //But, only the ones it "says" it has.
 
-                    int RuleCount = 0;
+                    var ruleCount = 0;
 
 
                     if (!string.IsNullOrEmpty(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[5].Text))
                     {
-                        RuleCount = Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[5].Text);
+                        ruleCount = Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[5].Text);
                     }
 
 
-                    for (var y = 1; y <= RuleCount; y++)
+                    for (var y = 1; y <= ruleCount; y++)
                     {
                         //For y = 1 To UBound(AllRules)
-                        var RuleSettings = AllRules[y].Split('|');
+                        var ruleSettings = allRules[y].Split('|');
 
                         //Rule #1, #2, etc.
-                        var RuleNum = RuleSettings[0];
+                        var ruleNum = ruleSettings[0];
                         //Value, most of the time this is the only thing we need.
-                        var RuleValue = RuleSettings[1];
+                        var ruleValue = ruleSettings[1];
 
 
-                        if (RuleValue == "5")
+                        if (ruleValue == "5")
                         {
                             chkDontPlayChannel.Checked = true;
                         }
-                        else if (RuleValue == "10")
+                        else if (ruleValue == "10")
                         {
                             ChkRandom.Checked = true;
                         }
-                        else if (RuleValue == "7")
+                        else if (ruleValue == "7")
                         {
                             ChkRealTime.Checked = true;
                         }
-                        else if (RuleValue == "9")
+                        else if (ruleValue == "9")
                         {
                             ChkResume.Checked = true;
                         }
-                        else if (RuleValue == "11")
+                        else if (ruleValue == "11")
                         {
                             ChkUnwatched.Checked = true;
                         }
-                        else if (RuleValue == "4")
+                        else if (ruleValue == "4")
                         {
                             ChkWatched.Checked = true;
                         }
-                        else if (RuleValue == "8")
+                        else if (ruleValue == "8")
                         {
                             ChkPause.Checked = true;
                         }
-                        else if (RuleValue == "12")
+                        else if (ruleValue == "12")
                         {
                             ChkPlayInOrder.Checked = true;
 
@@ -1839,62 +1831,62 @@ namespace PseudoTV_Manager
                             //Okay, so it's not something requiring a single option.
 
                             //Now loop through all the sub-options of each rule.
-                            string[] SubOptions = new string[5];
+                            var subOptions = new string[5];
 
-                            for (var z = 2; z <= RuleSettings.Length; z++)
+                            for (var z = 2; z <= ruleSettings.Length; z++)
                             {
-                                var OptionNum = Convert.ToInt32(RuleSettings[z].Split('^')[0]);
-                                var OptionValue = RuleSettings[z].Split('^')[1];
+                                var optionNum = Convert.ToInt32(ruleSettings[z].Split('^')[0]);
+                                var optionValue = ruleSettings[z].Split('^')[1];
 
 
-                                if (RuleValue == "13")
+                                if (ruleValue == "13")
                                 {
                                     //TODO: Optimize
-                                    ResetDays.Text = (Convert.ToInt32(OptionValue) / 60).ToString();
+                                    ResetDays.Text = (Convert.ToInt32(optionValue) / 60).ToString();
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "1")
+                                else if (ruleValue == "1")
                                 {
-                                    ChannelName.Text = OptionValue;
+                                    ChannelName.Text = optionValue;
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "15" & OptionValue == "Yes")
+                                else if (ruleValue == "15" & optionValue == "Yes")
                                 {
                                     ChkLogo.Checked = true;
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "14" & OptionValue == "Yes")
+                                else if (ruleValue == "14" & optionValue == "Yes")
                                 {
                                     ChkIceLibrary.Checked = true;
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "17" & OptionValue == "Yes")
+                                else if (ruleValue == "17" & optionValue == "Yes")
                                 {
                                     ChkExcludeBCT.Checked = true;
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "18" & OptionValue == "Yes")
+                                else if (ruleValue == "18" & optionValue == "Yes")
                                 {
                                     ChkPopup.Checked = true;
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "2")
+                                else if (ruleValue == "2")
                                 {
-                                    NotShows.Items.Add(OptionValue);
+                                    NotShows.Items.Add(optionValue);
                                     break; // TODO: might not be correct. Was : Exit For
                                 }
-                                else if (RuleValue == "6")
+                                else if (ruleValue == "6")
                                 {
                                     //Add this option to a sub-item array to add later to the
                                     //Object at the end
-                                    SubOptions[OptionNum - 1] = OptionValue;
+                                    subOptions[optionNum - 1] = optionValue;
 
-                                    if (OptionNum == 5)
+                                    if (optionNum == 5)
                                     {
                                         //last option.
                                         //create + insert object
-                                        ListViewItem itm = default(ListViewItem);
-                                        itm = new ListViewItem(SubOptions);
+                                        var itm = default(ListViewItem);
+                                        itm = new ListViewItem(subOptions);
                                         //Add to list
                                         InterleavedList.Items.Add(itm);
                                         //Remove it from the loop.  We only need 4 options here.
@@ -1905,16 +1897,16 @@ namespace PseudoTV_Manager
                                     {
                                     }
                                 }
-                                else if (RuleValue == "3")
+                                else if (ruleValue == "3")
                                 {
                                     //Add this option to a sub-item array to add later to the
                                     //Object at the end
-                                    SubOptions[OptionNum - 1] = OptionValue;
-                                    if (OptionNum == 4)
+                                    subOptions[optionNum - 1] = optionValue;
+                                    if (optionNum == 4)
                                     {
                                         //last option.
                                         //create + insert object
-                                        var itm = new ListViewItem(SubOptions);
+                                        var itm = new ListViewItem(subOptions);
                                         //Add to list
 
                                         SchedulingList.Items.Add(itm);
@@ -1928,36 +1920,36 @@ namespace PseudoTV_Manager
                     }
 
 
-                    RefreshTVGuideSublist(PlayListNumber, TVChannelTypeValue);
+                    RefreshTvGuideSublist(playListNumber, tvChannelTypeValue);
 
-                    if (Option1 == 1)
+                    if (option1 == 1)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                         //SortTypeBox.SelectedIndex = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text
-                        int index = 0;
+                        var index = 0;
                         index =
                             MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
                         MediaLimitBox.SelectedIndex = index;
                     }
-                    else if (Option1 == 2)
+                    else if (option1 == 2)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                         StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
                         ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
                     }
-                    else if (Option1 == 3)
+                    else if (option1 == 3)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                         StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
                         ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
                         ShowDescBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text;
                     }
-                    else if (Option1 == 4)
+                    else if (option1 == 4)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                         YouTubeType.SelectedIndex =
                             Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
-                        int index = 0;
+                        var index = 0;
                         index =
                             MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
                         MediaLimitBox.SelectedIndex = index;
@@ -1965,17 +1957,17 @@ namespace PseudoTV_Manager
                             Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
                         if (YouTubeType.SelectedIndex == 6 | YouTubeType.SelectedIndex == 7)
                         {
-                            string ReturnMulti = "";
+                            var returnMulti = "";
 
-                            ReturnMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            returnMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
 
-                            if (ReturnMulti.Contains("|"))
+                            if (returnMulti.Contains("|"))
                             {
-                                string[] ReturnMultiSplit = ReturnMulti.Split('|');
+                                var returnMultiSplit = returnMulti.Split('|');
 
-                                for (var x = 0; x <= ReturnMultiSplit.Length; x++)
+                                for (var x = 0; x <= returnMultiSplit.Length; x++)
                                 {
-                                    NotShows.Items.Add(ReturnMultiSplit[x]);
+                                    NotShows.Items.Add(returnMultiSplit[x]);
                                 }
 
 
@@ -1983,7 +1975,7 @@ namespace PseudoTV_Manager
                             else
                             {
                                 ShowDescBox.Visible = true;
-                                ShowDescBox.Text = ReturnMulti;
+                                ShowDescBox.Text = returnMulti;
 
                             }
 
@@ -1992,52 +1984,52 @@ namespace PseudoTV_Manager
                         }
 
                     }
-                    else if (Option1 == 5)
+                    else if (option1 == 5)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
                         SubChannelType.SelectedIndex =
                             Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
-                        int index = 0;
+                        var index = 0;
                         index =
                             MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
                         MediaLimitBox.SelectedIndex = index;
                         SortTypeBox.SelectedIndex =
                             Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
                     }
-                    else if (Option1 == 7)
+                    else if (option1 == 7)
                     {
                         PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                         SortTypeBox.SelectedIndex =
                             Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
-                        int index = 0;
+                        var index = 0;
                         index =
                             MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
                         MediaLimitBox.SelectedIndex = index;
 
-                        string ReturnPlugin = "";
+                        var returnPlugin = "";
 
-                        var SelectArray = new[] { 0 };
+                        var selectArray = new[] { 0 };
 
-                        ReturnPlugin = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                        returnPlugin = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
 
-                        string ReturnProperPlugin = ReturnPlugin.Remove(0, 9);
+                        var returnProperPlugin = returnPlugin.Remove(0, 9);
 
-                        string[] ReturnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
-                            "SELECT name FROM addon WHERE addonID = '" + ReturnProperPlugin + "'", SelectArray);
+                        var returnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
+                            "SELECT name FROM addon WHERE addonID = '" + returnProperPlugin + "'", selectArray);
 
-                        int index2 = 0;
-                        index2 = PluginType.FindString(ReturnArray[0]);
+                        var index2 = 0;
+                        index2 = PluginType.FindString(returnArray[0]);
                         PluginType.SelectedIndex = index2;
 
                         PluginNotInclude = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
 
                         if (PluginNotInclude.Contains(","))
                         {
-                            string[] PluginNotIncludeSplit = PluginNotInclude.Split(',');
+                            var pluginNotIncludeSplit = PluginNotInclude.Split(',');
 
-                            for (var x = 0; x <= PluginNotIncludeSplit.Length; x++)
+                            for (var x = 0; x <= pluginNotIncludeSplit.Length; x++)
                             {
-                                NotShows.Items.Add(PluginNotIncludeSplit[x]);
+                                NotShows.Items.Add(pluginNotIncludeSplit[x]);
                             }
                         }
                     }
@@ -2054,7 +2046,7 @@ namespace PseudoTV_Manager
         {
             if (PlayListType.SelectedIndex >= 0 & !string.IsNullOrEmpty(Option2.Text))
             {
-                RefreshTVGuideSublist(PlayListType.SelectedIndex, Option2.Text);
+                RefreshTvGuideSublist(PlayListType.SelectedIndex, Option2.Text);
             }
 
         }
@@ -2063,8 +2055,8 @@ namespace PseudoTV_Manager
         {
             //Clear the Sub-menu
             TVGuideSubMenu.Items.Clear();
-            var _with1 = PlayListLocation;
-            _with1.Location = new System.Drawing.Point(267, 120);
+            var with1 = PlayListLocation;
+            with1.Location = new System.Drawing.Point(267, 120);
             PlayListLocation.Text = "";
             Label6.Visible = false;
             Label6.Text = "";
@@ -2124,21 +2116,21 @@ namespace PseudoTV_Manager
                 Label6.Text = "Location:";
                 Label6.Visible = true;
                 PlayListLocation.Visible = true;
-                var _with2 = PlayListLocation;
-                _with2.Location = new System.Drawing.Point(270, 120);
+                var with2 = PlayListLocation;
+                with2.Location = new System.Drawing.Point(270, 120);
                 PlayListLocation.Visible = true;
-                var _with3 = MediaLimit;
-                _with3.Location = new System.Drawing.Point(160, 160);
+                var with3 = MediaLimit;
+                with3.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with4 = MediaLimitBox;
-                _with4.Location = new System.Drawing.Point(162, 180);
+                var with4 = MediaLimitBox;
+                with4.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with5 = SortType;
-                _with5.Location = new System.Drawing.Point(225, 160);
+                var with5 = SortType;
+                with5.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with6 = SortTypeBox;
-                _with6.Location = new System.Drawing.Point(227, 180);
+                var with6 = SortTypeBox;
+                with6.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 NotShows.Visible = true;
@@ -2176,21 +2168,21 @@ namespace PseudoTV_Manager
                 YouTubeType.Visible = true;
                 Label6.Text = "Channel/User:";
                 Label6.Visible = true;
-                var _with7 = PlayListLocation;
-                _with7.Location = new System.Drawing.Point(270, 120);
+                var with7 = PlayListLocation;
+                with7.Location = new System.Drawing.Point(270, 120);
                 PlayListLocation.Visible = true;
-                var _with8 = MediaLimit;
-                _with8.Location = new System.Drawing.Point(160, 160);
+                var with8 = MediaLimit;
+                with8.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with9 = MediaLimitBox;
-                _with9.Location = new System.Drawing.Point(162, 180);
+                var with9 = MediaLimitBox;
+                with9.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with10 = SortType;
-                _with10.Location = new System.Drawing.Point(225, 160);
+                var with10 = SortType;
+                with10.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with11 = SortTypeBox;
-                _with11.Location = new System.Drawing.Point(227, 180);
+                var with11 = SortTypeBox;
+                with11.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 NotShows.Visible = true;
@@ -2204,18 +2196,18 @@ namespace PseudoTV_Manager
                 Label6.Text = "Source path:";
                 Label6.Visible = true;
                 PlayListLocation.Visible = true;
-                var _with12 = MediaLimit;
-                _with12.Location = new System.Drawing.Point(160, 160);
+                var with12 = MediaLimit;
+                with12.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with13 = MediaLimitBox;
-                _with13.Location = new System.Drawing.Point(162, 180);
+                var with13 = MediaLimitBox;
+                with13.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with14 = SortType;
-                _with14.Location = new System.Drawing.Point(225, 160);
+                var with14 = SortType;
+                with14.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with15 = SortTypeBox;
-                _with15.Location = new System.Drawing.Point(227, 180);
+                var with15 = SortTypeBox;
+                with15.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 Button8.Visible = false;
@@ -2229,48 +2221,48 @@ namespace PseudoTV_Manager
                 Label6.Text = "LastFM Username:";
                 Label6.Visible = true;
                 PlayListLocation.Visible = true;
-                var _with16 = MediaLimit;
-                _with16.Location = new System.Drawing.Point(160, 160);
+                var with16 = MediaLimit;
+                with16.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with17 = MediaLimitBox;
-                _with17.Location = new System.Drawing.Point(162, 180);
+                var with17 = MediaLimitBox;
+                with17.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with18 = SortType;
-                _with18.Location = new System.Drawing.Point(225, 160);
+                var with18 = SortType;
+                with18.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with19 = SortTypeBox;
-                _with19.Location = new System.Drawing.Point(227, 180);
+                var with19 = SortTypeBox;
+                with19.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 SubChannelType.Items.Clear();
-                var _with20 = SubChannelType.Items;
-                _with20.Add("LastFM");
-                _with20.Add("MyMusicTV");
+                var with20 = SubChannelType.Items;
+                with20.Add("LastFM");
+                with20.Add("MyMusicTV");
                 SubChannelType.Visible = true;
                 SubChannelType.SelectedIndex = 0;
             }
             else if (PlayListType.SelectedIndex == 14)
             {
                 Label6.Visible = false;
-                var _with21 = MediaLimit;
-                _with21.Location = new System.Drawing.Point(160, 160);
+                var with21 = MediaLimit;
+                with21.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with22 = MediaLimitBox;
-                _with22.Location = new System.Drawing.Point(162, 180);
+                var with22 = MediaLimitBox;
+                with22.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with23 = SortType;
-                _with23.Location = new System.Drawing.Point(225, 160);
+                var with23 = SortType;
+                with23.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with24 = SortTypeBox;
-                _with24.Location = new System.Drawing.Point(227, 180);
+                var with24 = SortTypeBox;
+                with24.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 SubChannelType.Items.Clear();
-                var _with25 = SubChannelType.Items;
-                _with25.Add("popcorn");
-                _with25.Add("cinema");
+                var with25 = SubChannelType.Items;
+                with25.Add("popcorn");
+                with25.Add("cinema");
                 SubChannelType.Visible = true;
                 SubChannelType.SelectedIndex = 0;
             }
@@ -2278,24 +2270,24 @@ namespace PseudoTV_Manager
             {
                 NotShows.Items.Clear();
                 Label6.Visible = false;
-                var _with26 = PlayListLocation;
-                _with26.Location = new System.Drawing.Point(220, 120);
+                var with26 = PlayListLocation;
+                with26.Location = new System.Drawing.Point(220, 120);
                 PlayListLocation.Visible = true;
-                var _with27 = PluginType;
-                _with27.Location = new System.Drawing.Point(227, 86);
+                var with27 = PluginType;
+                with27.Location = new System.Drawing.Point(227, 86);
                 PluginType.Visible = true;
-                var _with28 = MediaLimit;
-                _with28.Location = new System.Drawing.Point(160, 160);
+                var with28 = MediaLimit;
+                with28.Location = new System.Drawing.Point(160, 160);
                 MediaLimit.Visible = true;
-                var _with29 = MediaLimitBox;
-                _with29.Location = new System.Drawing.Point(162, 180);
+                var with29 = MediaLimitBox;
+                with29.Location = new System.Drawing.Point(162, 180);
                 MediaLimitBox.SelectedIndex = 0;
                 MediaLimitBox.Visible = true;
-                var _with30 = SortType;
-                _with30.Location = new System.Drawing.Point(225, 160);
+                var with30 = SortType;
+                with30.Location = new System.Drawing.Point(225, 160);
                 SortType.Visible = true;
-                var _with31 = SortTypeBox;
-                _with31.Location = new System.Drawing.Point(227, 180);
+                var with31 = SortTypeBox;
+                with31.Location = new System.Drawing.Point(227, 180);
                 SortTypeBox.SelectedIndex = 0;
                 SortTypeBox.Visible = true;
                 NotShows.Visible = true;
@@ -2377,11 +2369,11 @@ namespace PseudoTV_Manager
             {
                 OpenFileDialog1.ShowDialog();
 
-                var Filename = OpenFileDialog1.FileName;
-                var FilenameSplit = Filename.Split(Convert.ToChar("\\"));
+                var filename = OpenFileDialog1.FileName;
+                var filenameSplit = filename.Split(Convert.ToChar("\\"));
 
                 PlayListLocation.Text = "special://profile/playlists/video/" +
-                                        FilenameSplit[FilenameSplit.Length];
+                                        filenameSplit[filenameSplit.Length];
             }
         }
 
@@ -2394,28 +2386,28 @@ namespace PseudoTV_Manager
 
             if (TVGuideList.SelectedItems.Count > 0)
             {
-                string FILE_NAME = PseudoTvSettingsLocation;
-                string TextFile = "";
+                var fileName = PseudoTvSettingsLocation;
+                var textFile = "";
 
-                var ChannelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
+                var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
 
 
                 //Loop through config file.
                 //Grab all comments MINUS the ones for selected #
 
-                if (System.IO.File.Exists(FILE_NAME) == true)
+                if (System.IO.File.Exists(fileName) == true)
                 {
-                    System.IO.StreamReader objReader = new System.IO.StreamReader(FILE_NAME);
+                    var objReader = new System.IO.StreamReader(fileName);
 
 
                     while (objReader.Peek() != -1)
                     {
-                        var SingleLine = objReader.ReadLine();
+                        var singleLine = objReader.ReadLine();
 
-                        if (!SingleLine.Contains("<setting id=" + (char)34 + "Channel_" + ChannelNum + "_") &&
-                            !SingleLine.Contains("</settings"))
+                        if (!singleLine.Contains("<setting id=" + (char)34 + "Channel_" + channelNum + "_") &&
+                            !singleLine.Contains("</settings"))
                         {
-                            TextFile = TextFile + SingleLine + Environment.NewLine;
+                            textFile = textFile + singleLine + Environment.NewLine;
                         }
 
                     }
@@ -2430,7 +2422,7 @@ namespace PseudoTV_Manager
                 }
 
                 var returnindex = TVGuideList.SelectedIndices[0];
-                RefreshTVGuide();
+                RefreshTvGuide();
                 TVGuideList.Items[returnindex].Selected = true;
 
             }
@@ -2447,28 +2439,28 @@ namespace PseudoTV_Manager
 
             if (TVGuideList.SelectedItems.Count > 0)
             {
-                string FILE_NAME = PseudoTvSettingsLocation;
-                string TextFile = "";
+                var fileName = PseudoTvSettingsLocation;
+                var textFile = "";
 
-                var ChannelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
+                var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
 
 
                 //Loop through config file.
                 //Grab all comments MINUS the ones for selected #
 
-                if (System.IO.File.Exists(FILE_NAME) == true)
+                if (System.IO.File.Exists(fileName) == true)
                 {
-                    System.IO.StreamReader objReader = new System.IO.StreamReader(FILE_NAME);
+                    var objReader = new System.IO.StreamReader(fileName);
 
 
                     while (objReader.Peek() != -1)
                     {
-                        var SingleLine = objReader.ReadLine();
+                        var singleLine = objReader.ReadLine();
 
-                        if (!SingleLine.Contains("<setting id=" + (char)34 + "Channel_" + ChannelNum + "_") &&
-                            !SingleLine.Contains("</settings"))
+                        if (!singleLine.Contains("<setting id=" + (char)34 + "Channel_" + channelNum + "_") &&
+                            !singleLine.Contains("</settings"))
                         {
-                            TextFile = TextFile + SingleLine + System.Environment.NewLine;
+                            textFile = textFile + singleLine + System.Environment.NewLine;
                         }
 
                     }
@@ -2480,7 +2472,7 @@ namespace PseudoTV_Manager
 
                 //Now, append info for this channel we're editing.
 
-                string AppendInfo = "";
+                var appendInfo = "";
                 var rulecount = 0;
 
                 //Show the Logo is checked.
@@ -2488,11 +2480,11 @@ namespace PseudoTV_Manager
                 if (ChkLogo.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "15" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + "Yes" + (char)34 + " />";
                 }
 
@@ -2501,8 +2493,8 @@ namespace PseudoTV_Manager
                 if (chkDontPlayChannel.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "5" + (char)34 + " />";
                 }
 
@@ -2511,8 +2503,8 @@ namespace PseudoTV_Manager
                 if (ChkRandom.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "10" + (char)34 + " />";
                 }
 
@@ -2521,8 +2513,8 @@ namespace PseudoTV_Manager
                 if (ChkRealTime.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "7" + (char)34 + " />";
                 }
 
@@ -2531,8 +2523,8 @@ namespace PseudoTV_Manager
                 if (ChkResume.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "9" + (char)34 + " />";
                 }
 
@@ -2541,8 +2533,8 @@ namespace PseudoTV_Manager
                 if (ChkUnwatched.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "11" + (char)34 + " />";
                 }
 
@@ -2551,8 +2543,8 @@ namespace PseudoTV_Manager
                 if (ChkWatched.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "4" + (char)34 + " />";
                 }
 
@@ -2561,11 +2553,11 @@ namespace PseudoTV_Manager
                 if (ChkIceLibrary.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "14" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + "No" + (char)34 + " />";
                 }
 
@@ -2574,11 +2566,11 @@ namespace PseudoTV_Manager
                 if (ChkExcludeBCT.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "17" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + "No" + (char)34 + " />";
                 }
 
@@ -2587,11 +2579,11 @@ namespace PseudoTV_Manager
                 if (ChkPopup.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "18" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + "No" + (char)34 + " />";
                 }
 
@@ -2600,8 +2592,8 @@ namespace PseudoTV_Manager
                 if (ChkPause.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "8" + (char)34 + " />";
                 }
 
@@ -2610,8 +2602,8 @@ namespace PseudoTV_Manager
                 if (ChkPlayInOrder.Checked == true)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "12" + (char)34 + " />";
                 }
 
@@ -2623,11 +2615,11 @@ namespace PseudoTV_Manager
                 {
                     _resetHours = (Convert.ToInt32(ResetDays.Text) * 60);
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "13" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + _resetHours + (char)34 + " />";
                 }
 
@@ -2637,11 +2629,11 @@ namespace PseudoTV_Manager
                 if (!string.IsNullOrEmpty(ChannelName.Text))
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "1" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + ChannelName.Text + (char)34 + " />";
                 }
 
@@ -2656,11 +2648,11 @@ namespace PseudoTV_Manager
                     for (var x = 0; x <= NotShows.Items.Count - 1; x++)
                     {
                         rulecount = rulecount + 1;
-                        AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                     "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 +
+                        appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                     "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 +
                                      " value=" + (char)34 + "2" + (char)34 + " />";
-                        AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                     "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 +
+                        appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                     "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 +
                                      " value=" + (char)34 + NotShows.Items[x] + (char)34 + " />";
                     }
                 }
@@ -2668,85 +2660,85 @@ namespace PseudoTV_Manager
                 for (var x = 0; x <= InterleavedList.Items.Count - 1; x++)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "6" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + InterleavedList.Items[x].SubItems[0].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_2" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_2" + (char)34 + " value=" +
                                  (char)34 + InterleavedList.Items[x].SubItems[1].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_3" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_3" + (char)34 + " value=" +
                                  (char)34 + InterleavedList.Items[x].SubItems[2].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_4" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_4" + (char)34 + " value=" +
                                  (char)34 + InterleavedList.Items[x].SubItems[3].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_5" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_5" + (char)34 + " value=" +
                                  (char)34 + InterleavedList.Items[x].SubItems[4].Text + (char)34 + " />";
                 }
 
                 for (var x = 0; x <= SchedulingList.Items.Count - 1; x++)
                 {
                     rulecount = rulecount + 1;
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_id" + (char)34 + " value=" +
                                  (char)34 + "3" + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_1" + (char)34 + " value=" +
                                  (char)34 + SchedulingList.Items[x].SubItems[0].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_2" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_2" + (char)34 + " value=" +
                                  (char)34 + SchedulingList.Items[x].SubItems[1].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_3" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_3" + (char)34 + " value=" +
                                  (char)34 + SchedulingList.Items[x].SubItems[2].Text + (char)34 + " />";
-                    AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                 "Channel_" + ChannelNum + "_rule_" + rulecount + "_opt_4" + (char)34 + " value=" +
+                    appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                 "Channel_" + channelNum + "_rule_" + rulecount + "_opt_4" + (char)34 + " value=" +
                                  (char)34 + SchedulingList.Items[x].SubItems[3].Text + (char)34 + " />";
                 }
 
                 //Update it has been changed to flag it?
                 //<setting id="Channel_1_changed" value="True" />
-                AppendInfo = AppendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                             "Channel_" + ChannelNum + "_changed" + (char)34 + " value=" + (char)34 +
+                appendInfo = appendInfo + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                             "Channel_" + channelNum + "_changed" + (char)34 + " value=" + (char)34 +
                              "True" + (char)34 + " />";
 
                 //Add type of channel to the top.
-                var TopAppend = "\t" + "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_type" +
+                var topAppend = "\t" + "<setting id=" + (char)34 + "Channel_" + channelNum + "_type" +
                                    (char)34 + " value=" + (char)34 + PlayListType.SelectedIndex + (char)34 +
                                    " />";
 
                 if (PlayListType.SelectedIndex == 0)
                 {
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 7)
                 {
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_3" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_3" + (char)34 +
                                 " value=" + (char)34 + MediaLimitBox.Text + (char)34 + " />" +
                                 System.Environment.NewLine + "\t" + "<setting id=" + (char)34 + "Channel_" +
-                                ChannelNum + "_4" + (char)34 + " value=" + (char)34 +
+                                channelNum + "_4" + (char)34 + " value=" + (char)34 +
                                 SortTypeBox.SelectedIndex + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 8 | PlayListType.SelectedIndex == 9)
                 {
-                    TopAppend += System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_2" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_2" + (char)34 +
                                 " value=" + (char)34 + StrmUrlBox.Text + (char)34 + " />" +
                                 System.Environment.NewLine + "\t" + "<setting id=" + (char)34 + "Channel_" +
-                                ChannelNum + "_3" + (char)34 + " value=" + (char)34 + ShowTitleBox.Text +
+                                channelNum + "_3" + (char)34 + " value=" + (char)34 + ShowTitleBox.Text +
                                 (char)34 + " />" + System.Environment.NewLine + "\t" + "<setting id=" +
-                                (char)34 + "Channel_" + ChannelNum + "_4" + (char)34 + " value=" +
+                                (char)34 + "Channel_" + channelNum + "_4" + (char)34 + " value=" +
                                 (char)34 + ShowDescBox.Text + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 10)
@@ -2756,78 +2748,78 @@ namespace PseudoTV_Manager
                         PlayListLocation.Text = YouTubeMulti;
                     }
                     
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_2" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_2" + (char)34 +
                                 " value=" + (char)34 + YouTubeType.SelectedIndex + 1 + (char)34 + " />" +
                                 System.Environment.NewLine + "\t" + "<setting id=" + (char)34 + "Channel_" +
-                                ChannelNum + "_3" + (char)34 + " value=" + (char)34 + MediaLimitBox.Text +
+                                channelNum + "_3" + (char)34 + " value=" + (char)34 + MediaLimitBox.Text +
                                 (char)34 + " />" + System.Environment.NewLine + "\t" + "<setting id=" +
-                                (char)34 + "Channel_" + ChannelNum + "_4" + (char)34 + " value=" +
+                                (char)34 + "Channel_" + channelNum + "_4" + (char)34 + " value=" +
                                 (char)34 + SortTypeBox.SelectedIndex + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 11)
                 {
-                    TopAppend += System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_2" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_2" + (char)34 +
                                 " value=" + (char)34 + "1" + (char)34 + " />" + System.Environment.NewLine +
-                                "\t" + "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_3" +
+                                "\t" + "<setting id=" + (char)34 + "Channel_" + channelNum + "_3" +
                                 (char)34 + " value=" + (char)34 + MediaLimitBox.Text + (char)34 +
                                 " />" + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_4" + (char)34 + " value=" + (char)34 +
+                                "Channel_" + channelNum + "_4" + (char)34 + " value=" + (char)34 +
                                 SortTypeBox.SelectedIndex + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 13)
                 {
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 SubChannelType.SelectedIndex + 1 + (char)34 + " />" + System.Environment.NewLine +
-                                "\t" + "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_2" +
+                                "\t" + "<setting id=" + (char)34 + "Channel_" + channelNum + "_2" +
                                 (char)34 + " value=" + (char)34 + PlayListLocation.Text + (char)34 +
                                 " />" + System.Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_3" + (char)34 + " value=" + (char)34 +
+                                "Channel_" + channelNum + "_3" + (char)34 + " value=" + (char)34 +
                                 MediaLimitBox.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_4" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_4" + (char)34 +
                                 " value=" + (char)34 + SortTypeBox.SelectedIndex + (char)34 + " />";
                 }
                 else if (PlayListType.SelectedIndex == 15)
                 {
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
-                                "<setting id=" + (char)34 + "Channel_" + ChannelNum + "_2" + (char)34 +
+                                "<setting id=" + (char)34 + "Channel_" + channelNum + "_2" + (char)34 +
                                 " value=" + (char)34 + PluginNotInclude + (char)34 + " />" +
                                 System.Environment.NewLine + "\t" + "<setting id=" + (char)34 + "Channel_" +
-                                ChannelNum + "_3" + (char)34 + " value=" + (char)34 + MediaLimitBox.Text +
+                                channelNum + "_3" + (char)34 + " value=" + (char)34 + MediaLimitBox.Text +
                                 (char)34 + " />" + System.Environment.NewLine + "\t" + "<setting id=" +
-                                (char)34 + "Channel_" + ChannelNum + "_4" + (char)34 + " value=" +
+                                (char)34 + "Channel_" + channelNum + "_4" + (char)34 + " value=" +
                                 (char)34 + SortTypeBox.SelectedIndex + (char)34 + " />";
                 }
                 else
                 {
-                    TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                                "Channel_" + ChannelNum + "_1" + (char)34 + " value=" + (char)34 +
+                    topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                                "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 Option2.Text + (char)34 + " />";
                 }
 
                 //Also append the Rulecount to the top, just underneath the channel type & 2nd value
-                TopAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
-                            "Channel_" + ChannelNum + "_rulecount" + (char)34 + " value=" + (char)34 +
+                topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
+                            "Channel_" + channelNum + "_rulecount" + (char)34 + " value=" + (char)34 +
                             rulecount + (char)34 + " />";
 
-                AppendInfo = TopAppend + AppendInfo;
+                appendInfo = topAppend + appendInfo;
 
                 //Combine the original text, plus the edited channel at the bottom, followed by ending the settings.
-                TextFile += AppendInfo + System.Environment.NewLine + "</settings>";
+                textFile += appendInfo + System.Environment.NewLine + "</settings>";
 
-                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, TextFile);
+                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, textFile);
 
                 //RefreshALL()
                 var returnindex = TVGuideList.SelectedIndices[0];
-                RefreshTVGuide();
+                RefreshTvGuide();
                 TVGuideList.Items[returnindex].Selected = true;
             }
         }
@@ -2867,11 +2859,11 @@ namespace PseudoTV_Manager
 
         private void Button12_Click(System.Object sender, System.EventArgs e)
         {
-            var Response = ShowInputDialog("Enter TV Show's Name", "TV Show Name");
+            var response = ShowInputDialog("Enter TV Show's Name", "TV Show Name");
 
-            if (!string.IsNullOrEmpty(Response.Input))
+            if (!string.IsNullOrEmpty(response.Input))
             {
-                NotShows.Items.Add(Response);
+                NotShows.Items.Add(response);
             }
 
         }
@@ -2886,31 +2878,31 @@ namespace PseudoTV_Manager
 
         private void Button14_Click(System.Object sender, System.EventArgs e)
         {
-            string[] NewItem = new string[6];
+            var newItem = new string[6];
 
-            NewItem[0] = ShowInputDialog("Enter Channel Number", "Enter Channel Number").Input;
-            NewItem[1] = "1";
-            NewItem[2] = null;
-            NewItem[3] = null;
-            NewItem[4] = null;
-            NewItem[5] = null;
+            newItem[0] = ShowInputDialog("Enter Channel Number", "Enter Channel Number").Input;
+            newItem[1] = "1";
+            newItem[2] = null;
+            newItem[3] = null;
+            newItem[4] = null;
+            newItem[5] = null;
 
-            ListViewItem itm = default(ListViewItem);
-            itm = new ListViewItem(NewItem);
+            var itm = default(ListViewItem);
+            itm = new ListViewItem(newItem);
 
-            bool InList = false;
+            var inList = false;
 
-            if (PseudoTvUtils.IsNumeric(NewItem[0]))
+            if (PseudoTvUtils.IsNumeric(newItem[0]))
             {
-                var firstItemValue = Convert.ToInt32(NewItem[0]);
+                var firstItemValue = Convert.ToInt32(newItem[0]);
                 if (firstItemValue > 0 & firstItemValue <= 999)
                 {
                     for (var x = 0; x <= TVGuideList.Items.Count - 1; x++)
                     {
-                        if (TVGuideList.Items[x].SubItems[0].Text == NewItem[0])
+                        if (TVGuideList.Items[x].SubItems[0].Text == newItem[0])
                         {
-                            MessageBox.Show("You already have a channel " + NewItem[0]);
-                            InList = true;
+                            MessageBox.Show("You already have a channel " + newItem[0]);
+                            inList = true;
                             break; // TODO: might not be correct. Was : Exit For
                         }
                     }
@@ -2918,11 +2910,11 @@ namespace PseudoTV_Manager
                 else
                 {
                     MessageBox.Show("Sorry, the channel has to be 1 - 999)");
-                    InList = true;
+                    inList = true;
                 }
             }
 
-            if (InList == false & PseudoTvUtils.IsNumeric(NewItem[0]))
+            if (inList == false & PseudoTvUtils.IsNumeric(newItem[0]))
             {
                 TVGuideList.Items.Add(itm);
 
@@ -2930,7 +2922,7 @@ namespace PseudoTV_Manager
                 for (var x = 0; x <= TVGuideList.Items.Count - 1; x++)
                 {
 
-                    if (TVGuideList.Items[x].SubItems[0].Text == NewItem[0])
+                    if (TVGuideList.Items[x].SubItems[0].Text == newItem[0])
                     {
                         TVGuideList.Items[x].Selected = true;
                     }
@@ -2952,31 +2944,31 @@ namespace PseudoTV_Manager
                 //Grab all comments MINUS the ones for selected #
                 //Append this & our new content to the file.
 
-                string FILE_NAME = PseudoTvSettingsLocation;
-                string TextFile = "";
+                var fileName = PseudoTvSettingsLocation;
+                var textFile = "";
 
-                var ChannelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
+                var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
 
                 //Loop through config file.
                 //Grab all comments MINUS the ones for selected #
 
-                if (System.IO.File.Exists(FILE_NAME) == true)
+                if (System.IO.File.Exists(fileName) == true)
                 {
-                    System.IO.StreamReader objReader = new System.IO.StreamReader(FILE_NAME);
+                    var objReader = new System.IO.StreamReader(fileName);
 
 
                     while (objReader.Peek() != -1)
                     {
-                        var SingleLine = objReader.ReadLine();
+                        var singleLine = objReader.ReadLine();
 
                         if (
-                            SingleLine.Contains("<setting id=" + (char)34 + "Channel_" + ChannelNum + "_") ||
-                            SingleLine.Contains("</settings"))
+                            singleLine.Contains("<setting id=" + (char)34 + "Channel_" + channelNum + "_") ||
+                            singleLine.Contains("</settings"))
                         {
                         }
                         else
                         {
-                            TextFile = TextFile + SingleLine + System.Environment.NewLine;
+                            textFile = textFile + singleLine + System.Environment.NewLine;
                         }
 
                     }
@@ -2990,9 +2982,9 @@ namespace PseudoTV_Manager
 
                 }
 
-                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, TextFile);
+                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, textFile);
 
-                RefreshTVGuide();
+                RefreshTvGuide();
 
                 TVGuideList.SelectedItems.Clear();
 
@@ -3052,7 +3044,7 @@ namespace PseudoTV_Manager
 
         private void ListMoviePosters_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
-            int x = ListMoviePosters.SelectedIndex;
+            var x = ListMoviePosters.SelectedIndex;
 
             MoviePicture.ImageLocation = ListMoviePosters.Items[x].ToString();
             MoviePicture.Refresh();
@@ -3061,9 +3053,9 @@ namespace PseudoTV_Manager
 
         private void MoviePosterSelect_Click(System.Object sender, System.EventArgs e)
         {
-            int x = ListMoviePosters.SelectedIndex;
-            string Type = "poster";
-            string MediaType = "movie";
+            var x = ListMoviePosters.SelectedIndex;
+            var type = "poster";
+            var mediaType = "movie";
 
 
             if (MovieLocation.TextLength >= 6)
@@ -3075,24 +3067,24 @@ namespace PseudoTV_Manager
                 }
             }
 
-            string directoryName = "";
+            var directoryName = "";
             directoryName = Path.GetDirectoryName(MovieLocation.Text);
 
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to TVPosterSelect.
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            var saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.InitialDirectory = directoryName;
             saveFileDialog1.Filter = "JPeg Image|*.jpg";
             saveFileDialog1.Title = "Save an Image File";
             saveFileDialog1.FileName = "poster.jpg";
             saveFileDialog1.ShowDialog();
 
-            string FileToSaveAs = System.IO.Path.Combine(saveFileDialog1.InitialDirectory, saveFileDialog1.FileName);
-            MoviePicture.Image.Save(FileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
+            var fileToSaveAs = System.IO.Path.Combine(saveFileDialog1.InitialDirectory, saveFileDialog1.FileName);
+            MoviePicture.Image.Save(fileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
 
             PseudoTvUtils.DbExecute("UPDATE art SET url = '" + ListMoviePosters.Items[x].ToString() +
                                     "' WHERE media_id = '" +
-                                    MovieIDLabel.Text + "' and media_type = '" + MediaType + "' and type = '" + Type +
+                                    MovieIDLabel.Text + "' and media_type = '" + mediaType + "' and type = '" + type +
                                     "'");
             //TODO: VisualStyleElement.Status.Text = "Updated " + MovieLabel.Text + " " + MovieIDLabel.Text +
             //                                " Successfully with " + ListMoviePosters.Items[x].ToString() + "";
@@ -3106,51 +3098,51 @@ namespace PseudoTV_Manager
             {
                 MoviePicture.Update();
 
-                ListViewItem ListItem = default(ListViewItem);
-                ListItem = MovieList.SelectedItems[0];
+                var listItem = default(ListViewItem);
+                listItem = MovieList.SelectedItems[0];
 
-                string MovieName = null;
-                string MovieID = null;
+                string movieName = null;
+                string movieId = null;
 
-                MovieID = ListItem.SubItems[1].Text;
-                MovieName = ListItem.SubItems[0].Text;
-                MovieIDLabel.Text = MovieID;
+                movieId = listItem.SubItems[1].Text;
+                movieName = listItem.SubItems[0].Text;
+                MovieIDLabel.Text = movieId;
 
 
-                var SelectArray = new[] { 16, 24, 20, 10 };
+                var selectArray = new[] { 16, 24, 20, 10 };
 
                 //Shoot it over to the ReadRecord sub, 
-                string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
-                    "SELECT * FROM movie WHERE idMovie='" + MovieID + "'", SelectArray);
+                var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    "SELECT * FROM movie WHERE idMovie='" + movieId + "'", selectArray);
 
-                string[] ReturnArraySplit = null;
+                string[] returnArraySplit = null;
 
                 //We only have 1 response, since it searches by ID. So, just break it into parts. 
-                ReturnArraySplit = ReturnArray[0].Split('~');
+                returnArraySplit = returnArray[0].Split('~');
 
-                string MoviePoster = ReturnArraySplit[3];
+                var moviePoster = returnArraySplit[3];
                 ListMoviePosters.Items.Clear();
 
-                if (MoviePoster.Contains("<thumb aspect=\"poster\" preview=\"") ||
-                    MoviePoster.Contains("<thumb>"))
+                if (moviePoster.Contains("<thumb aspect=\"poster\" preview=\"") ||
+                    moviePoster.Contains("<thumb>"))
                 {
-                    string[] MoviePosterSplit = MoviePoster.Split(Convert.ToChar("<thumb aspect=\"poster\" preview=\""));
+                    var moviePosterSplit = moviePoster.Split(Convert.ToChar("<thumb aspect=\"poster\" preview=\""));
 
-                    for (var x = 1; x <= MoviePosterSplit.Length; x++)
+                    for (var x = 1; x <= moviePosterSplit.Length; x++)
                     {
-                        int i = MoviePosterSplit[x].IndexOf("<thumb aspect=\"poster\" preview=\"");
-                        MoviePosterSplit[x] = MoviePosterSplit[x].Substring(i + 1, MoviePosterSplit[x].IndexOf("\">"));
-                        ListMoviePosters.Items.Add(MoviePosterSplit[x]);
+                        var i = moviePosterSplit[x].IndexOf("<thumb aspect=\"poster\" preview=\"");
+                        moviePosterSplit[x] = moviePosterSplit[x].Substring(i + 1, moviePosterSplit[x].IndexOf("\">"));
+                        ListMoviePosters.Items.Add(moviePosterSplit[x]);
                     }
 
-                    string[] MoviePosterSplit2 = MoviePoster.Split(Convert.ToChar("<thumb>"));
+                    var moviePosterSplit2 = moviePoster.Split(Convert.ToChar("<thumb>"));
 
-                    for (var x = 1; x <= MoviePosterSplit2.Length; x++)
+                    for (var x = 1; x <= moviePosterSplit2.Length; x++)
                     {
-                        int i = MoviePosterSplit2[x].IndexOf("<thumb>");
-                        MoviePosterSplit2[x] = MoviePosterSplit2[x]
-                            .Substring(i + 1, MoviePosterSplit2[x].IndexOf("</thumb>"));
-                        ListMoviePosters.Items.Add(MoviePosterSplit2[x]);
+                        var i = moviePosterSplit2[x].IndexOf("<thumb>");
+                        moviePosterSplit2[x] = moviePosterSplit2[x]
+                            .Substring(i + 1, moviePosterSplit2[x].IndexOf("</thumb>"));
+                        ListMoviePosters.Items.Add(moviePosterSplit2[x]);
                     }
                 }
                 else
@@ -3158,34 +3150,34 @@ namespace PseudoTV_Manager
                     ListMoviePosters.Items.Add("Nothing Found");
                 }
 
-                string MovieGenres = ReturnArraySplit[0];
+                var movieGenres = returnArraySplit[0];
 
-                MovieLabel.Text = MovieName;
-                MovieLocation.Text = ReturnArraySplit[1];
+                MovieLabel.Text = movieName;
+                MovieLocation.Text = returnArraySplit[1];
 
-                if (string.IsNullOrEmpty(ReturnArraySplit[2]))
+                if (string.IsNullOrEmpty(returnArraySplit[2]))
                 {
                     txtMovieNetwork.SelectedIndex = -1;
                 }
                 else
                 {
-                    txtMovieNetwork.Text = ReturnArraySplit[2];
+                    txtMovieNetwork.Text = returnArraySplit[2];
                 }
 
                 //Loop through each Movie Genre, if there more than one.
                 MovieGenresList.Items.Clear();
-                if (MovieGenres.Contains(" / "))
+                if (movieGenres.Contains(" / "))
                 {
-                    string[] MovieGenresSplit = MovieGenres.Split(Convert.ToChar(" / "));
+                    var movieGenresSplit = movieGenres.Split(Convert.ToChar(" / "));
 
-                    for (var x = 0; x <= MovieGenresSplit.Length; x++)
+                    for (var x = 0; x <= movieGenresSplit.Length; x++)
                     {
-                        MovieGenresList.Items.Add(MovieGenresSplit[x]);
+                        MovieGenresList.Items.Add(movieGenresSplit[x]);
                     }
                 }
-                else if (!string.IsNullOrEmpty(MovieGenres))
+                else if (!string.IsNullOrEmpty(movieGenres))
                 {
-                    MovieGenresList.Items.Add(MovieGenres);
+                    MovieGenresList.Items.Add(movieGenres);
                 }
 
 
@@ -3198,7 +3190,7 @@ namespace PseudoTV_Manager
                     }
                 }
 
-                string directoryName = "";
+                var directoryName = "";
                 directoryName = Path.GetDirectoryName(MovieLocation.Text);
 
                 if (System.IO.File.Exists(directoryName + "\\" + "poster.jpg"))
@@ -3229,7 +3221,7 @@ namespace PseudoTV_Manager
             if (MovieGenresList.SelectedIndex >= 0)
             {
                 //Grab the 3rd column from the TVShowList, which is the TVShowID
-                var GenreID = LookUpGenre(MovieGenresList.Items[MovieGenresList.SelectedIndex].ToString());
+                var genreId = LookUpGenre(MovieGenresList.Items[MovieGenresList.SelectedIndex].ToString());
 
                 //Now, remove the link in the database.
                 //PseudoTvUtils.DbExecute("DELETE FROM genrelinktvshow WHERE idGenre = '" & GenreID & "' AND idShow ='" & TVShowList.Items(TVShowList.SelectedIndices[0]).SubItems[2].Text & "'")
@@ -3245,50 +3237,50 @@ namespace PseudoTV_Manager
         {
             MovieNetworkList.Items.Clear();
 
-            var SelectArray = new[] { 2, 20 };
+            var selectArray = new[] { 2, 20 };
 
-            string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                 "SELECT * FROM movie ORDER BY c18 ASC",
-                SelectArray);
+                selectArray);
 
             //Loop through each returned Movie
-            for (var x = 0; x <= ReturnArray.Length - 1; x++)
+            for (var x = 0; x <= returnArray.Length - 1; x++)
             {
-                if ((string.IsNullOrEmpty(ReturnArray[x])))
+                if ((string.IsNullOrEmpty(returnArray[x])))
                 {
                     continue;
                 }
 
-                string[] ReturnArraySplit = null;
+                string[] returnArraySplit = null;
 
-                string ShowName = null;
-                string ShowNetwork = null;
+                string showName = null;
+                string showNetwork = null;
 
-                ReturnArraySplit = ReturnArray[x].Split('~');
+                returnArraySplit = returnArray[x].Split('~');
 
-                ShowName = ReturnArraySplit[0];
+                showName = returnArraySplit[0];
                 //Updated ReturnArraySplit for ShowNetwork to reflect MyVideos78.db schema
-                ShowNetwork = ReturnArraySplit[1];
+                showNetwork = returnArraySplit[1];
 
-                bool NetworkListed = false;
+                var networkListed = false;
 
 
                 for (var y = 0; y <= MovieNetworkList.Items.Count - 1; y++)
                 {
-                    if (MovieNetworkList.Items[y].SubItems[0].Text == ShowNetwork)
+                    if (MovieNetworkList.Items[y].SubItems[0].Text == showNetwork)
                     {
-                        NetworkListed = true;
+                        networkListed = true;
                         MovieNetworkList.Items[y].SubItems[1].Text = MovieNetworkList.Items[y].SubItems[1].Text + 1;
                     }
 
                 }
 
-                if (NetworkListed == false)
+                if (networkListed == false)
                 {
-                    ListViewItem itm = default(ListViewItem);
-                    string[] str = new string[3];
+                    var itm = default(ListViewItem);
+                    var str = new string[3];
 
-                    str[0] = ShowNetwork;
+                    str[0] = showNetwork;
                     str[1] = "1";
                     //test
                     itm = new ListViewItem(str);
@@ -3306,45 +3298,45 @@ namespace PseudoTV_Manager
         {
             NetworkList.Items.Clear();
 
-            var SelectArray = new[] { 1, 15 };
+            var selectArray = new[] { 1, 15 };
 
-            string[] ReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                 "SELECT * FROM tvshow ORDER BY c14 ASC",
-                SelectArray);
+                selectArray);
 
             //Loop through each returned TV show.
 
-            for (var x = 0; x <= ReturnArray.Length - 1; x++)
+            for (var x = 0; x <= returnArray.Length - 1; x++)
             {
 
-                string[] ReturnArraySplit = null;
+                string[] returnArraySplit = null;
 
-                string ShowName = null;
-                string ShowNetwork = null;
+                string showName = null;
+                string showNetwork = null;
 
-                ReturnArraySplit = ReturnArray[x].Split('~');
+                returnArraySplit = returnArray[x].Split('~');
 
-                ShowName = ReturnArraySplit[0];
-                ShowNetwork = ReturnArraySplit[1];
+                showName = returnArraySplit[0];
+                showNetwork = returnArraySplit[1];
 
-                var NetworkListed = false;
+                var networkListed = false;
 
                 for (var y = 0; y <= NetworkList.Items.Count - 1; y++)
                 {
-                    if (NetworkList.Items[y].SubItems[0].Text == ShowNetwork)
+                    if (NetworkList.Items[y].SubItems[0].Text == showNetwork)
                     {
-                        NetworkListed = true;
+                        networkListed = true;
                         NetworkList.Items[y].SubItems[1].Text = NetworkList.Items[y].SubItems[1].Text + 1;
                     }
 
                 }
 
-                if (NetworkListed == false)
+                if (networkListed == false)
                 {
-                    ListViewItem itm = default(ListViewItem);
-                    string[] str = new string[3];
+                    var itm = default(ListViewItem);
+                    var str = new string[3];
 
-                    str[0] = ShowNetwork;
+                    str[0] = showNetwork;
                     str[1] = "1";
 
                     itm = new ListViewItem(str);
@@ -3364,64 +3356,64 @@ namespace PseudoTV_Manager
             if (MovieList.SelectedItems.Count > 0)
             {
                 // Fix any issues with shows and 's.
-                string MovieName = MovieLabel.Text;
+                var movieName = MovieLabel.Text;
                 //Convert show genres into the format ex:  genre1 / genre2 / etc.
-                var MovieGenres = ConvertGenres(MovieGenresList);
-                MovieName = MovieName.Replace("'", "''");
+                var movieGenres = ConvertGenres(MovieGenresList);
+                movieName = movieName.Replace("'", "''");
                 //Grab the Network ID based on the name
-                var NetworkID = LookUpNetwork(txtMovieNetwork.Text);
-                string MovieID = MovieList.SelectedItems[0].SubItems[1].Text;
+                var networkId = LookUpNetwork(txtMovieNetwork.Text);
+                var movieId = MovieList.SelectedItems[0].SubItems[1].Text;
 
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
-                    PseudoTvUtils.DbExecute("DELETE FROM studio_link WHERE media_id = '" + MovieID + "'");
+                    PseudoTvUtils.DbExecute("DELETE FROM studio_link WHERE media_id = '" + movieId + "'");
                     PseudoTvUtils.DbExecute("INSERT INTO studio_link (studio_id, media_id, media_type) VALUES ('" +
-                                            NetworkID + "', '" +
-                                            MovieID + "', 'movie')");
+                                            networkId + "', '" +
+                                            movieId + "', 'movie')");
                 }
                 else
                 {
-                    PseudoTvUtils.DbExecute("DELETE FROM studiolinkmovie WHERE idMovie = '" + MovieID + "'");
-                    PseudoTvUtils.DbExecute("INSERT INTO studiolinkmovie (idStudio, idMovie) VALUES ('" + NetworkID +
-                                            "', '" + MovieID +
+                    PseudoTvUtils.DbExecute("DELETE FROM studiolinkmovie WHERE idMovie = '" + movieId + "'");
+                    PseudoTvUtils.DbExecute("INSERT INTO studiolinkmovie (idStudio, idMovie) VALUES ('" + networkId +
+                                            "', '" + movieId +
                                             "')");
                 }
 
-                PseudoTvUtils.DbExecute("UPDATE movie SET c14 = '" + MovieGenres + "', c18 ='" + txtMovieNetwork.Text +
-                                        "' WHERE idMovie = '" + MovieID + "'");
+                PseudoTvUtils.DbExecute("UPDATE movie SET c14 = '" + movieGenres + "', c18 ='" + txtMovieNetwork.Text +
+                                        "' WHERE idMovie = '" + movieId + "'");
                 //TODO: VisualStyleElement.Status.Text = "Updated " + MovieLabel.Text + " Successfully";
 
                 if ((KodiVersion >= KodiVersion.Isengard))
                 {
                     //Remove all genres from tv show
-                    PseudoTvUtils.DbExecute("DELETE FROM genre_link  WHERE media_id = '" + MovieID + "'");
+                    PseudoTvUtils.DbExecute("DELETE FROM genre_link  WHERE media_id = '" + movieId + "'");
 
                     //add each one.  one by one.
                     for (var x = 0; x <= MovieGenresList.Items.Count - 1; x++)
                     {
-                        var GenreID = LookUpGenre(MovieGenresList.Items[x].ToString());
+                        var genreId = LookUpGenre(MovieGenresList.Items[x].ToString());
                         PseudoTvUtils.DbExecute("INSERT INTO genre_link  (genre_id, media_id, media_type) VALUES ('" +
-                                                GenreID +
-                                                "', '" + MovieID + "', 'movie')");
+                                                genreId +
+                                                "', '" + movieId + "', 'movie')");
                     }
                 }
                 else
                 {
                     //Remove all genres from tv show
-                    PseudoTvUtils.DbExecute("DELETE FROM genrelinkmovie  WHERE idMovie = '" + MovieID + "'");
+                    PseudoTvUtils.DbExecute("DELETE FROM genrelinkmovie  WHERE idMovie = '" + movieId + "'");
 
                     //add each one.  one by one.
                     for (var x = 0; x <= MovieGenresList.Items.Count - 1; x++)
                     {
-                        var GenreID = LookUpGenre(MovieGenresList.Items[x].ToString());
-                        PseudoTvUtils.DbExecute("INSERT INTO genrelinkmovie (idGenre, idMovie) VALUES ('" + GenreID +
-                                                "', '" + MovieID +
+                        var genreId = LookUpGenre(MovieGenresList.Items[x].ToString());
+                        PseudoTvUtils.DbExecute("INSERT INTO genrelinkmovie (idGenre, idMovie) VALUES ('" + genreId +
+                                                "', '" + movieId +
                                                 "')");
                     }
                 }
 
                 //Save our spot on the list.
-                var SavedName = txtMovieNetwork.Text;
+                var savedName = txtMovieNetwork.Text;
 
                 //Refresh Things
                 RefreshNetworkListMovies();
@@ -3448,49 +3440,49 @@ namespace PseudoTV_Manager
         private void MovieNetworkList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
         {
             // Get the new sorting column. 
-            ColumnHeader new_sorting_column = MovieNetworkList.Columns[e.Column];
+            var newSortingColumn = MovieNetworkList.Columns[e.Column];
             // Figure out the new sorting order. 
-            System.Windows.Forms.SortOrder sort_order = default(System.Windows.Forms.SortOrder);
-            if (m_SortingColumn == null)
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn == null)
             {
                 // New column. Sort ascending. 
-                sort_order = SortOrder.Ascending;
+                sortOrder = SortOrder.Ascending;
                 // See if this is the same column. 
             }
             else
             {
-                if (new_sorting_column.Equals(m_SortingColumn))
+                if (newSortingColumn.Equals(_mSortingColumn))
                 {
                     // Same column. Switch the sort order. 
-                    if (m_SortingColumn.Text.StartsWith("> "))
+                    if (_mSortingColumn.Text.StartsWith("> "))
                     {
-                        sort_order = SortOrder.Descending;
+                        sortOrder = SortOrder.Descending;
                     }
                     else
                     {
-                        sort_order = SortOrder.Ascending;
+                        sortOrder = SortOrder.Ascending;
                     }
                 }
                 else
                 {
                     // New column. Sort ascending. 
-                    sort_order = SortOrder.Ascending;
+                    sortOrder = SortOrder.Ascending;
                 }
                 // Remove the old sort indicator. 
-                m_SortingColumn.Text = m_SortingColumn.Text.Substring(2);
+                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
             }
             // Display the new sort order. 
-            m_SortingColumn = new_sorting_column;
-            if (sort_order == SortOrder.Ascending)
+            _mSortingColumn = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
             {
-                m_SortingColumn.Text = "> " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
             }
             else
             {
-                m_SortingColumn.Text = "< " + m_SortingColumn.Text;
+                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            MovieNetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sort_order);
+            MovieNetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
             // Sort. 
             MovieNetworkList.Sort();
         }
@@ -3502,12 +3494,12 @@ namespace PseudoTV_Manager
 
             if (MovieNetworkList.SelectedIndices.Count > 0)
             {
-                var SelectArray = new[] { 2 };
+                var selectArray = new[] { 2 };
 
 
                 var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
                     "SELECT * FROM movie WHERE c18='" +
-                    MovieNetworkList.Items[MovieNetworkList.SelectedIndices[0]].SubItems[0].Text + "'", SelectArray);
+                    MovieNetworkList.Items[MovieNetworkList.SelectedIndices[0]].SubItems[0].Text + "'", selectArray);
 
                 for (var x = 0; x <= returnArray.Length - 1; x++)
                 {
@@ -3527,8 +3519,8 @@ namespace PseudoTV_Manager
             if (YouTubeType.SelectedIndex == 0)
             {
                 Label6.Text = "Channel/User:";
-                var _with32 = PlayListLocation;
-                _with32.Location = new System.Drawing.Point(270, 120);
+                var with32 = PlayListLocation;
+                with32.Location = new System.Drawing.Point(270, 120);
                 PlayListLocation.Visible = true;
                 NotShows.Visible = false;
                 AddExcludeBtn.Visible = false;
@@ -3538,8 +3530,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 1)
             {
                 Label6.Text = "Playlist:";
-                var _with33 = PlayListLocation;
-                _with33.Location = new System.Drawing.Point(220, 120);
+                var with33 = PlayListLocation;
+                with33.Location = new System.Drawing.Point(220, 120);
                 PlayListLocation.Visible = true;
                 NotShows.Visible = false;
                 AddExcludeBtn.Visible = false;
@@ -3549,8 +3541,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 2 | YouTubeType.SelectedIndex == 3)
             {
                 Label6.Text = "Username:";
-                var _with34 = PlayListLocation;
-                _with34.Location = new System.Drawing.Point(245, 120);
+                var with34 = PlayListLocation;
+                with34.Location = new System.Drawing.Point(245, 120);
                 PlayListLocation.Visible = true;
                 NotShows.Visible = false;
                 AddExcludeBtn.Visible = false;
@@ -3560,8 +3552,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 4)
             {
                 Label6.Text = "Search String:";
-                var _with35 = PlayListLocation;
-                _with35.Location = new System.Drawing.Point(270, 120);
+                var with35 = PlayListLocation;
+                with35.Location = new System.Drawing.Point(270, 120);
                 PlayListLocation.Visible = true;
                 NotShows.Visible = false;
                 AddExcludeBtn.Visible = false;
@@ -3571,8 +3563,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 6)
             {
                 Label6.Text = "";
-                var _with36 = PlayListLocation;
-                _with36.Location = new System.Drawing.Point(295, 120);
+                var with36 = PlayListLocation;
+                with36.Location = new System.Drawing.Point(295, 120);
                 PlayListLocation.Visible = false;
                 NotShows.Visible = true;
                 AddExcludeBtn.Visible = true;
@@ -3583,8 +3575,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 7)
             {
                 Label6.Text = "";
-                var _with37 = PlayListLocation;
-                _with37.Location = new System.Drawing.Point(295, 120);
+                var with37 = PlayListLocation;
+                with37.Location = new System.Drawing.Point(295, 120);
                 PlayListLocation.Visible = false;
                 NotShows.Visible = true;
                 AddExcludeBtn.Visible = true;
@@ -3595,8 +3587,8 @@ namespace PseudoTV_Manager
             else if (YouTubeType.SelectedIndex == 8)
             {
                 Label6.Text = "GData Url:";
-                var _with38 = PlayListLocation;
-                _with38.Location = new System.Drawing.Point(245, 120);
+                var with38 = PlayListLocation;
+                with38.Location = new System.Drawing.Point(245, 120);
                 PlayListLocation.Visible = true;
                 NotShows.Visible = false;
                 AddExcludeBtn.Visible = false;
@@ -3625,14 +3617,14 @@ namespace PseudoTV_Manager
             if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 0)
             {
                 Label6.Text = "LastFM User:";
-                var _with39 = PlayListLocation;
-                _with39.Location = new System.Drawing.Point(270, 120);
+                var with39 = PlayListLocation;
+                with39.Location = new System.Drawing.Point(270, 120);
             }
             else if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 1)
             {
                 Label6.Text = "Channel_##:";
-                var _with40 = PlayListLocation;
-                _with40.Location = new System.Drawing.Point(295, 120);
+                var with40 = PlayListLocation;
+                with40.Location = new System.Drawing.Point(295, 120);
             }
         }
 
@@ -3666,58 +3658,8 @@ namespace PseudoTV_Manager
 
         private void GDataDemoLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            ProcessStartInfo sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
+            var sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
             Process.Start(sInfo);
-        }
-
-
-        private static InputDialogResponse ShowInputDialog(string question, string inputTxt = null)
-        {
-            System.Drawing.Size size = new System.Drawing.Size(200, 70);
-            Form inputBox = new Form();
-
-            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            inputBox.ClientSize = size;
-            inputBox.Text = inputTxt ?? question;
-
-            System.Windows.Forms.TextBox textBox = new TextBox
-            {
-                Size = new System.Drawing.Size(size.Width - 10, 23),
-                Location = new System.Drawing.Point(5, 5),
-                Text = question
-            };
-            inputBox.Controls.Add(textBox);
-
-            Button okButton = new Button
-            {
-                DialogResult = System.Windows.Forms.DialogResult.OK,
-                Name = "okButton",
-                Size = new System.Drawing.Size(75, 23),
-                Text = "&OK",
-                Location = new System.Drawing.Point(size.Width - 80 - 80, 39)
-            };
-            inputBox.Controls.Add(okButton);
-
-            Button cancelButton = new Button
-            {
-                DialogResult = System.Windows.Forms.DialogResult.Cancel,
-                Name = "cancelButton",
-                Size = new System.Drawing.Size(75, 23),
-                Text = "&Cancel",
-                Location = new System.Drawing.Point(size.Width - 80, 39)
-            };
-            inputBox.Controls.Add(cancelButton);
-
-            inputBox.AcceptButton = okButton;
-            inputBox.CancelButton = cancelButton;
-
-            DialogResult result = inputBox.ShowDialog();
-
-            return new InputDialogResponse
-            {
-                DialogResult = result,
-                Input = textBox.Text
-            };
         }
 
         private void AddExcludeBtn_Click(object sender, EventArgs e)
@@ -3771,8 +3713,8 @@ namespace PseudoTV_Manager
                     NotShows.Items.RemoveAt(NotShows.SelectedIndex);
                 }
 
-                string[] items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
-                string result = string.Join("|", items);
+                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
+                var result = string.Join("|", items);
 
                 YouTubeMulti = result;
             }
@@ -3783,8 +3725,8 @@ namespace PseudoTV_Manager
                     NotShows.Items.RemoveAt(NotShows.SelectedIndex);
                 }
 
-                string[] items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
-                string result = string.Join(",", items);
+                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
+                var result = string.Join(",", items);
 
                 PluginNotInclude = result;
             }
