@@ -845,6 +845,7 @@ namespace PseudoTV_Manager.Forms
             this.TVGuideList.TabIndex = 1;
             this.TVGuideList.UseCompatibleStateImageBehavior = false;
             this.TVGuideList.View = System.Windows.Forms.View.Details;
+            this.TVGuideList.SelectedIndexChanged += new System.EventHandler(this.TVGuideList_SelectedIndexChanged);
             // 
             // PluginType
             // 
@@ -878,6 +879,7 @@ namespace PseudoTV_Manager.Forms
             this.GenresList.TabIndex = 2;
             this.GenresList.UseCompatibleStateImageBehavior = false;
             this.GenresList.View = System.Windows.Forms.View.Details;
+            this.GenresList.SelectedIndexChanged += new System.EventHandler(this.GenresList_SelectedIndexChanged);
             // 
             // Label15
             // 
@@ -908,6 +910,7 @@ namespace PseudoTV_Manager.Forms
             this.MovieNetworkList.TabIndex = 4;
             this.MovieNetworkList.UseCompatibleStateImageBehavior = false;
             this.MovieNetworkList.View = System.Windows.Forms.View.Details;
+            this.MovieNetworkList.SelectedIndexChanged += new System.EventHandler(this.MovieNetworkList_SelectedIndexChanged);
             // 
             // Label14
             // 
@@ -965,6 +968,7 @@ namespace PseudoTV_Manager.Forms
             this.NetworkList.TabIndex = 1;
             this.NetworkList.UseCompatibleStateImageBehavior = false;
             this.NetworkList.View = System.Windows.Forms.View.Details;
+            this.NetworkList.SelectedIndexChanged += new System.EventHandler(this.NetworkList_SelectedIndexChanged);
             // 
             // TabPage3
             // 
@@ -1049,7 +1053,7 @@ namespace PseudoTV_Manager.Forms
             // MnuExit
             // 
             this.MnuExit.Name = "MnuExit";
-            this.MnuExit.Size = new System.Drawing.Size(152, 22);
+            this.MnuExit.Size = new System.Drawing.Size(116, 22);
             this.MnuExit.Text = "Exit";
             // 
             // Label24
@@ -1099,7 +1103,7 @@ namespace PseudoTV_Manager.Forms
             // MnuSettings
             // 
             this.MnuSettings.Name = "MnuSettings";
-            this.MnuSettings.Size = new System.Drawing.Size(152, 22);
+            this.MnuSettings.Size = new System.Drawing.Size(116, 22);
             this.MnuSettings.Text = "Settings";
             this.MnuSettings.Click += new System.EventHandler(this.MnuSettings_Click);
             // 
@@ -1118,7 +1122,7 @@ namespace PseudoTV_Manager.Forms
             // 
             this.MenuStrip1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MenuStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.MenuStrip1.GripMargin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            this.MenuStrip1.GripMargin = new System.Windows.Forms.Padding(0);
             this.MenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileToolStripMenuItem});
@@ -1436,7 +1440,7 @@ namespace PseudoTV_Manager.Forms
             this.txtShowNetwork.Size = new System.Drawing.Size(280, 28);
             this.txtShowNetwork.TabIndex = 16;
             // 
-            // BtnSaveSettings
+            // Button3
             // 
             this.Button3.Location = new System.Drawing.Point(433, 136);
             this.Button3.Name = "Button3";
@@ -1559,6 +1563,7 @@ namespace PseudoTV_Manager.Forms
             this.TVShowList.TabIndex = 0;
             this.TVShowList.UseCompatibleStateImageBehavior = false;
             this.TVShowList.View = System.Windows.Forms.View.Details;
+            this.TVShowList.SelectedIndexChanged += new System.EventHandler(this.TVShowList_SelectedIndexChanged);
             // 
             // TabPage5
             // 

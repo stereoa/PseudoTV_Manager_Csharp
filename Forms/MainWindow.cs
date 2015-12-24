@@ -266,7 +266,7 @@ namespace PseudoTV_Manager.Forms
             }
 
             //Sort List
-            TVGuideList.ListViewItemSorter = new ClsListviewSorter(0, SortOrder.Ascending);
+            TVGuideList.ListViewItemSorter = new ListViewSorter(0, SortOrder.Ascending);
             // Sort. 
             TVGuideList.Sort();
         }
@@ -502,78 +502,13 @@ namespace PseudoTV_Manager.Forms
         public void RefreshSettings()
         {
             //TODO:
-            //My.Settings.Reload();
-            //Settings.txt location
-            //Dim SettingsFile As String = Application.StartupPath() & "\" & "Settings.txt"
+            Settings.Default.Reload();
 
-            //See if there's already a text file in place, if so load it.
-            //    If System.IO.File.Exists(SettingsFile) = True Then
-            //        Dim FileLocations = ReadFile(SettingsFile)
 
-            //        'Make sure there's the | symbol there so we can split it
-            //        If InStr(FileLocations, " | ") Then
-            //            FileLocations = Split(FileLocations, " | ")
-
-            //            'Now count the split and make sure it has the proper amount.
-            //            If UBound(FileLocations) = 3 Then
-
-            //                If FileLocations[0] = "0" Then
-            //                    'This is for a standard SQLite Entry.
-            //                    DatabaseType = 0
-            //                    Settings.Default.VideoDatabaseLocation = FileLocations[1]
-            //                    TxtSettings.Default.PseudoTvSettingsLocation = FileLocations[2]
-            //		TxtSettings.Default.AddonDatabaseLocation = FileLocations[3]
-            //		'get Kodi KodiVersion based on video db KodiVersion
-            //		Version = GetKodiVersion(Settings.Default.VideoDatabaseLocation)
-            //                Else
-            //                    DatabaseType = 1
-            //                    MySQLConnectionString = FileLocations[1]
-            //                    TxtSettings.Default.PseudoTvSettingsLocation = FileLocations[2]
-            //                    TxtSettings.Default.AddonDatabaseLocation = FileLocations[3]
-            //	End If
-
-            //End If
-
-            //            RefreshALL()
-            //            RefreshTVGuide()
-
-            //        End If
-            //if (!(My.Settings.Settings.Default.VideoDatabaseLocation == "False") &
-            //    !string.IsNullOrEmpty(My.Settings.Settings.Default.VideoDatabaseLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.PseudoTvSettingsLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.AddonDatabaseLocation))
-            //{
-            //    DatabaseType = 0;
-            //    Settings.Default.VideoDatabaseLocation = My.Settings.Settings.Default.VideoDatabaseLocation;
-            //    _logger.Debug(Settings.Default.VideoDatabaseLocation);
-            //    TxtSettings.Default.PseudoTvSettingsLocation = My.Settings.TxtSettings.Default.PseudoTvSettingsLocation;
-            //    _logger.Debug(TxtSettings.Default.PseudoTvSettingsLocation);
-            //    TxtSettings.Default.AddonDatabaseLocation = My.Settings.TxtSettings.Default.AddonDatabaseLocation;
-            //    _logger.Debug(TxtSettings.Default.AddonDatabaseLocation);
-            //    this.Version = My.Settings.Version;
-            //    _logger.Debug(this.Version);
-            //    RefreshALL();
-            //    RefreshTVGuide();
-            //}
-            //else if (!(My.Settings.Settings.Default.VideoDatabaseLocation == "False") &
-            //         !string.IsNullOrEmpty(My.Settings.MySQLConnectionString) &
-            //         !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.PseudoTvSettingsLocation) &
-            //         !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.AddonDatabaseLocation))
-            //{
-            //    DatabaseType = 1;
-            //    MySQLConnectionString = My.Settings.MySQLConnectionString;
-            //    _logger.Debug(MySQLConnectionString);
-            //    TxtSettings.Default.PseudoTvSettingsLocation = My.Settings.TxtSettings.Default.PseudoTvSettingsLocation;
-            //    _logger.Debug(TxtSettings.Default.PseudoTvSettingsLocation);
-            //    TxtSettings.Default.AddonDatabaseLocation = My.Settings.TxtSettings.Default.AddonDatabaseLocation;
-            //    _logger.Debug(TxtSettings.Default.AddonDatabaseLocation);
-            //    this.Version = My.Settings.Version;
-            //    _logger.Debug(this.Version);
-            //    RefreshALL();
-            //    RefreshTVGuide();
-            //}
-            //else
-            //{
+            RefreshAll();
+            RefreshTvGuide();
+            
+            //TODO:
             //    //System.IO.File.Create(SettingsFile)
             //    MessageBox.Show(
             //        "Unable to locate the location of XBMC video library and PseudoTV's setting location.  Please enter them and save the changes.");
@@ -581,11 +516,6 @@ namespace PseudoTV_Manager.Forms
             //    //mySettings.Version = Me.Version
             //    mySettings.Show();
             //}
-
-            //Form2.Version = this.Version;
-            //Form3.Version = this.Version;
-            //Form7.Version = this.Version;
-            //Form8.Version = this.Version;
         }
 
         private void ListTVBanners_SelectedIndexChanged(System.Object sender, System.EventArgs e)
@@ -770,7 +700,7 @@ namespace PseudoTV_Manager.Forms
                 {
                     var tvPosterSplit = Regex.Split(tvPoster, "<thumb aspect=\"poster\">");
 
-                    for (var x = 1; x <= tvPosterSplit.Length; x++)
+                    for (var x = 1; x <= tvPosterSplit.Length - 1; x++)
                     {
                         var i = tvPosterSplit[x].IndexOf("<thumb aspect=\"poster\">");
                         tvPosterSplit[x] = tvPosterSplit[x].Substring(i + 1, tvPosterSplit[x].IndexOf("</thumb>"));
@@ -786,7 +716,7 @@ namespace PseudoTV_Manager.Forms
                 {
                     var tvBannerSplit = Regex.Split(tvBanner, "<thumb aspect=\"banner\">");
 
-                    for (var x = 1; x <= tvBannerSplit.Length; x++)
+                    for (var x = 1; x <= tvBannerSplit.Length - 1; x++)
                     {
                         var i = tvBannerSplit[x].IndexOf("<thumb aspect=\"banner\">");
                         tvBannerSplit[x] = tvBannerSplit[x].Substring(i + 1, tvBannerSplit[x].IndexOf("</thumb>"));
@@ -804,7 +734,7 @@ namespace PseudoTV_Manager.Forms
                 {
                     var tvGenresSplit = Regex.Split(tvGenres, " / ");
 
-                    for (var x = 0; x <= tvGenresSplit.Length; x++)
+                    for (var x = 0; x <= tvGenresSplit.Length - 1; x++)
                     {
                         ListTVGenres.Items.Add(tvGenresSplit[x]);
                     }
@@ -891,7 +821,7 @@ namespace PseudoTV_Manager.Forms
                 _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            TVShowList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
+            TVShowList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             TVShowList.Sort();
         }
@@ -1021,7 +951,7 @@ namespace PseudoTV_Manager.Forms
                 _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            NetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
+            NetworkList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             NetworkList.Sort();
         }
@@ -1145,7 +1075,7 @@ namespace PseudoTV_Manager.Forms
                 _mSortingColumn2.Text = "< " + _mSortingColumn2.Text;
             }
             // Create a comparer. 
-            GenresList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
+            GenresList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             GenresList.Sort();
         }
@@ -1441,7 +1371,7 @@ namespace PseudoTV_Manager.Forms
                 else
                 {
 
-                    for (var x = 0; x <= returnArrayMovies.Length; x++)
+                    for (var x = 0; x <= returnArrayMovies.Length - 1; x++)
                     {
                         var showArray = new[] { 2 };
 
@@ -1483,7 +1413,7 @@ namespace PseudoTV_Manager.Forms
                     }
                     else
                     {
-                        for (var x = 0; x <= returnArray.Length; x++)
+                        for (var x = 0; x <= returnArray.Length-1; x++)
                         {
                             var showArray = new[] { 1 };
 
@@ -1521,7 +1451,7 @@ namespace PseudoTV_Manager.Forms
                     }
                     else
                     {
-                        for (var x = 0; x <= returnArrayMovies.Length; x++)
+                        for (var x = 0; x <= returnArrayMovies.Length-1; x++)
                         {
                             var showArray = new[] { 2 };
 
@@ -1609,7 +1539,7 @@ namespace PseudoTV_Manager.Forms
                 _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            TVGuideList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
+            TVGuideList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             TVGuideList.Sort();
         }
@@ -3079,116 +3009,7 @@ namespace PseudoTV_Manager.Forms
 
         private void MovieList_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
-            if (MovieList.SelectedItems.Count > 0)
-            {
-                MoviePicture.Update();
 
-                var listItem = default(ListViewItem);
-                listItem = MovieList.SelectedItems[0];
-
-                string movieName = null;
-                string movieId = null;
-
-                movieId = listItem.SubItems[1].Text;
-                movieName = listItem.SubItems[0].Text;
-                MovieIDLabel.Text = movieId;
-
-
-                var selectArray = new[] { 16, 24, 20, 10 };
-
-                //Shoot it over to the ReadRecord sub, 
-                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
-                    "SELECT * FROM movie WHERE idMovie='" + movieId + "'", selectArray);
-
-                string[] returnArraySplit = null;
-
-                //We only have 1 response, since it searches by ID. So, just break it into parts. 
-                returnArraySplit = returnArray[0].Split('~');
-
-                var moviePoster = returnArraySplit[3];
-                ListMoviePosters.Items.Clear();
-
-                if (moviePoster.Contains("<thumb aspect=\"poster\" preview=\"") ||
-                    moviePoster.Contains("<thumb>"))
-                {
-                    var moviePosterSplit = Regex.Split(moviePoster, "<thumb aspect=\"poster\" preview=\"");
-
-                    for (var x = 1; x <= moviePosterSplit.Length; x++)
-                    {
-                        var i = moviePosterSplit[x].IndexOf("<thumb aspect=\"poster\" preview=\"");
-                        moviePosterSplit[x] = moviePosterSplit[x].Substring(i + 1, moviePosterSplit[x].IndexOf("\">"));
-                        ListMoviePosters.Items.Add(moviePosterSplit[x]);
-                    }
-
-                    var moviePosterSplit2 = Regex.Split(moviePoster, "<thumb>");
-
-                    for (var x = 1; x <= moviePosterSplit2.Length; x++)
-                    {
-                        var i = moviePosterSplit2[x].IndexOf("<thumb>");
-                        moviePosterSplit2[x] = moviePosterSplit2[x]
-                            .Substring(i + 1, moviePosterSplit2[x].IndexOf("</thumb>"));
-                        ListMoviePosters.Items.Add(moviePosterSplit2[x]);
-                    }
-                }
-                else
-                {
-                    ListMoviePosters.Items.Add("Nothing Found");
-                }
-
-                var movieGenres = returnArraySplit[0];
-
-                MovieLabel.Text = movieName;
-                MovieLocation.Text = returnArraySplit[1];
-
-                if (string.IsNullOrEmpty(returnArraySplit[2]))
-                {
-                    txtMovieNetwork.SelectedIndex = -1;
-                }
-                else
-                {
-                    txtMovieNetwork.Text = returnArraySplit[2];
-                }
-
-                //Loop through each Movie Genre, if there more than one.
-                MovieGenresList.Items.Clear();
-                if (movieGenres.Contains(" / "))
-                {
-                    var movieGenresSplit = Regex.Split(movieGenres, " / ");
-
-                    for (var x = 0; x <= movieGenresSplit.Length; x++)
-                    {
-                        MovieGenresList.Items.Add(movieGenresSplit[x]);
-                    }
-                }
-                else if (!string.IsNullOrEmpty(movieGenres))
-                {
-                    MovieGenresList.Items.Add(movieGenres);
-                }
-
-
-                if (MovieLocation.TextLength >= 6)
-                {
-                    if (MovieLocation.Text.Substring(0, 6) == "smb://")
-                    {
-                        MovieLocation.Text = MovieLocation.Text.Replace("/", "\\");
-                        MovieLocation.Text = "\\\\" + MovieLocation.Text.Substring(6);
-                    }
-                }
-
-                var directoryName = "";
-                directoryName = Path.GetDirectoryName(MovieLocation.Text);
-
-                if (System.IO.File.Exists(directoryName + "\\" + "poster.jpg"))
-                {
-                    MoviePicture.ImageLocation = (directoryName + "\\" + "poster.jpg");
-                }
-                else
-                {
-                    MoviePicture.ImageLocation =
-                        "https://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/poster.png";
-                }
-
-            }
         }
 
 
@@ -3263,11 +3084,11 @@ namespace PseudoTV_Manager.Forms
                 if (networkListed == false)
                 {
                     var itm = default(ListViewItem);
-                    var str = new string[3];
+                    var str = new string[2];
 
                     str[0] = showNetwork;
                     str[1] = "1";
-                    //test
+
                     itm = new ListViewItem(str);
 
                     //Add the item to the TV show list.
@@ -3319,7 +3140,7 @@ namespace PseudoTV_Manager.Forms
                 if (networkListed == false)
                 {
                     var itm = default(ListViewItem);
-                    var str = new string[3];
+                    var str = new string[2];
 
                     str[0] = showNetwork;
                     str[1] = "1";
@@ -3467,7 +3288,7 @@ namespace PseudoTV_Manager.Forms
                 _mSortingColumn.Text = "< " + _mSortingColumn.Text;
             }
             // Create a comparer. 
-            MovieNetworkList.ListViewItemSorter = new ClsListviewSorter(e.Column, sortOrder);
+            MovieNetworkList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             MovieNetworkList.Sort();
         }
