@@ -32,7 +32,7 @@ namespace PseudoTV_Manager.Forms
         private readonly OpenFileDialog _settingsFileDialog;
         private readonly OpenFileDialog _addonDbFileDialog
             ;
-        private void Button1_Click(System.Object sender, System.EventArgs e)
+        private void BtnVideoDbLocationBrowse_Click(System.Object sender, System.EventArgs e)
         {
             _kodiVersionString = XbmcVersion.SelectedIndex == 0 ? "XBMC" : "Kodi";
 
@@ -47,7 +47,7 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button2_Click(System.Object sender, System.EventArgs e)
+        private void BtnPseudoTvSettingsLocationBrowse_Click(System.Object sender, System.EventArgs e)
         {
             _settingsFileDialog.InitialDirectory = "C:\\Users\\" + User + "\\AppData\\Roaming\\" + _kodiVersionString + "\\userdata\\addon_data\\script.pseudotv.live";
 
@@ -61,7 +61,7 @@ namespace PseudoTV_Manager.Forms
 
         }
 
-        private void Button4_Click(System.Object sender, System.EventArgs e)
+        private void BtnAddonDbLocationBrowse_Click(System.Object sender, System.EventArgs e)
         {
             _addonDbFileDialog.InitialDirectory = "C:\\Users\\" + User + "\\AppData\\Roaming\\" + _kodiVersionString + "\\userdata\\Database";
 
@@ -76,7 +76,7 @@ namespace PseudoTV_Manager.Forms
         }
 
 
-        private void Button3_Click(System.Object sender, System.EventArgs e)
+        private void SaveSettings_Click(System.Object sender, System.EventArgs e)
         {
             //Dim SettingsFile As String = Application.StartupPath() & "\" & "Settings.txt"
 
@@ -99,33 +99,28 @@ namespace PseudoTV_Manager.Forms
                     //Dim FilePaths As String = "0" & " | " & TxtVideoDbLocation.Text & " | " & TxtPseudoTvSettingsLocation.Text & " | " & TxtAddonDatabaseLocation.Text
                     //SaveFile(SettingsFile, FilePaths)
 
-                    //Now, update the variables in the Main form with the proper paths
-                    MainWindow.DatabaseType = 0;
+                    //Now, update all settings
                     Settings.Default.DatabaseType = 0;
-                    MainWindow.VideoDatabaseLocation = TxtVideoDbLocation.Text;
                     Settings.Default.VideoDatabaseLocation = TxtVideoDbLocation.Text;
-                    MainWindow.PseudoTvSettingsLocation = TxtPseudoTvSettingsLocation.Text;
                     Settings.Default.PseudoTvSettingsLocation = TxtPseudoTvSettingsLocation.Text;
-                    MainWindow.AddonDatabaseLocation = TxtAddonDatabaseLocation.Text;
                     Settings.Default.AddonDatabaseLocation = TxtAddonDatabaseLocation.Text;
-                    MainWindow.KodiVersion = KodiVersion;
                     Settings.Default.KodiVersion = (int)KodiVersion;
                     Settings.Default.Save();
+
                     //Refresh everything
-                    MainWindow.RefreshAll();
-                    MainWindow.RefreshTvGuide();
+                    _mainWindow.RefreshAll();
+                    _mainWindow.RefreshTvGuide();
 
                     Visible = false;
-                    //TODO: Pass instance of MainWindow to this class
                     _mainWindow.Focus();
                 }
 
             }
-            else if (!string.IsNullOrEmpty(TextBox3.Text) & !string.IsNullOrEmpty(TextBox4.Text) & !string.IsNullOrEmpty(TextBox6.Text) & System.IO.File.Exists(TxtPseudoTvSettingsLocation.Text) == true & System.IO.File.Exists(TxtAddonDatabaseLocation.Text) == true)
+            else if (!string.IsNullOrEmpty(TxtMySqlServer.Text) & !string.IsNullOrEmpty(TxtMySqlUserId.Text) & !string.IsNullOrEmpty(TxtMySqlDatabase.Text) & System.IO.File.Exists(TxtPseudoTvSettingsLocation.Text) == true & System.IO.File.Exists(TxtAddonDatabaseLocation.Text) == true)
             {
                 //server=localhost; user id=mike; password=12345; database=in_out
 
-                dynamic connectionString = "server=" + TextBox3.Text + "; user id=" + TextBox4.Text + "; password=" + TextBox5.Text + "; database=" + TextBox6.Text + "; port=" + TextBox7.Text;
+                dynamic connectionString = "server=" + TxtMySqlServer.Text + "; user id=" + TxtMySqlUserId.Text + "; password=" + TxtMySqlPassword.Text + "; database=" + TxtMySqlDatabase.Text + "; port=" + TxtMySqlPort.Text;
 
 
                 if (PseudoTvUtils.TestMYSQL(connectionString) == true)
@@ -133,21 +128,17 @@ namespace PseudoTV_Manager.Forms
                     //Dim FilePaths As String = "1" & " | " & ConnectionString & " | " & TxtPseudoTvSettingsLocation.Text & " | " & TxtAddonDatabaseLocation.Text
                     //SaveFile(SettingsFile, FilePaths)
 
-                    //Now, update the variables in the Main form with the proper paths
-                    MainWindow.DatabaseType = 1;
+                    //Now, update all settings
                     Settings.Default.DatabaseType = 1;
-                    MainWindow.MySqlConnectionString = connectionString;
-                    Settings.Default.MySQLConnectionString = connectionString;
-                    MainWindow.PseudoTvSettingsLocation = TxtPseudoTvSettingsLocation.Text;
+                    Settings.Default.MySqlConnectionString = connectionString;
                     Settings.Default.PseudoTvSettingsLocation = TxtPseudoTvSettingsLocation.Text;
-                    MainWindow.AddonDatabaseLocation = TxtAddonDatabaseLocation.Text;
                     Settings.Default.AddonDatabaseLocation = TxtAddonDatabaseLocation.Text;
-                    MainWindow.KodiVersion = this.KodiVersion;
                     Settings.Default.KodiVersion = (int)KodiVersion;
                     Settings.Default.Save();
+
                     //Refresh everything
-                    MainWindow.RefreshAll();
-                    MainWindow.RefreshTvGuide();
+                    _mainWindow.RefreshAll();
+                    _mainWindow.RefreshTvGuide();
 
                     this.Visible = false;
                     _mainWindow.Focus();
@@ -156,7 +147,7 @@ namespace PseudoTV_Manager.Forms
         }
 
 
-        private void Form6_Load(object sender, System.EventArgs e)
+        private void SettingsWindow_Load(object sender, System.EventArgs e)
         {
             switch (KodiVersion)
             {
@@ -174,27 +165,27 @@ namespace PseudoTV_Manager.Forms
                     break;
             }
 
-            if (!string.IsNullOrEmpty(MainWindow.VideoDatabaseLocation))
+            if (!string.IsNullOrEmpty(Settings.Default.VideoDatabaseLocation))
             {
-                TxtVideoDbLocation.Text = MainWindow.VideoDatabaseLocation;
-                TxtPseudoTvSettingsLocation.Text = MainWindow.PseudoTvSettingsLocation;
-                TxtAddonDatabaseLocation.Text = MainWindow.AddonDatabaseLocation;
+                TxtVideoDbLocation.Text = Settings.Default.VideoDatabaseLocation;
+                TxtPseudoTvSettingsLocation.Text = Settings.Default.PseudoTvSettingsLocation;
+                TxtAddonDatabaseLocation.Text = Settings.Default.AddonDatabaseLocation;
             }
             else
             {
                 FindKodiSettings();
             }
 
-            if (!string.IsNullOrEmpty(MainWindow.MySqlConnectionString))
+            if (!string.IsNullOrEmpty(Settings.Default.MySqlConnectionString))
             {
-                var splitString = MainWindow.MySqlConnectionString.Split(';');
+                var splitString = Settings.Default.MySqlConnectionString.Split(';');
 
-                TxtPseudoTvSettingsLocation.Text = MainWindow.PseudoTvSettingsLocation;
-                TextBox3.Text = splitString[0].Split(Convert.ToChar("server="))[1];
-                TextBox4.Text = splitString[1].Split(Convert.ToChar("user id="))[1];
-                TextBox5.Text = splitString[2].Split(Convert.ToChar("password="))[1];
-                TextBox6.Text = splitString[3].Split(Convert.ToChar("database="))[1];
-                TextBox7.Text = splitString[4].Split(Convert.ToChar("port="))[1];
+                TxtPseudoTvSettingsLocation.Text = Settings.Default.PseudoTvSettingsLocation;
+                TxtMySqlServer.Text = Regex.Split(splitString[0], "server=")[1];
+                TxtMySqlUserId.Text = Regex.Split(splitString[1], "user id=")[1];
+                TxtMySqlPassword.Text = Regex.Split(splitString[2], "password=")[1];
+                TxtMySqlDatabase.Text = Regex.Split(splitString[3], "database=")[1];
+                TxtMySqlPort.Text = Regex.Split(splitString[4], "port=")[1];
             }
 
         }
@@ -265,10 +256,9 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        public object ReadVersion(string genreName)
+        //This looks up the Genre based on the name and returns the proper Genre ID
+        public int ReadVersion(string genreName)
         {
-            //This looks up the Genre based on the name and returns the proper Genre ID
-
             int genreId = 0;
 
             var selectArray = new[] { 0 };

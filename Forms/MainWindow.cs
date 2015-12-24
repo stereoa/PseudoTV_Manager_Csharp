@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using NLog;
 using PseudoTV_Manager.Enum;
-
-//Import the SQLite DLL file.
-//C:\SQLite\THERE!
+using PseudoTV_Manager.Properties;
 
 namespace PseudoTV_Manager.Forms
 {
@@ -22,39 +20,31 @@ namespace PseudoTV_Manager.Forms
 
         //For sorting columns in listviews
         private ColumnHeader _mSortingColumn;
-
         private ColumnHeader _mSortingColumn2;
-        public static int DatabaseType;
-        public static string MySqlConnectionString;
-        public static string VideoDatabaseLocation;
-        public static string PseudoTvSettingsLocation;
-        public static string AddonDatabaseLocation;
+
         public int XbmcVersion;
         public string UserDataFolder;
         public string PluginNotInclude;
         public string YouTubeMulti;
         private int _resetHours;
 
-        public static KodiVersion KodiVersion = KodiVersion.Helix;
-
         protected Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public string LookUpGenre(string genreName)
+        public int LookUpGenre(string genreName)
         {
             //This looks up the Genre based on the name and returns the proper Genre ID
-
-            string genreId = null;
+            int genreId = 0;
 
             var selectArray = new[] { 0 };
 
             var genrePar = "name";
-            if ((KodiVersion < KodiVersion.Isengard))
+            if ((Settings.Default.KodiVersion < (int)KodiVersion.Isengard))
             {
                 genrePar = "strGenre";
             }
 
             //Shoot it over to the ReadRecord sub
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                 "SELECT * FROM genre where " + genrePar + "='" + genreName + "'", selectArray);
 
             //The ID # is all we need.
@@ -65,7 +55,7 @@ namespace PseudoTV_Manager.Forms
             }
             else
             {
-                genreId = returnArray[0];
+                genreId = Convert.ToInt32(returnArray[0]);
             }
 
             return genreId;
@@ -80,13 +70,13 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 0 };
 
             var studioPar = "name";
-            if ((KodiVersion < KodiVersion.Isengard))
+            if ((Settings.Default.KodiVersion < (int)KodiVersion.Isengard))
             {
                 studioPar = "strStudio";
             }
 
             //Shoot it over to the ReadRecord sub
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                 "SELECT * FROM studio where " + studioPar + "='" + network + "'", selectArray);
 
             //The ID # is all we need.
@@ -102,7 +92,7 @@ namespace PseudoTV_Manager.Forms
 
         }
 
-        public static void RefreshTvGuide()
+        public void RefreshTvGuide()
         {
             //Clear the TV name and the List items
             TVGuideShowName.Text = "";
@@ -114,12 +104,12 @@ namespace PseudoTV_Manager.Forms
             string[] channelArray = null;
             var channelNum = 0;
 
-            var fileLocation = PseudoTvSettingsLocation;
+            var fileLocation = Settings.Default.PseudoTvSettingsLocation;
 
-            if (System.IO.File.Exists(PseudoTvSettingsLocation) == true)
+            if (System.IO.File.Exists(Settings.Default.PseudoTvSettingsLocation) == true)
             {
                 //Load everything into the FullFile string
-                var fullFile = PseudoTvUtils.ReadFile(PseudoTvSettingsLocation);
+                var fullFile = PseudoTvUtils.ReadFile(Settings.Default.PseudoTvSettingsLocation);
 
                 var objReader = new System.IO.StreamReader(fileLocation);
 
@@ -131,12 +121,12 @@ namespace PseudoTV_Manager.Forms
 
                     if (singleLine.Contains("_type" + (char)34 + " value="))
                     {
-                        var part1 = singleLine.Split(Convert.ToChar("_type"))[0];
+                        var part1 = Regex.Split(singleLine, "_type")[0];
                         var part2 = part1.Split('_')[1];
 
                         Array.Resize(ref channelArray, channelNum + 1);
                         channelNum = channelNum + 1;
-                        channelArray[channelArray.Length] = part2;
+                        channelArray[channelArray.Length - 1] = part2;
 
                     }
 
@@ -144,8 +134,7 @@ namespace PseudoTV_Manager.Forms
 
                 objReader.Close();
 
-
-                for (var x = 0; x <= channelArray.Length; x++)
+                for (var x = 0; x <= channelArray.Length - 1; x++)
                 {
                     string[] channelInfo = null;
 
@@ -160,9 +149,7 @@ namespace PseudoTV_Manager.Forms
                     var channelTypeDetail4 = "";
 
                     //Grab everything that says setting id = Channel #
-                    channelInfo = fullFile.Split(
-                        new[] { "<setting id=" + (char)34 + "Channel_" + channelArray[x] + "_" },
-                        StringSplitOptions.RemoveEmptyEntries);
+                    channelInfo = Regex.Split(fullFile, "<setting id=" + (char)34 + "Channel_" + channelArray[x] + "_");
 
                     //Now loop through everything it returned.
                     for (var y = 1; y <= channelInfo.Length - 1; y++)
@@ -172,7 +159,7 @@ namespace PseudoTV_Manager.Forms
 
                         ruleType = channelInfo[y].Split((char)34)[0];
 
-                        ruleValue = channelInfo[y].Split(Convert.ToChar("value=" + (char)34))[1];
+                        ruleValue = Regex.Split(channelInfo[y], "value=" + (char)34)[1];
                         ruleValue = ruleValue.Split((char)34)[0];
 
 
@@ -222,16 +209,16 @@ namespace PseudoTV_Manager.Forms
 
                             //Get the rule number.
                             string ruleNumber = null;
-                            ruleNumber = ruleType.Split(Convert.ToChar("rule_"))[1];
+                            ruleNumber = Regex.Split(ruleType, "rule_")[1];
                             ruleNumber = ruleNumber.Split('_')[0];
 
                             if (ruleType.Contains("opt"))
                             {
                                 //Okay, it's an actual option tied to another rule.
 
-                                var optNumber = ruleType.Split(Convert.ToChar("_opt_"))[1];
-                                ruleNumber = ruleType.Split(Convert.ToChar("_opt_"))[0];
-                                ruleNumber = ruleNumber.Split(Convert.ToChar("rule_"))[1];
+                                var optNumber = Regex.Split(ruleType, "_opt_")[1];
+                                ruleNumber = Regex.Split(ruleType, "_opt_")[0];
+                                ruleNumber = Regex.Split(ruleNumber, "rule_")[1];
 
                                 //MsgBox("Opt : " & RuleNumber & " | " & OptNumber & " | " & RuleValue)
                                 //ChannelRulesAdvanced = ChannelRulesAdvanced & "~" & RuleNumber & "|" & OptNumber & "|" & RuleValue
@@ -291,13 +278,13 @@ namespace PseudoTV_Manager.Forms
 
 
             //Shoot it over to the ReadRecord sub
-            var returnArrayMain = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre",
+            var returnArrayMain = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM genre",
                 selectArrayMain);
 
             //Loop through and read the name
 
 
-            for (var x = 0; x <= returnArrayMain.Length; x++)
+            for (var x = 0; x <= returnArrayMain.Length - 1; x++)
             {
                 //Sort them into an array
                 var splitItem = returnArrayMain[x].Split('~');
@@ -310,29 +297,29 @@ namespace PseudoTV_Manager.Forms
 
                 //Now, grab a list of all the shows that match the GenreID
                 string[] returnArray = null;
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
-                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" + splitItem[0] + "' AND media_type = 'tvshow'",
                         selectArray);
                 }
                 else
                 {
-                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genrelinktvshow WHERE idGenre='" + splitItem[0] + "'", selectArray);
                 }
 
                 //This will grab the number of movies.
                 string[] returnArray2 = null;
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
-                    returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" + splitItem[0] + "' AND media_type = 'movie'",
                         selectArray);
                 }
                 else
                 {
-                    returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genrelinkmovie WHERE idGenre='" + splitItem[0] + "'", selectArray);
                 }
 
@@ -392,7 +379,7 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 1, 15, 0 };
 
             //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM tvshow ORDER BY c00",
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM tvshow ORDER BY c00",
                 selectArray);
 
             //Now, read the output of the array.
@@ -420,7 +407,7 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 1 };
 
             //Grab the Plugin List
-            var returnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
+            var returnArray = PseudoTvUtils.ReadPluginRecord(Settings.Default.AddonDatabaseLocation,
                 "SELECT DISTINCT addon.addonID, addon.name FROM addon, package WHERE addon.addonID = package.addonID and addon.addonID LIKE '" +
                 addonLike + "%'", selectArray);
 
@@ -443,7 +430,7 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 2, 0 };
 
             //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM movie ORDER BY c00",
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM movie ORDER BY c00",
                 selectArray);
 
             //Now, read the output of the array.
@@ -533,16 +520,16 @@ namespace PseudoTV_Manager.Forms
             //                If FileLocations[0] = "0" Then
             //                    'This is for a standard SQLite Entry.
             //                    DatabaseType = 0
-            //                    VideoDatabaseLocation = FileLocations[1]
-            //                    TxtPseudoTvSettingsLocation = FileLocations[2]
-            //		TxtAddonDatabaseLocation = FileLocations[3]
+            //                    Settings.Default.VideoDatabaseLocation = FileLocations[1]
+            //                    TxtSettings.Default.PseudoTvSettingsLocation = FileLocations[2]
+            //		TxtSettings.Default.AddonDatabaseLocation = FileLocations[3]
             //		'get Kodi KodiVersion based on video db KodiVersion
-            //		Version = GetKodiVersion(VideoDatabaseLocation)
+            //		Version = GetKodiVersion(Settings.Default.VideoDatabaseLocation)
             //                Else
             //                    DatabaseType = 1
             //                    MySQLConnectionString = FileLocations[1]
-            //                    TxtPseudoTvSettingsLocation = FileLocations[2]
-            //                    TxtAddonDatabaseLocation = FileLocations[3]
+            //                    TxtSettings.Default.PseudoTvSettingsLocation = FileLocations[2]
+            //                    TxtSettings.Default.AddonDatabaseLocation = FileLocations[3]
             //	End If
 
             //End If
@@ -551,35 +538,35 @@ namespace PseudoTV_Manager.Forms
             //            RefreshTVGuide()
 
             //        End If
-            //if (!(My.Settings.VideoDatabaseLocation == "False") &
-            //    !string.IsNullOrEmpty(My.Settings.VideoDatabaseLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.TxtPseudoTvSettingsLocation) &
-            //    !string.IsNullOrEmpty(My.Settings.TxtAddonDatabaseLocation))
+            //if (!(My.Settings.Settings.Default.VideoDatabaseLocation == "False") &
+            //    !string.IsNullOrEmpty(My.Settings.Settings.Default.VideoDatabaseLocation) &
+            //    !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.PseudoTvSettingsLocation) &
+            //    !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.AddonDatabaseLocation))
             //{
             //    DatabaseType = 0;
-            //    VideoDatabaseLocation = My.Settings.VideoDatabaseLocation;
-            //    _logger.Debug(VideoDatabaseLocation);
-            //    TxtPseudoTvSettingsLocation = My.Settings.TxtPseudoTvSettingsLocation;
-            //    _logger.Debug(TxtPseudoTvSettingsLocation);
-            //    TxtAddonDatabaseLocation = My.Settings.TxtAddonDatabaseLocation;
-            //    _logger.Debug(TxtAddonDatabaseLocation);
+            //    Settings.Default.VideoDatabaseLocation = My.Settings.Settings.Default.VideoDatabaseLocation;
+            //    _logger.Debug(Settings.Default.VideoDatabaseLocation);
+            //    TxtSettings.Default.PseudoTvSettingsLocation = My.Settings.TxtSettings.Default.PseudoTvSettingsLocation;
+            //    _logger.Debug(TxtSettings.Default.PseudoTvSettingsLocation);
+            //    TxtSettings.Default.AddonDatabaseLocation = My.Settings.TxtSettings.Default.AddonDatabaseLocation;
+            //    _logger.Debug(TxtSettings.Default.AddonDatabaseLocation);
             //    this.Version = My.Settings.Version;
             //    _logger.Debug(this.Version);
             //    RefreshALL();
             //    RefreshTVGuide();
             //}
-            //else if (!(My.Settings.VideoDatabaseLocation == "False") &
+            //else if (!(My.Settings.Settings.Default.VideoDatabaseLocation == "False") &
             //         !string.IsNullOrEmpty(My.Settings.MySQLConnectionString) &
-            //         !string.IsNullOrEmpty(My.Settings.TxtPseudoTvSettingsLocation) &
-            //         !string.IsNullOrEmpty(My.Settings.TxtAddonDatabaseLocation))
+            //         !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.PseudoTvSettingsLocation) &
+            //         !string.IsNullOrEmpty(My.Settings.TxtSettings.Default.AddonDatabaseLocation))
             //{
             //    DatabaseType = 1;
             //    MySQLConnectionString = My.Settings.MySQLConnectionString;
             //    _logger.Debug(MySQLConnectionString);
-            //    TxtPseudoTvSettingsLocation = My.Settings.TxtPseudoTvSettingsLocation;
-            //    _logger.Debug(TxtPseudoTvSettingsLocation);
-            //    TxtAddonDatabaseLocation = My.Settings.TxtAddonDatabaseLocation;
-            //    _logger.Debug(TxtAddonDatabaseLocation);
+            //    TxtSettings.Default.PseudoTvSettingsLocation = My.Settings.TxtSettings.Default.PseudoTvSettingsLocation;
+            //    _logger.Debug(TxtSettings.Default.PseudoTvSettingsLocation);
+            //    TxtSettings.Default.AddonDatabaseLocation = My.Settings.TxtSettings.Default.AddonDatabaseLocation;
+            //    _logger.Debug(TxtSettings.Default.AddonDatabaseLocation);
             //    this.Version = My.Settings.Version;
             //    _logger.Debug(this.Version);
             //    RefreshALL();
@@ -731,7 +718,7 @@ namespace PseudoTV_Manager.Forms
                 tvShowArray[4] = 7;
 
                 //Shoot it over to the ReadRecord sub, 
-                var tvShowReturnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var tvShowReturnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM tvshow WHERE idShow='" + tvShowId + "'", tvShowArray);
 
                 string[] tvShowReturnArraySplit = null;
@@ -743,7 +730,7 @@ namespace PseudoTV_Manager.Forms
 
 
                 //Shoot it over to the ReadRecord sub, 
-                var vidPathArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var vidPathArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM tvshowlinkpath WHERE idShow='" + tvShowId + "'", tvPathArray);
 
                 string[] vidPathArraySplit = null;
@@ -752,7 +739,7 @@ namespace PseudoTV_Manager.Forms
 
                 var tvShowLocationArray = new[] { 0, 1 };
 
-                var tvShowLocationArrayReturn = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var tvShowLocationArrayReturn = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM path WHERE idPath='" + vidPathArraySplit[1] + "'", tvShowLocationArray);
 
                 string[] tvShowLocationSplit = null;
@@ -781,7 +768,7 @@ namespace PseudoTV_Manager.Forms
 
                 if (tvPoster.Contains("<thumb aspect=\"poster\">"))
                 {
-                    var tvPosterSplit = tvPoster.Split(Convert.ToChar("<thumb aspect=\"poster\">"));
+                    var tvPosterSplit = Regex.Split(tvPoster, "<thumb aspect=\"poster\">");
 
                     for (var x = 1; x <= tvPosterSplit.Length; x++)
                     {
@@ -797,7 +784,7 @@ namespace PseudoTV_Manager.Forms
 
                 if (tvBanner.Contains("<thumb aspect=\"banner\">"))
                 {
-                    var tvBannerSplit = tvBanner.Split(Convert.ToChar("<thumb aspect=\"banner\">"));
+                    var tvBannerSplit = Regex.Split(tvBanner, "<thumb aspect=\"banner\">");
 
                     for (var x = 1; x <= tvBannerSplit.Length; x++)
                     {
@@ -815,7 +802,7 @@ namespace PseudoTV_Manager.Forms
                 ListTVGenres.Items.Clear();
                 if (tvGenres.Contains(" / "))
                 {
-                    var tvGenresSplit = tvGenres.Split(Convert.ToChar(" / "));
+                    var tvGenresSplit = Regex.Split(tvGenres, " / ");
 
                     for (var x = 0; x <= tvGenresSplit.Length; x++)
                     {
@@ -937,7 +924,7 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 1 };
 
             //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
 
             //Now, read the output of the array.
 
@@ -965,7 +952,7 @@ namespace PseudoTV_Manager.Forms
             var selectArray = new[] { 1 };
 
             //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
 
             //Now, read the output of the array.
 
@@ -1048,7 +1035,7 @@ namespace PseudoTV_Manager.Forms
             {
                 var selectArray = new[] { 1 };
 
-                var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM tvshow WHERE c14='" +
                     NetworkList.Items[NetworkList.SelectedIndices[0]].SubItems[0].Text + "'", selectArray);
 
@@ -1093,10 +1080,10 @@ namespace PseudoTV_Manager.Forms
             RefreshAll();
         }
 
-        public static void RefreshAll()
+        public void RefreshAll()
         {
-            if (!string.IsNullOrEmpty(VideoDatabaseLocation) |
-                !string.IsNullOrEmpty(MySqlConnectionString) & !string.IsNullOrEmpty(PseudoTvSettingsLocation))
+            if (!string.IsNullOrEmpty(Settings.Default.VideoDatabaseLocation) |
+                !string.IsNullOrEmpty(Settings.Default.MySqlConnectionString) & !string.IsNullOrEmpty(Settings.Default.PseudoTvSettingsLocation))
             {
                 RefreshMovieList();
                 RefreshTvShows();
@@ -1174,16 +1161,16 @@ namespace PseudoTV_Manager.Forms
 
                 //Now, gather a list of all the show IDs that match the genreID
                 string[] returnArray = null;
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
-                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "' AND media_type = 'tvshow'",
                         selectArray);
                 }
                 else
                 {
-                    returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genrelinktvshow WHERE idGenre='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", selectArray);
                 }
@@ -1200,7 +1187,7 @@ namespace PseudoTV_Manager.Forms
                         var showNameArray = new string[1];
                         selectArray[0] = 1;
 
-                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", selectArray);
 
                         //Now add that name to the list.
@@ -1210,16 +1197,16 @@ namespace PseudoTV_Manager.Forms
 
                 //MOVIES REPEAT THIS PROCESS.
                 string[] returnArrayMovies = null;
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
-                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "' AND media_type = 'movie'",
                         selectArray);
                 }
                 else
                 {
-                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genrelinkmovie WHERE idGenre='" +
                         GenresList.Items[GenresList.SelectedIndices[0]].SubItems[4].Text + "'", selectArray);
                 }
@@ -1235,7 +1222,7 @@ namespace PseudoTV_Manager.Forms
                         var showNameArray = new string[1];
                         selectArray[0] = 1;
 
-                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", selectArray);
 
                         //Now add that name to the list.
@@ -1260,7 +1247,7 @@ namespace PseudoTV_Manager.Forms
                 //Grab the Network ID based on the name
                 var networkId = LookUpNetwork(txtShowNetwork.Text);
 
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
                     PseudoTvUtils.DbExecute("DELETE FROM studio_link WHERE media_id = '" + TVShowLabel.Text + "'");
                     PseudoTvUtils.DbExecute("INSERT INTO studio_link(studio_id, media_id, media_type) VALUES ('" +
@@ -1280,7 +1267,7 @@ namespace PseudoTV_Manager.Forms
                                         txtShowNetwork.Text + "' WHERE idShow = '" + TVShowLabel.Text + "'");
                 //TODO: VisualStyleElement.Status.Text = "Updated " + TxtShowName.Text + " Successfully";
 
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
                     //Remove all genres from tv show
                     PseudoTvUtils.DbExecute("DELETE FROM genre_link WHERE media_id = '" + TVShowLabel.Text + "'");
@@ -1347,7 +1334,7 @@ namespace PseudoTV_Manager.Forms
                 {
                     var channelPreview = new[] { 1 };
 
-                    var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM tvshow WHERE c14='" + tvChannelTypeValue + "'", channelPreview);
 
                     //Make sure the Array is not null.
@@ -1373,7 +1360,7 @@ namespace PseudoTV_Manager.Forms
 
 
                     //Now, gather a list of all the show IDs that match the genreID
-                    var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM movie WHERE c18='" + tvChannelTypeValue + "'", selectArray);
 
                     //Now loop through each one individually.
@@ -1400,15 +1387,15 @@ namespace PseudoTV_Manager.Forms
 
                     //Now, gather a list of all the show IDs that match the genreID
                     string[] returnArray = null;
-                    if ((KodiVersion >= KodiVersion.Isengard))
+                    if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                     {
-                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
                             "' AND media_type = 'tvshow'", selectArray);
                     }
                     else
                     {
-                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
                             selectArray);
                     }
@@ -1419,7 +1406,7 @@ namespace PseudoTV_Manager.Forms
                     {
                         var showNameArray = new[] { 1 };
 
-                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", showNameArray);
 
                         //Now add that name to the list.
@@ -1434,15 +1421,15 @@ namespace PseudoTV_Manager.Forms
                 var selectArrayMovies = new[] { 1 };
 
                 string[] returnArrayMovies = null;
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
-                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
                         "' AND media_type = 'movie'", selectArrayMovies);
                 }
                 else
                 {
-                    returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                    returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                         "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
                         selectArrayMovies);
                 }
@@ -1458,7 +1445,7 @@ namespace PseudoTV_Manager.Forms
                     {
                         var showArray = new[] { 2 };
 
-                        var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", showArray);
 
                         //Now add that name to the list.
@@ -1477,15 +1464,15 @@ namespace PseudoTV_Manager.Forms
 
                     //Now, gather a list of all the show IDs that match the genreID
                     string[] returnArray = null;
-                    if ((KodiVersion >= KodiVersion.Isengard))
+                    if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                     {
-                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
                             "' AND media_type = 'tvshow'", selectArray);
                     }
                     else
                     {
-                        returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genrelinktvshow WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
                             selectArray);
                     }
@@ -1500,7 +1487,7 @@ namespace PseudoTV_Manager.Forms
                         {
                             var showArray = new[] { 1 };
 
-                            var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                                 "SELECT * FROM tvshow WHERE idShow='" + returnArray[x] + "'", showArray);
 
                             //Now add that name to the list.
@@ -1513,15 +1500,15 @@ namespace PseudoTV_Manager.Forms
                     var selectArrayMovies = new[] { 1 };
 
                     string[] returnArrayMovies = null;
-                    if ((KodiVersion >= KodiVersion.Isengard))
+                    if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                     {
-                        returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genre_link WHERE genre_id='" + LookUpGenre(tvChannelTypeValue) +
                             "' AND media_type = 'movie'", selectArrayMovies);
                     }
                     else
                     {
-                        returnArrayMovies = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                        returnArrayMovies = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                             "SELECT * FROM genrelinkmovie WHERE idGenre='" + LookUpGenre(tvChannelTypeValue) + "'",
                             selectArrayMovies);
                     }
@@ -1538,7 +1525,7 @@ namespace PseudoTV_Manager.Forms
                         {
                             var showArray = new[] { 2 };
 
-                            var returnArray2 = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                            var returnArray2 = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                                 "SELECT * FROM movie WHERE idMovie='" + returnArrayMovies[x] + "'", showArray);
 
                             //Now add that name to the list.
@@ -2014,7 +2001,7 @@ namespace PseudoTV_Manager.Forms
 
                         var returnProperPlugin = returnPlugin.Remove(0, 9);
 
-                        var returnArray = PseudoTvUtils.ReadPluginRecord(AddonDatabaseLocation,
+                        var returnArray = PseudoTvUtils.ReadPluginRecord(Settings.Default.AddonDatabaseLocation,
                             "SELECT name FROM addon WHERE addonID = '" + returnProperPlugin + "'", selectArray);
 
                         var index2 = 0;
@@ -2370,7 +2357,7 @@ namespace PseudoTV_Manager.Forms
                 OpenFileDialog1.ShowDialog();
 
                 var filename = OpenFileDialog1.FileName;
-                var filenameSplit = filename.Split(Convert.ToChar("\\"));
+                var filenameSplit = filename.Split('\\');
 
                 PlayListLocation.Text = "special://profile/playlists/video/" +
                                         filenameSplit[filenameSplit.Length];
@@ -2386,7 +2373,7 @@ namespace PseudoTV_Manager.Forms
 
             if (TVGuideList.SelectedItems.Count > 0)
             {
-                var fileName = PseudoTvSettingsLocation;
+                var fileName = Settings.Default.PseudoTvSettingsLocation;
                 var textFile = "";
 
                 var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
@@ -2439,7 +2426,7 @@ namespace PseudoTV_Manager.Forms
 
             if (TVGuideList.SelectedItems.Count > 0)
             {
-                var fileName = PseudoTvSettingsLocation;
+                var fileName = Settings.Default.PseudoTvSettingsLocation;
                 var textFile = "";
 
                 var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
@@ -2747,7 +2734,7 @@ namespace PseudoTV_Manager.Forms
                     {
                         PlayListLocation.Text = YouTubeMulti;
                     }
-                    
+
                     topAppend += Environment.NewLine + "\t" + "<setting id=" + (char)34 +
                                 "Channel_" + channelNum + "_1" + (char)34 + " value=" + (char)34 +
                                 PlayListLocation.Text + (char)34 + " />" + System.Environment.NewLine + "\t" +
@@ -2815,7 +2802,7 @@ namespace PseudoTV_Manager.Forms
                 //Combine the original text, plus the edited channel at the bottom, followed by ending the settings.
                 textFile += appendInfo + System.Environment.NewLine + "</settings>";
 
-                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, textFile);
+                PseudoTvUtils.SaveFile(Settings.Default.PseudoTvSettingsLocation, textFile);
 
                 //RefreshALL()
                 var returnindex = TVGuideList.SelectedIndices[0];
@@ -2859,7 +2846,7 @@ namespace PseudoTV_Manager.Forms
 
         private void Button12_Click(System.Object sender, System.EventArgs e)
         {
-            var response = ShowInputDialog("Enter TV Show's Name", "TV Show Name");
+            var response = PseudoTvUtils.ShowInputDialog("Enter TV Show's Name", "TV Show Name");
 
             if (!string.IsNullOrEmpty(response.Input))
             {
@@ -2880,7 +2867,7 @@ namespace PseudoTV_Manager.Forms
         {
             var newItem = new string[6];
 
-            newItem[0] = ShowInputDialog("Enter Channel Number", "Enter Channel Number").Input;
+            newItem[0] = PseudoTvUtils.ShowInputDialog("Enter Channel Number", "Enter Channel Number").Input;
             newItem[1] = "1";
             newItem[2] = null;
             newItem[3] = null;
@@ -2944,7 +2931,7 @@ namespace PseudoTV_Manager.Forms
                 //Grab all comments MINUS the ones for selected #
                 //Append this & our new content to the file.
 
-                var fileName = PseudoTvSettingsLocation;
+                var fileName = Settings.Default.PseudoTvSettingsLocation;
                 var textFile = "";
 
                 var channelNum = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[0].Text;
@@ -2982,7 +2969,7 @@ namespace PseudoTV_Manager.Forms
 
                 }
 
-                PseudoTvUtils.SaveFile(PseudoTvSettingsLocation, textFile);
+                PseudoTvUtils.SaveFile(Settings.Default.PseudoTvSettingsLocation, textFile);
 
                 RefreshTvGuide();
 
@@ -3025,12 +3012,10 @@ namespace PseudoTV_Manager.Forms
             //TODO: Form5.Visible = true;
         }
 
-        private void AaaToolStripMenuItem_Click(System.Object sender, System.EventArgs e)
+        private void MnuSettings_Click(System.Object sender, System.EventArgs e)
         {
-            //TODO:
-            //Form6 mySettings = new Form6();
-            //mySettings.Version = this.Version;
-            //mySettings.Show();
+            SettingsWindow settings = new SettingsWindow(this);
+            settings.Show();
         }
 
         private void DontShowToolStripMenuItem_Click(System.Object sender, System.EventArgs e)
@@ -3112,7 +3097,7 @@ namespace PseudoTV_Manager.Forms
                 var selectArray = new[] { 16, 24, 20, 10 };
 
                 //Shoot it over to the ReadRecord sub, 
-                var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM movie WHERE idMovie='" + movieId + "'", selectArray);
 
                 string[] returnArraySplit = null;
@@ -3126,7 +3111,7 @@ namespace PseudoTV_Manager.Forms
                 if (moviePoster.Contains("<thumb aspect=\"poster\" preview=\"") ||
                     moviePoster.Contains("<thumb>"))
                 {
-                    var moviePosterSplit = moviePoster.Split(Convert.ToChar("<thumb aspect=\"poster\" preview=\""));
+                    var moviePosterSplit = Regex.Split(moviePoster, "<thumb aspect=\"poster\" preview=\"");
 
                     for (var x = 1; x <= moviePosterSplit.Length; x++)
                     {
@@ -3135,7 +3120,7 @@ namespace PseudoTV_Manager.Forms
                         ListMoviePosters.Items.Add(moviePosterSplit[x]);
                     }
 
-                    var moviePosterSplit2 = moviePoster.Split(Convert.ToChar("<thumb>"));
+                    var moviePosterSplit2 = Regex.Split(moviePoster, "<thumb>");
 
                     for (var x = 1; x <= moviePosterSplit2.Length; x++)
                     {
@@ -3168,7 +3153,7 @@ namespace PseudoTV_Manager.Forms
                 MovieGenresList.Items.Clear();
                 if (movieGenres.Contains(" / "))
                 {
-                    var movieGenresSplit = movieGenres.Split(Convert.ToChar(" / "));
+                    var movieGenresSplit = Regex.Split(movieGenres, " / ");
 
                     for (var x = 0; x <= movieGenresSplit.Length; x++)
                     {
@@ -3239,7 +3224,7 @@ namespace PseudoTV_Manager.Forms
 
             var selectArray = new[] { 2, 20 };
 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                 "SELECT * FROM movie ORDER BY c18 ASC",
                 selectArray);
 
@@ -3300,7 +3285,7 @@ namespace PseudoTV_Manager.Forms
 
             var selectArray = new[] { 1, 15 };
 
-            var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                 "SELECT * FROM tvshow ORDER BY c14 ASC",
                 selectArray);
 
@@ -3364,7 +3349,7 @@ namespace PseudoTV_Manager.Forms
                 var networkId = LookUpNetwork(txtMovieNetwork.Text);
                 var movieId = MovieList.SelectedItems[0].SubItems[1].Text;
 
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
                     PseudoTvUtils.DbExecute("DELETE FROM studio_link WHERE media_id = '" + movieId + "'");
                     PseudoTvUtils.DbExecute("INSERT INTO studio_link (studio_id, media_id, media_type) VALUES ('" +
@@ -3383,7 +3368,7 @@ namespace PseudoTV_Manager.Forms
                                         "' WHERE idMovie = '" + movieId + "'");
                 //TODO: VisualStyleElement.Status.Text = "Updated " + MovieLabel.Text + " Successfully";
 
-                if ((KodiVersion >= KodiVersion.Isengard))
+                if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
                     //Remove all genres from tv show
                     PseudoTvUtils.DbExecute("DELETE FROM genre_link  WHERE media_id = '" + movieId + "'");
@@ -3497,7 +3482,7 @@ namespace PseudoTV_Manager.Forms
                 var selectArray = new[] { 2 };
 
 
-                var returnArray = PseudoTvUtils.DbReadRecord(VideoDatabaseLocation,
+                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
                     "SELECT * FROM movie WHERE c18='" +
                     MovieNetworkList.Items[MovieNetworkList.SelectedIndices[0]].SubItems[0].Text + "'", selectArray);
 
@@ -3667,7 +3652,7 @@ namespace PseudoTV_Manager.Forms
 
             if (PlayListType.SelectedIndex == 10)
             {
-                var response = ShowInputDialog("Enter Playlist or User String").Input;
+                var response = PseudoTvUtils.ShowInputDialog("Enter Playlist or User String").Input;
 
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -3685,7 +3670,7 @@ namespace PseudoTV_Manager.Forms
             }
             else
             {
-                var response = ShowInputDialog("Enter Exclude String").Input;
+                var response = PseudoTvUtils.ShowInputDialog("Enter Exclude String").Input;
 
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -3730,25 +3715,6 @@ namespace PseudoTV_Manager.Forms
 
                 PluginNotInclude = result;
             }
-        }
-    }
-
-    public class InputDialogResponse
-    {
-        public DialogResult DialogResult { get; set; }
-        public string Input { get; set; }
-    }
-
-    public class ClsListviewSorter : IComparer
-    {
-        public ClsListviewSorter(int i, SortOrder @ascending)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Compare(object x, object y)
-        {
-            throw new NotImplementedException();
         }
     }
 }

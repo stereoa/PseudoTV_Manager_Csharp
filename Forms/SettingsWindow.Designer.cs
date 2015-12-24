@@ -30,7 +30,7 @@
         {
             this.XbmcVersion = new System.Windows.Forms.ComboBox();
             this.XbmcVersionLbl = new System.Windows.Forms.Label();
-            this.Button4 = new System.Windows.Forms.Button();
+            this.BtnAddonsDbLocationBrowse = new System.Windows.Forms.Button();
             this.TxtAddonDatabaseLocation = new System.Windows.Forms.TextBox();
             this.AddonDbLocDef = new System.Windows.Forms.Label();
             this.AddonDbLoc = new System.Windows.Forms.Label();
@@ -39,24 +39,24 @@
             this.Label2 = new System.Windows.Forms.Label();
             this.Label1 = new System.Windows.Forms.Label();
             this.TxtVideoDbLocation = new System.Windows.Forms.TextBox();
-            this.Button1 = new System.Windows.Forms.Button();
+            this.BtnVideoDbLocationBrowse = new System.Windows.Forms.Button();
             this.TabPage2 = new System.Windows.Forms.TabPage();
-            this.TextBox7 = new System.Windows.Forms.TextBox();
+            this.TxtMySqlPort = new System.Windows.Forms.TextBox();
             this.Label8 = new System.Windows.Forms.Label();
-            this.TextBox6 = new System.Windows.Forms.TextBox();
+            this.TxtMySqlDatabase = new System.Windows.Forms.TextBox();
             this.Label7 = new System.Windows.Forms.Label();
-            this.TextBox5 = new System.Windows.Forms.TextBox();
+            this.TxtMySqlPassword = new System.Windows.Forms.TextBox();
             this.Label6 = new System.Windows.Forms.Label();
-            this.TextBox4 = new System.Windows.Forms.TextBox();
+            this.TxtMySqlUserId = new System.Windows.Forms.TextBox();
             this.Label5 = new System.Windows.Forms.Label();
-            this.TextBox3 = new System.Windows.Forms.TextBox();
+            this.TxtMySqlServer = new System.Windows.Forms.TextBox();
             this.TabControl1 = new System.Windows.Forms.TabControl();
-            this.Button2 = new System.Windows.Forms.Button();
+            this.BtnPseudoTvSettingsLocationBrowse = new System.Windows.Forms.Button();
             this.OpenFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.TxtPseudoTvSettingsLocation = new System.Windows.Forms.TextBox();
             this.Label3 = new System.Windows.Forms.Label();
             this.Label4 = new System.Windows.Forms.Label();
-            this.Button3 = new System.Windows.Forms.Button();
+            this.BtnSaveSettings = new System.Windows.Forms.Button();
             this.TabPage1.SuspendLayout();
             this.TabPage2.SuspendLayout();
             this.TabControl1.SuspendLayout();
@@ -86,15 +86,16 @@
             this.XbmcVersionLbl.TabIndex = 26;
             this.XbmcVersionLbl.Text = "Version:";
             // 
-            // Button4
+            // BtnAddonsDbLocationBrowse
             // 
-            this.Button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button4.Location = new System.Drawing.Point(425, 396);
-            this.Button4.Name = "Button4";
-            this.Button4.Size = new System.Drawing.Size(30, 18);
-            this.Button4.TabIndex = 25;
-            this.Button4.Text = "...";
-            this.Button4.UseVisualStyleBackColor = true;
+            this.BtnAddonsDbLocationBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnAddonsDbLocationBrowse.Location = new System.Drawing.Point(425, 396);
+            this.BtnAddonsDbLocationBrowse.Name = "BtnAddonsDbLocationBrowse";
+            this.BtnAddonsDbLocationBrowse.Size = new System.Drawing.Size(30, 18);
+            this.BtnAddonsDbLocationBrowse.TabIndex = 25;
+            this.BtnAddonsDbLocationBrowse.Text = "...";
+            this.BtnAddonsDbLocationBrowse.UseVisualStyleBackColor = true;
+            this.BtnAddonsDbLocationBrowse.Click += new System.EventHandler(this.BtnAddonDbLocationBrowse_Click);
             // 
             // TxtAddonDatabaseLocation
             // 
@@ -138,7 +139,7 @@
             this.TabPage1.Controls.Add(this.Label2);
             this.TabPage1.Controls.Add(this.Label1);
             this.TabPage1.Controls.Add(this.TxtVideoDbLocation);
-            this.TabPage1.Controls.Add(this.Button1);
+            this.TabPage1.Controls.Add(this.BtnVideoDbLocationBrowse);
             this.TabPage1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.TabPage1.Location = new System.Drawing.Point(4, 22);
             this.TabPage1.Name = "TabPage1";
@@ -174,29 +175,30 @@
             this.TxtVideoDbLocation.Size = new System.Drawing.Size(406, 20);
             this.TxtVideoDbLocation.TabIndex = 2;
             // 
-            // Button1
+            // BtnVideoDbLocationBrowse
             // 
-            this.Button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button1.Location = new System.Drawing.Point(417, 53);
-            this.Button1.Name = "Button1";
-            this.Button1.Size = new System.Drawing.Size(30, 18);
-            this.Button1.TabIndex = 3;
-            this.Button1.Text = "...";
-            this.Button1.UseVisualStyleBackColor = true;
+            this.BtnVideoDbLocationBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnVideoDbLocationBrowse.Location = new System.Drawing.Point(417, 53);
+            this.BtnVideoDbLocationBrowse.Name = "BtnVideoDbLocationBrowse";
+            this.BtnVideoDbLocationBrowse.Size = new System.Drawing.Size(30, 18);
+            this.BtnVideoDbLocationBrowse.TabIndex = 3;
+            this.BtnVideoDbLocationBrowse.Text = "...";
+            this.BtnVideoDbLocationBrowse.UseVisualStyleBackColor = true;
+            this.BtnVideoDbLocationBrowse.Click += new System.EventHandler(this.BtnVideoDbLocationBrowse_Click);
             // 
             // TabPage2
             // 
             this.TabPage2.BackColor = System.Drawing.SystemColors.Control;
             this.TabPage2.Controls.Add(this.Label9);
-            this.TabPage2.Controls.Add(this.TextBox7);
+            this.TabPage2.Controls.Add(this.TxtMySqlPort);
             this.TabPage2.Controls.Add(this.Label8);
-            this.TabPage2.Controls.Add(this.TextBox6);
+            this.TabPage2.Controls.Add(this.TxtMySqlDatabase);
             this.TabPage2.Controls.Add(this.Label7);
-            this.TabPage2.Controls.Add(this.TextBox5);
+            this.TabPage2.Controls.Add(this.TxtMySqlPassword);
             this.TabPage2.Controls.Add(this.Label6);
-            this.TabPage2.Controls.Add(this.TextBox4);
+            this.TabPage2.Controls.Add(this.TxtMySqlUserId);
             this.TabPage2.Controls.Add(this.Label5);
-            this.TabPage2.Controls.Add(this.TextBox3);
+            this.TabPage2.Controls.Add(this.TxtMySqlServer);
             this.TabPage2.Location = new System.Drawing.Point(4, 22);
             this.TabPage2.Name = "TabPage2";
             this.TabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -204,12 +206,12 @@
             this.TabPage2.TabIndex = 1;
             this.TabPage2.Text = "MySQL";
             // 
-            // TextBox7
+            // TxtMySqlPort
             // 
-            this.TextBox7.Location = new System.Drawing.Point(137, 127);
-            this.TextBox7.Name = "TextBox7";
-            this.TextBox7.Size = new System.Drawing.Size(215, 20);
-            this.TextBox7.TabIndex = 8;
+            this.TxtMySqlPort.Location = new System.Drawing.Point(137, 127);
+            this.TxtMySqlPort.Name = "TxtMySqlPort";
+            this.TxtMySqlPort.Size = new System.Drawing.Size(215, 20);
+            this.TxtMySqlPort.TabIndex = 8;
             // 
             // Label8
             // 
@@ -221,12 +223,12 @@
             this.Label8.Text = "Video Database \r\nTable Name:";
             this.Label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // TextBox6
+            // TxtMySqlDatabase
             // 
-            this.TextBox6.Location = new System.Drawing.Point(137, 167);
-            this.TextBox6.Name = "TextBox6";
-            this.TextBox6.Size = new System.Drawing.Size(215, 20);
-            this.TextBox6.TabIndex = 6;
+            this.TxtMySqlDatabase.Location = new System.Drawing.Point(137, 167);
+            this.TxtMySqlDatabase.Name = "TxtMySqlDatabase";
+            this.TxtMySqlDatabase.Size = new System.Drawing.Size(215, 20);
+            this.TxtMySqlDatabase.TabIndex = 6;
             // 
             // Label7
             // 
@@ -237,12 +239,12 @@
             this.Label7.TabIndex = 5;
             this.Label7.Text = "Password:";
             // 
-            // TextBox5
+            // TxtMySqlPassword
             // 
-            this.TextBox5.Location = new System.Drawing.Point(137, 84);
-            this.TextBox5.Name = "TextBox5";
-            this.TextBox5.Size = new System.Drawing.Size(215, 20);
-            this.TextBox5.TabIndex = 4;
+            this.TxtMySqlPassword.Location = new System.Drawing.Point(137, 84);
+            this.TxtMySqlPassword.Name = "TxtMySqlPassword";
+            this.TxtMySqlPassword.Size = new System.Drawing.Size(215, 20);
+            this.TxtMySqlPassword.TabIndex = 4;
             // 
             // Label6
             // 
@@ -253,12 +255,12 @@
             this.Label6.TabIndex = 3;
             this.Label6.Text = "Username:";
             // 
-            // TextBox4
+            // TxtMySqlUserId
             // 
-            this.TextBox4.Location = new System.Drawing.Point(137, 48);
-            this.TextBox4.Name = "TextBox4";
-            this.TextBox4.Size = new System.Drawing.Size(215, 20);
-            this.TextBox4.TabIndex = 2;
+            this.TxtMySqlUserId.Location = new System.Drawing.Point(137, 48);
+            this.TxtMySqlUserId.Name = "TxtMySqlUserId";
+            this.TxtMySqlUserId.Size = new System.Drawing.Size(215, 20);
+            this.TxtMySqlUserId.TabIndex = 2;
             // 
             // Label5
             // 
@@ -269,12 +271,12 @@
             this.Label5.TabIndex = 1;
             this.Label5.Text = "Server Address:";
             // 
-            // TextBox3
+            // TxtMySqlServer
             // 
-            this.TextBox3.Location = new System.Drawing.Point(137, 10);
-            this.TextBox3.Name = "TextBox3";
-            this.TextBox3.Size = new System.Drawing.Size(215, 20);
-            this.TextBox3.TabIndex = 0;
+            this.TxtMySqlServer.Location = new System.Drawing.Point(137, 10);
+            this.TxtMySqlServer.Name = "TxtMySqlServer";
+            this.TxtMySqlServer.Size = new System.Drawing.Size(215, 20);
+            this.TxtMySqlServer.TabIndex = 0;
             // 
             // TabControl1
             // 
@@ -286,15 +288,16 @@
             this.TabControl1.Size = new System.Drawing.Size(462, 228);
             this.TabControl1.TabIndex = 21;
             // 
-            // Button2
+            // BtnPseudoTvSettingsLocationBrowse
             // 
-            this.Button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button2.Location = new System.Drawing.Point(425, 326);
-            this.Button2.Name = "Button2";
-            this.Button2.Size = new System.Drawing.Size(30, 18);
-            this.Button2.TabIndex = 19;
-            this.Button2.Text = "...";
-            this.Button2.UseVisualStyleBackColor = true;
+            this.BtnPseudoTvSettingsLocationBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnPseudoTvSettingsLocationBrowse.Location = new System.Drawing.Point(425, 326);
+            this.BtnPseudoTvSettingsLocationBrowse.Name = "BtnPseudoTvSettingsLocationBrowse";
+            this.BtnPseudoTvSettingsLocationBrowse.Size = new System.Drawing.Size(30, 18);
+            this.BtnPseudoTvSettingsLocationBrowse.TabIndex = 19;
+            this.BtnPseudoTvSettingsLocationBrowse.Text = "...";
+            this.BtnPseudoTvSettingsLocationBrowse.UseVisualStyleBackColor = true;
+            this.BtnPseudoTvSettingsLocationBrowse.Click += new System.EventHandler(this.BtnPseudoTvSettingsLocationBrowse_Click);
             // 
             // OpenFileDialog1
             // 
@@ -326,14 +329,15 @@
             this.Label4.TabIndex = 16;
             this.Label4.Text = "PseudoTV Settings2.XML File:";
             // 
-            // Button3
+            // BtnSaveSettings
             // 
-            this.Button3.Location = new System.Drawing.Point(187, 420);
-            this.Button3.Name = "Button3";
-            this.Button3.Size = new System.Drawing.Size(75, 23);
-            this.Button3.TabIndex = 20;
-            this.Button3.Text = "Save";
-            this.Button3.UseVisualStyleBackColor = true;
+            this.BtnSaveSettings.Location = new System.Drawing.Point(187, 420);
+            this.BtnSaveSettings.Name = "BtnSaveSettings";
+            this.BtnSaveSettings.Size = new System.Drawing.Size(75, 23);
+            this.BtnSaveSettings.TabIndex = 20;
+            this.BtnSaveSettings.Text = "Save";
+            this.BtnSaveSettings.UseVisualStyleBackColor = true;
+            this.BtnSaveSettings.Click += new System.EventHandler(this.SaveSettings_Click);
             // 
             // SettingsWindow
             // 
@@ -342,18 +346,19 @@
             this.ClientSize = new System.Drawing.Size(484, 453);
             this.Controls.Add(this.XbmcVersion);
             this.Controls.Add(this.XbmcVersionLbl);
-            this.Controls.Add(this.Button4);
+            this.Controls.Add(this.BtnAddonsDbLocationBrowse);
             this.Controls.Add(this.TxtAddonDatabaseLocation);
             this.Controls.Add(this.AddonDbLocDef);
             this.Controls.Add(this.AddonDbLoc);
             this.Controls.Add(this.TabControl1);
-            this.Controls.Add(this.Button2);
+            this.Controls.Add(this.BtnPseudoTvSettingsLocationBrowse);
             this.Controls.Add(this.TxtPseudoTvSettingsLocation);
             this.Controls.Add(this.Label3);
             this.Controls.Add(this.Label4);
-            this.Controls.Add(this.Button3);
+            this.Controls.Add(this.BtnSaveSettings);
             this.Name = "SettingsWindow";
-            this.Text = "SettingsWindow";
+            this.Text = "Settings";
+            this.Load += new System.EventHandler(this.SettingsWindow_Load);
             this.TabPage1.ResumeLayout(false);
             this.TabPage1.PerformLayout();
             this.TabPage2.ResumeLayout(false);
@@ -368,7 +373,7 @@
 
         internal System.Windows.Forms.ComboBox XbmcVersion;
         internal System.Windows.Forms.Label XbmcVersionLbl;
-        internal System.Windows.Forms.Button Button4;
+        internal System.Windows.Forms.Button BtnAddonsDbLocationBrowse;
         internal System.Windows.Forms.TextBox TxtAddonDatabaseLocation;
         internal System.Windows.Forms.Label AddonDbLocDef;
         internal System.Windows.Forms.Label AddonDbLoc;
@@ -377,23 +382,23 @@
         internal System.Windows.Forms.Label Label2;
         internal System.Windows.Forms.Label Label1;
         internal System.Windows.Forms.TextBox TxtVideoDbLocation;
-        internal System.Windows.Forms.Button Button1;
+        internal System.Windows.Forms.Button BtnVideoDbLocationBrowse;
         internal System.Windows.Forms.TabPage TabPage2;
-        internal System.Windows.Forms.TextBox TextBox7;
+        internal System.Windows.Forms.TextBox TxtMySqlPort;
         internal System.Windows.Forms.Label Label8;
-        internal System.Windows.Forms.TextBox TextBox6;
+        internal System.Windows.Forms.TextBox TxtMySqlDatabase;
         internal System.Windows.Forms.Label Label7;
-        internal System.Windows.Forms.TextBox TextBox5;
+        internal System.Windows.Forms.TextBox TxtMySqlPassword;
         internal System.Windows.Forms.Label Label6;
-        internal System.Windows.Forms.TextBox TextBox4;
+        internal System.Windows.Forms.TextBox TxtMySqlUserId;
         internal System.Windows.Forms.Label Label5;
-        internal System.Windows.Forms.TextBox TextBox3;
+        internal System.Windows.Forms.TextBox TxtMySqlServer;
         internal System.Windows.Forms.TabControl TabControl1;
-        internal System.Windows.Forms.Button Button2;
+        internal System.Windows.Forms.Button BtnPseudoTvSettingsLocationBrowse;
         internal System.Windows.Forms.OpenFileDialog OpenFileDialog1;
         internal System.Windows.Forms.TextBox TxtPseudoTvSettingsLocation;
         internal System.Windows.Forms.Label Label3;
         internal System.Windows.Forms.Label Label4;
-        internal System.Windows.Forms.Button Button3;
+        internal System.Windows.Forms.Button BtnSaveSettings;
     }
 }

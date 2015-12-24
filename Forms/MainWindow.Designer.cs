@@ -30,7 +30,7 @@ namespace PseudoTV_Manager.Forms
 		/// </summary>
 		private void InitializeComponent()
 		{
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.DelExcludeBtn = new System.Windows.Forms.Button();
             this.AddExcludeBtn = new System.Windows.Forms.Button();
             this.TabPage4 = new System.Windows.Forms.TabPage();
@@ -109,18 +109,21 @@ namespace PseudoTV_Manager.Forms
             this.FolderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.Status = new System.Windows.Forms.ToolStripStatusLabel();
             this.OpenFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.ExitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MnuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.Label24 = new System.Windows.Forms.Label();
             this.Label23 = new System.Windows.Forms.Label();
             this.Label22 = new System.Windows.Forms.Label();
             this.PeppyDonate = new System.Windows.Forms.Label();
-            this.AaaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MnuSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip1 = new System.Windows.Forms.MenuStrip();
             this.HelpLink = new System.Windows.Forms.LinkLabel();
             this.Label21 = new System.Windows.Forms.Label();
             this.Label13 = new System.Windows.Forms.Label();
             this.TabPage6 = new System.Windows.Forms.TabPage();
+            this.label27 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
             this.HelpList = new System.Windows.Forms.ComboBox();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.Button16 = new System.Windows.Forms.Button();
@@ -165,9 +168,6 @@ namespace PseudoTV_Manager.Forms
             this.MovieLocation = new System.Windows.Forms.TextBox();
             this.MovieLabel = new System.Windows.Forms.Label();
             this.Button15 = new System.Windows.Forms.Button();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
             this.TabPage4.SuspendLayout();
             this.TabPage3.SuspendLayout();
             this.TabPage2.SuspendLayout();
@@ -1046,11 +1046,11 @@ namespace PseudoTV_Manager.Forms
             // 
             this.OpenFileDialog1.FileName = "OpenFileDialog1";
             // 
-            // ExitToolStripMenuItem
+            // MnuExit
             // 
-            this.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem";
-            this.ExitToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.ExitToolStripMenuItem.Text = "Exit";
+            this.MnuExit.Name = "MnuExit";
+            this.MnuExit.Size = new System.Drawing.Size(152, 22);
+            this.MnuExit.Text = "Exit";
             // 
             // Label24
             // 
@@ -1096,28 +1096,29 @@ namespace PseudoTV_Manager.Forms
             this.PeppyDonate.TabIndex = 3;
             this.PeppyDonate.Text = "Peppy6582";
             // 
-            // AaaToolStripMenuItem
+            // MnuSettings
             // 
-            this.AaaToolStripMenuItem.Name = "AaaToolStripMenuItem";
-            this.AaaToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.AaaToolStripMenuItem.Text = "Settings";
+            this.MnuSettings.Name = "MnuSettings";
+            this.MnuSettings.Size = new System.Drawing.Size(152, 22);
+            this.MnuSettings.Text = "Settings";
+            this.MnuSettings.Click += new System.EventHandler(this.MnuSettings_Click);
             // 
             // FileToolStripMenuItem
             // 
             this.FileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.AaaToolStripMenuItem,
-            this.ExitToolStripMenuItem});
+            this.MnuSettings,
+            this.MnuExit});
             this.FileToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
             this.FileToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.FileToolStripMenuItem.Name = "FileToolStripMenuItem";
             this.FileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.FileToolStripMenuItem.Text = "&File";
-            this.FileToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // MenuStrip1
             // 
             this.MenuStrip1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MenuStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.MenuStrip1.GripMargin = new System.Windows.Forms.Padding(0, 0, 0, 0);
             this.MenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileToolStripMenuItem});
@@ -1179,6 +1180,39 @@ namespace PseudoTV_Manager.Forms
             this.TabPage6.Size = new System.Drawing.Size(992, 662);
             this.TabPage6.TabIndex = 5;
             this.TabPage6.Text = "About/Help";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label27.ForeColor = System.Drawing.Color.Navy;
+            this.label27.Location = new System.Drawing.Point(538, 195);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(133, 24);
+            this.label27.TabIndex = 11;
+            this.label27.Text = "Messiadbunny";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label26.ForeColor = System.Drawing.Color.Navy;
+            this.label26.Location = new System.Drawing.Point(564, 171);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(72, 24);
+            this.label26.TabIndex = 10;
+            this.label26.Text = "stereoa";
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label25.ForeColor = System.Drawing.Color.Navy;
+            this.label25.Location = new System.Drawing.Point(514, 147);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(172, 24);
+            this.label25.TabIndex = 9;
+            this.label25.Text = "computergeek1507";
             // 
             // HelpList
             // 
@@ -1402,7 +1436,7 @@ namespace PseudoTV_Manager.Forms
             this.txtShowNetwork.Size = new System.Drawing.Size(280, 28);
             this.txtShowNetwork.TabIndex = 16;
             // 
-            // Button3
+            // BtnSaveSettings
             // 
             this.Button3.Location = new System.Drawing.Point(433, 136);
             this.Button3.Name = "Button3";
@@ -1651,39 +1685,6 @@ namespace PseudoTV_Manager.Forms
             this.Button15.Text = "Del";
             this.Button15.UseVisualStyleBackColor = true;
             // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
-            this.label25.ForeColor = System.Drawing.Color.Navy;
-            this.label25.Location = new System.Drawing.Point(514, 147);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(172, 24);
-            this.label25.TabIndex = 9;
-            this.label25.Text = "computergeek1507";
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
-            this.label26.ForeColor = System.Drawing.Color.Navy;
-            this.label26.Location = new System.Drawing.Point(564, 171);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(72, 24);
-            this.label26.TabIndex = 10;
-            this.label26.Text = "stereoa";
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
-            this.label27.ForeColor = System.Drawing.Color.Navy;
-            this.label27.Location = new System.Drawing.Point(538, 195);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(133, 24);
-            this.label27.TabIndex = 11;
-            this.label27.Text = "Messiadbunny";
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1809,12 +1810,12 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.FolderBrowserDialog FolderBrowserDialog1;
         internal System.Windows.Forms.ToolStripStatusLabel Status;
         internal System.Windows.Forms.OpenFileDialog OpenFileDialog1;
-        internal System.Windows.Forms.ToolStripMenuItem ExitToolStripMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem MnuExit;
         internal System.Windows.Forms.Label Label24;
         internal System.Windows.Forms.Label Label23;
         internal System.Windows.Forms.Label Label22;
         internal System.Windows.Forms.Label PeppyDonate;
-        internal System.Windows.Forms.ToolStripMenuItem AaaToolStripMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem MnuSettings;
         internal System.Windows.Forms.ToolStripMenuItem FileToolStripMenuItem;
         internal System.Windows.Forms.MenuStrip MenuStrip1;
         internal System.Windows.Forms.LinkLabel HelpLink;

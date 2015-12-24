@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.IO;
-using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 using NLog;
-using MySql.Data;
 using PseudoTV_Manager.Enum;
 using PseudoTV_Manager.Forms;
+using PseudoTV_Manager.Properties;
 
 namespace PseudoTV_Manager
 {
@@ -70,13 +66,13 @@ namespace PseudoTV_Manager
         {
             //Connect to the data-base
 
-            string PluginDatabaseData = "Data Source=" + MainWindow.AddonDatabaseLocation;
+            string PluginDatabaseData = "Data Source=" + Settings.Default.AddonDatabaseLocation;
 
             string[] ArrayResponse = { "" };
             //This is a standard, SQLite database.
             var sqlConnect = new SQLiteConnection();
             SQLiteCommand sqlCommand = null;
-            sqlConnect.ConnectionString = "Data Source=" + MainWindow.AddonDatabaseLocation;
+            sqlConnect.ConnectionString = "Data Source=" + Settings.Default.AddonDatabaseLocation;
 
             try
             {
@@ -131,14 +127,14 @@ namespace PseudoTV_Manager
 
         public static void PluginExecute(string SQLQuery)
         {
-            string PluginDatabaseData = "Data Source=" + MainWindow.AddonDatabaseLocation;
+            string PluginDatabaseData = "Data Source=" + Settings.Default.AddonDatabaseLocation;
 
             //These are standard SQLite databases.
             //Open the connection.
             SQLiteConnection sqlConnect = new SQLiteConnection();
             SQLiteCommand sqlCommand = null;
 
-            sqlConnect.ConnectionString = "Data Source=" + MainWindow.AddonDatabaseLocation;
+            sqlConnect.ConnectionString = "Data Source=" + Settings.Default.AddonDatabaseLocation;
 
             try
             {
@@ -176,12 +172,12 @@ namespace PseudoTV_Manager
             string[] arrayResponse = { "" };
 
 
-            if (MainWindow.DatabaseType == 0)
+            if (Settings.Default.DatabaseType == 0)
             {
                 //This is a standard, SQLite database.
                 SQLiteConnection sqlConnect = new SQLiteConnection();
                 SQLiteCommand sqlCommand = null;
-                sqlConnect.ConnectionString = "Data Source=" + MainWindow.VideoDatabaseLocation;
+                sqlConnect.ConnectionString = "Data Source=" + Settings.Default.VideoDatabaseLocation;
 
                 try
                 {
@@ -198,7 +194,7 @@ namespace PseudoTV_Manager
                         string StringResponse = "";
 
 
-                        for (var y = 0; y <= ColumnArray.Length; y++)
+                        for (var y = 0; y <= ColumnArray.Length - 1; y++)
                         {
                             if (y > 0)
                             {
@@ -236,7 +232,7 @@ namespace PseudoTV_Manager
                 //This is for MySQL Databases, just slight syntax differences.
                 var sqlConnect = new MySqlConnection();
                 MySqlCommand sqlCommand = null;
-                sqlConnect.ConnectionString = MainWindow.MySqlConnectionString;
+                sqlConnect.ConnectionString = Settings.Default.MySqlConnectionString;
                 try
                 {
                     sqlConnect.Open();
@@ -293,13 +289,13 @@ namespace PseudoTV_Manager
 
         public static void DbExecute(string SQLQuery)
         {
-            if (MainWindow.DatabaseType == 0)
+            if (Settings.Default.DatabaseType == 0)
             {
                 //These are standard SQLite databases.
                 //Open the connection.
                 SQLiteConnection sqlConnect = new SQLiteConnection();
                 SQLiteCommand sqlCommand = null;
-                sqlConnect.ConnectionString = "Data Source=" + MainWindow.VideoDatabaseLocation;
+                sqlConnect.ConnectionString = "Data Source=" + Settings.Default.VideoDatabaseLocation;
 
                 try
                 {
@@ -334,7 +330,7 @@ namespace PseudoTV_Manager
                 //Open the connection.
                 MySqlConnection sqlConnect = new MySqlConnection();
                 MySqlCommand sqlCommand = null;
-                sqlConnect.ConnectionString = MainWindow.MySqlConnectionString;
+                sqlConnect.ConnectionString = Settings.Default.MySqlConnectionString;
                 try
                 {
                     sqlConnect.Open();

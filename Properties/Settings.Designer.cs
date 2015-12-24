@@ -38,12 +38,12 @@ namespace PseudoTV_Manager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MySQLConnectionString {
+        public string MySqlConnectionString {
             get {
-                return ((string)(this["MySQLConnectionString"]));
+                return ((string)(this["MySqlConnectionString"]));
             }
             set {
-                this["MySQLConnectionString"] = value;
+                this["MySqlConnectionString"] = value;
             }
         }
         
@@ -52,10 +52,10 @@ namespace PseudoTV_Manager.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string PseudoTvSettingsLocation {
             get {
-                return ((string)(this["TxtPseudoTvSettingsLocation"]));
+                return ((string)(this["PseudoTvSettingsLocation"]));
             }
             set {
-                this["TxtPseudoTvSettingsLocation"] = value;
+                this["PseudoTvSettingsLocation"] = value;
             }
         }
         
@@ -64,10 +64,10 @@ namespace PseudoTV_Manager.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AddonDatabaseLocation {
             get {
-                return ((string)(this["TxtAddonDatabaseLocation"]));
+                return ((string)(this["AddonDatabaseLocation"]));
             }
             set {
-                this["TxtAddonDatabaseLocation"] = value;
+                this["AddonDatabaseLocation"] = value;
             }
         }
         
@@ -88,10 +88,10 @@ namespace PseudoTV_Manager.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string VideoDatabaseLocation {
             get {
-                return ((string)(this["TxtVideoDatabaseLocation"]));
+                return ((string)(this["VideoDatabaseLocation"]));
             }
             set {
-                this["TxtVideoDatabaseLocation"] = value;
+                this["VideoDatabaseLocation"] = value;
             }
         }
     }
