@@ -22,8 +22,6 @@ namespace PseudoTV_Manager.Forms
         private ColumnHeader _mSortingColumn;
         private ColumnHeader _mSortingColumn2;
 
-        public int XbmcVersion;
-        public string UserDataFolder;
         public string PluginNotInclude;
         public string YouTubeMulti;
         private int _resetHours;
@@ -33,7 +31,7 @@ namespace PseudoTV_Manager.Forms
         public int LookUpGenre(string genreName)
         {
             //This looks up the Genre based on the name and returns the proper Genre ID
-            int genreId = 0;
+            var genreId = 0;
 
             var selectArray = new[] { 0 };
 
@@ -49,14 +47,8 @@ namespace PseudoTV_Manager.Forms
 
             //The ID # is all we need.
             //Just make sure it's not a null reference.
-            if (returnArray == null)
-            {
-                MessageBox.Show("nothing!");
-            }
-            else
-            {
-                genreId = Convert.ToInt32(returnArray[0]);
-            }
+            if (returnArray == null) MessageBox.Show("nothing!");
+            else genreId = Convert.ToInt32(returnArray[0]);
 
             return genreId;
         }
@@ -92,6 +84,7 @@ namespace PseudoTV_Manager.Forms
 
         }
 
+        #region Refresh Methods
         public void RefreshTvGuide()
         {
             //Clear the TV name and the List items
@@ -111,28 +104,25 @@ namespace PseudoTV_Manager.Forms
                 //Load everything into the FullFile string
                 var fullFile = PseudoTvUtils.ReadFile(Settings.Default.PseudoTvSettingsLocation);
 
-                var objReader = new System.IO.StreamReader(fileLocation);
-
-                //Loop through each line individually, then add the channel # to an array
-
-                while (objReader.Peek() != -1)
+                using (var objReader = new System.IO.StreamReader(fileLocation))
                 {
-                    var singleLine = objReader.ReadLine();
-
-                    if (singleLine.Contains("_type" + (char)34 + " value="))
+                    while (objReader.Peek() != -1)
                     {
-                        var part1 = Regex.Split(singleLine, "_type")[0];
-                        var part2 = part1.Split('_')[1];
+                        var singleLine = objReader.ReadLine();
 
-                        Array.Resize(ref channelArray, channelNum + 1);
-                        channelNum = channelNum + 1;
-                        channelArray[channelArray.Length - 1] = part2;
+                        if (singleLine.Contains("_type" + (char)34 + " value="))
+                        {
+                            var part1 = Regex.Split(singleLine, "_type")[0];
+                            var part2 = part1.Split('_')[1];
+
+                            Array.Resize(ref channelArray, channelNum + 1);
+                            channelNum = channelNum + 1;
+                            channelArray[channelArray.Length - 1] = part2;
+
+                        }
 
                     }
-
                 }
-
-                objReader.Close();
 
                 for (var x = 0; x <= channelArray.Length - 1; x++)
                 {
@@ -163,79 +153,73 @@ namespace PseudoTV_Manager.Forms
                         ruleValue = ruleValue.Split((char)34)[0];
 
 
-                        if (ruleType == "changed")
+                        switch (ruleType)
                         {
-                        }
-                        else if (ruleType == "rulecount")
-                        {
-                            channelRulesCount = ruleValue;
-                        }
-                        else if (ruleType == "time")
-                        {
-                            channelTime = ruleValue;
-                        }
-                        else if (ruleType == "type")
-                        {
-                            //Update the Channel type to the value of that.
-                            channelType = ruleValue;
-                        }
-                        else if (ruleType == "1")
-                        {
-                            //Gets more information on what type the channel is, playlist location/genre/zap2it/etc.
-                            channelTypeDetail = ruleValue;
-                        }
-                        else if (ruleType == "2")
-                        {
-                            //Gets (LiveTV-8)stream source/(IPTV-9)iptv source/(Youtube-10)youtube channel type/
-                            //(Rss-11)reserved/(LastFM-13)LastFM User/(BTP/Cinema Experience14)filter types or smart playlist/
-                            //(Direct/SF-15, Direct Playon-16)exclude list/
-                            channelTypeDetail2 = ruleValue;
-                        }
-                        else if (ruleType == "3")
-                        {
-                            //Gets (LiveTV-8)xmltv filename/(IPTV-9)show titles/(Youtube-10, Rss-11, LastFM-13)media limits/
-                            //(BTP/Cinema Experience-14)parsing resolution/(Direct/SF-15, Direct Playon-16)file limit
-                            channelTypeDetail3 = ruleValue;
-                        }
-                        else if (ruleType == "4")
-                        {
-                            //Gets (IPTV-9)show description/(Youtube-10, Rss-11, LastFM-13)sort ordering/
-                            //(BTP/Cinema Experience-14)years to parse by or unused/(Direct/SF-15, Direct Playon-16)sort ordering
-                            channelTypeDetail4 = ruleValue;
-                        }
-                        else if (ruleType.Contains("rule"))
-                        {
-                            //Okay, It's rule information.
+                            case "changed":
+                                break;
+                            case "rulecount":
+                                channelRulesCount = ruleValue;
+                                break;
+                            case "time":
+                                channelTime = ruleValue;
+                                break;
+                            case "type":
+                                //Update the Channel type to the value of that.
+                                channelType = ruleValue;
+                                break;
+                            case "1":
+                                //Gets more information on what type the channel is, playlist location/genre/zap2it/etc.
+                                channelTypeDetail = ruleValue;
+                                break;
+                            case "2":
+                                //Gets (LiveTV-8)stream source/(IPTV-9)iptv source/(Youtube-10)youtube channel type/
+                                //(Rss-11)reserved/(LastFM-13)LastFM User/(BTP/Cinema Experience14)filter types or smart playlist/
+                                //(Direct/SF-15, Direct Playon-16)exclude list/
+                                channelTypeDetail2 = ruleValue;
+                                break;
+                            case "3":
+                                //Gets (LiveTV-8)xmltv filename/(IPTV-9)show titles/(Youtube-10, Rss-11, LastFM-13)media limits/
+                                //(BTP/Cinema Experience-14)parsing resolution/(Direct/SF-15, Direct Playon-16)file limit
+                                channelTypeDetail3 = ruleValue;
+                                break;
+                            case "4":
+                                //Gets (IPTV-9)show description/(Youtube-10, Rss-11, LastFM-13)sort ordering/
+                                //(BTP/Cinema Experience-14)years to parse by or unused/(Direct/SF-15, Direct Playon-16)sort ordering
+                                channelTypeDetail4 = ruleValue;
+                                break;
+                            default:
+                                if (ruleType.Contains("rule"))
+                                {
+                                    //Okay, It's rule information.
 
-                            //Get the rule number.
-                            string ruleNumber = null;
-                            ruleNumber = Regex.Split(ruleType, "rule_")[1];
-                            ruleNumber = ruleNumber.Split('_')[0];
+                                    //Get the rule number.
+                                    string ruleNumber = null;
+                                    ruleNumber = Regex.Split(ruleType, "rule_")[1];
+                                    ruleNumber = ruleNumber.Split('_')[0];
 
-                            if (ruleType.Contains("opt"))
-                            {
-                                //Okay, it's an actual option tied to another rule.
+                                    if (ruleType.Contains("opt"))
+                                    {
+                                        //Okay, it's an actual option tied to another rule.
 
-                                var optNumber = Regex.Split(ruleType, "_opt_")[1];
-                                ruleNumber = Regex.Split(ruleType, "_opt_")[0];
-                                ruleNumber = Regex.Split(ruleNumber, "rule_")[1];
+                                        var optNumber = Regex.Split(ruleType, "_opt_")[1];
+                                        ruleNumber = Regex.Split(ruleType, "_opt_")[0];
+                                        ruleNumber = Regex.Split(ruleNumber, "rule_")[1];
 
-                                //MsgBox("Opt : " & RuleNumber & " | " & OptNumber & " | " & RuleValue)
-                                //ChannelRulesAdvanced = ChannelRulesAdvanced & "~" & RuleNumber & "|" & OptNumber & "|" & RuleValue
-                                //MsgBox(RuleNumber & " | " & OptNumber & " | " & RuleValue)
+                                        //MsgBox("Opt : " & RuleNumber & " | " & OptNumber & " | " & RuleValue)
+                                        //ChannelRulesAdvanced = ChannelRulesAdvanced & "~" & RuleNumber & "|" & OptNumber & "|" & RuleValue
+                                        //MsgBox(RuleNumber & " | " & OptNumber & " | " & RuleValue)
 
-                                //Add this to the previous rule, remove the ending 
-                                //Then add this rule as Rule#:RuleValue
-                                channelRules = channelRules + "|" + optNumber + "^" + ruleValue;
-                            }
-                            else
-                            {
-                                channelRules = channelRules + "~" + ruleNumber + "|" + ruleValue;
-                            }
+                                        //Add this to the previous rule, remove the ending 
+                                        //Then add this rule as Rule#:RuleValue
+                                        channelRules = channelRules + "|" + optNumber + "^" + ruleValue;
+                                    }
+                                    else
+                                    {
+                                        channelRules = channelRules + "~" + ruleNumber + "|" + ruleValue;
+                                    }
 
-                        }
-                        else
-                        {
+                                }
+                                break;
                         }
 
                         //End result for a basic option:  ~RuleNumber|RuleValue 
@@ -256,8 +240,7 @@ namespace PseudoTV_Manager.Forms
                     str[7] = channelTypeDetail3;
                     str[8] = channelTypeDetail4;
 
-                    var itm = default(ListViewItem);
-                    itm = new ListViewItem(str);
+                    var itm = new ListViewItem(str);
                     //Add to list
                     TVGuideList.Items.Add(itm);
 
@@ -360,8 +343,7 @@ namespace PseudoTV_Manager.Forms
                 str[4] = splitItem[0];
 
 
-                var itm = default(ListViewItem);
-                itm = new ListViewItem(str);
+                var itm = new ListViewItem(str);
                 //Add to list
                 GenresList.Items.Add(itm);
 
@@ -369,7 +351,6 @@ namespace PseudoTV_Manager.Forms
 
             GenresList.Sort();
         }
-
 
         public void RefreshTvShows()
         {
@@ -450,6 +431,222 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
+        public void RefreshSettings()
+        {
+            Settings.Default.Reload();
+
+
+            RefreshAll();
+            RefreshTvGuide();
+
+            //TODO:
+            //    //System.IO.File.Create(SettingsFile)
+            //    MessageBox.Show(
+            //        "Unable to locate the location of XBMC video library and PseudoTV's setting location.  Please enter them and save the changes.");
+            //    Form6 mySettings = new Form6();
+            //    //mySettings.Version = Me.Version
+            //    mySettings.Show();
+            //}
+        }
+
+        public void RefreshNetworkListMovies()
+        {
+            MovieNetworkList.Items.Clear();
+
+            var selectArray = new[] { 2, 20 };
+
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
+                "SELECT * FROM movie ORDER BY c18 ASC",
+                selectArray);
+
+            //Loop through each returned Movie
+            for (var x = 0; x <= returnArray.Length - 1; x++)
+            {
+                if ((string.IsNullOrEmpty(returnArray[x])))
+                {
+                    continue;
+                }
+
+                string[] returnArraySplit = null;
+
+                string showName = null;
+                string showNetwork = null;
+
+                returnArraySplit = returnArray[x].Split('~');
+
+                showName = returnArraySplit[0];
+                //Updated ReturnArraySplit for ShowNetwork to reflect MyVideos78.db schema
+                showNetwork = returnArraySplit[1];
+
+                var networkListed = false;
+
+
+                for (var y = 0; y <= MovieNetworkList.Items.Count - 1; y++)
+                {
+                    if (MovieNetworkList.Items[y].SubItems[0].Text == showNetwork)
+                    {
+                        networkListed = true;
+                        MovieNetworkList.Items[y].SubItems[1].Text = MovieNetworkList.Items[y].SubItems[1].Text + 1;
+                    }
+
+                }
+
+                if (networkListed == false)
+                {
+                    var itm = default(ListViewItem);
+                    var str = new string[2];
+
+                    str[0] = showNetwork;
+                    str[1] = "1";
+
+                    itm = new ListViewItem(str);
+
+                    //Add the item to the TV show list.
+                    MovieNetworkList.Items.Add(itm);
+
+                }
+
+            }
+
+        }
+
+        public void RefreshNetworkList()
+        {
+            NetworkList.Items.Clear();
+
+            var selectArray = new[] { 1, 15 };
+
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
+                "SELECT * FROM tvshow ORDER BY c14 ASC",
+                selectArray);
+
+            //Loop through each returned TV show.
+
+            for (var x = 0; x <= returnArray.Length - 1; x++)
+            {
+
+                string[] returnArraySplit = null;
+
+                string showName = null;
+                string showNetwork = null;
+
+                returnArraySplit = returnArray[x].Split('~');
+
+                showName = returnArraySplit[0];
+                showNetwork = returnArraySplit[1];
+
+                var networkListed = false;
+
+                for (var y = 0; y <= NetworkList.Items.Count - 1; y++)
+                {
+                    if (NetworkList.Items[y].SubItems[0].Text == showNetwork)
+                    {
+                        networkListed = true;
+                        NetworkList.Items[y].SubItems[1].Text = NetworkList.Items[y].SubItems[1].Text + 1;
+                    }
+
+                }
+
+                if (networkListed == false)
+                {
+                    var itm = default(ListViewItem);
+                    var str = new string[2];
+
+                    str[0] = showNetwork;
+                    str[1] = "1";
+
+                    itm = new ListViewItem(str);
+
+                    //Add the item to the TV show list.
+                    NetworkList.Items.Add(itm);
+
+                }
+
+            }
+
+        }
+
+        public void RefreshAllGenres()
+        {
+            var savedText = Option2.Text;
+            Option2.Items.Clear();
+            //Set an array with the columns you want returned
+            var selectArray = new[] { 1 };
+
+            //Shoot it over to the ReadRecord sub, 
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
+
+            //Now, read the output of the array.
+
+            //Loop through each of the Array items.
+            for (var x = 0; x <= returnArray.Length - 1; x++)
+            {
+                Option2.Items.Add(returnArray[x]);
+            }
+            Option2.Sorted = true;
+            Option2.Text = savedText;
+        }
+
+        public void RefreshAllStudios()
+        {
+            var savedText = Option2.Text;
+
+            //Clear all
+            Option2.Items.Clear();
+            //Form3.ListBox1.Items.Clear()
+            TxtShowNetwork.Items.Clear();
+            txtMovieNetwork.Items.Clear();
+            //TODO: Form8.ListBox1.Items.Clear();
+
+            //Set an array with the columns you want returned
+            var selectArray = new[] { 1 };
+
+            //Shoot it over to the ReadRecord sub, 
+            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
+
+            //Now, read the output of the array.
+
+            //Loop through each of the Array items.
+            for (var x = 0; x <= returnArray.Length - 1; x++)
+            {
+                Option2.Items.Add(returnArray[x]);
+                //Form3.ListBox1.Items.Add(ReturnArray[x])
+                TxtShowNetwork.Items.Add(returnArray[x]);
+                txtMovieNetwork.Items.Add(returnArray[x]);
+                //TODO: Form8.ListBox1.Items.Add(returnArray[x]);
+            }
+
+            //Sort them all.
+            Option2.Sorted = true;
+            //Form3.ListBox1.Sorted = True
+            //TODO: Form8.ListBox1.Sorted = true;
+            TxtShowNetwork.Sorted = true;
+            txtMovieNetwork.Sorted = true;
+            Option2.Text = savedText;
+
+        }
+
+        public void RefreshAll()
+        {
+            if (!string.IsNullOrEmpty(Settings.Default.VideoDatabaseLocation) |
+                !string.IsNullOrEmpty(Settings.Default.MySqlConnectionString) & !string.IsNullOrEmpty(Settings.Default.PseudoTvSettingsLocation))
+            {
+                RefreshMovieList();
+                RefreshTvShows();
+                RefreshPlugins();
+                RefreshAllStudios();
+                RefreshNetworkList();
+                RefreshNetworkListMovies();
+                RefreshGenres();
+                TxtShowName.Text = "";
+                txtShowLocation.Text = "";
+                TVPosterPictureBox.ImageLocation = "";
+                MovieLocation.Text = "";
+                MoviePicture.ImageLocation = "";
+            }
+        }
+
+        #endregion
 
         private void MainWindow_Load(object sender, System.EventArgs e)
         {
@@ -498,26 +695,7 @@ namespace PseudoTV_Manager.Forms
 
         }
 
-
-        public void RefreshSettings()
-        {
-            //TODO:
-            Settings.Default.Reload();
-
-
-            RefreshAll();
-            RefreshTvGuide();
-            
-            //TODO:
-            //    //System.IO.File.Create(SettingsFile)
-            //    MessageBox.Show(
-            //        "Unable to locate the location of XBMC video library and PseudoTV's setting location.  Please enter them and save the changes.");
-            //    Form6 mySettings = new Form6();
-            //    //mySettings.Version = Me.Version
-            //    mySettings.Show();
-            //}
-        }
-
+        #region Events
         private void ListTVBanners_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
             var x = ListTVBanners.SelectedIndex;
@@ -600,7 +778,7 @@ namespace PseudoTV_Manager.Forms
                 if (txtShowLocation.Text.Substring(0, 6) == "smb://")
                 {
                     txtShowLocation.Text = txtShowLocation.Text.Replace("/", "\\");
-                    txtShowLocation.Text = "\\\\" + txtShowLocation.Text.Substring(6);
+                    txtShowLocation.Text = @"\\" + txtShowLocation.Text.Substring(6);
                 }
             }
 
@@ -681,11 +859,11 @@ namespace PseudoTV_Manager.Forms
                 var tvGenres = tvShowReturnArraySplit[1];
                 if (string.IsNullOrEmpty(tvShowReturnArraySplit[2]))
                 {
-                    txtShowNetwork.SelectedIndex = -1;
+                    TxtShowNetwork.SelectedIndex = -1;
                 }
                 else
                 {
-                    txtShowNetwork.Text = tvShowReturnArraySplit[2];
+                    TxtShowNetwork.Text = tvShowReturnArraySplit[2];
                 }
 
                 txtShowLocation.Text = tvShowLocationSplit[1];
@@ -781,7 +959,7 @@ namespace PseudoTV_Manager.Forms
             // Get the new sorting column. 
             var newSortingColumn = TVShowList.Columns[e.Column];
             // Figure out the new sorting order. 
-            var sortOrder = default(System.Windows.Forms.SortOrder);
+            SortOrder sortOrder;
             if (_mSortingColumn == null)
             {
                 // New column. Sort ascending. 
@@ -824,86 +1002,6 @@ namespace PseudoTV_Manager.Forms
             TVShowList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
             // Sort. 
             TVShowList.Sort();
-        }
-
-        public object ConvertGenres(ListBox genrelist)
-        {
-            //Converts the existing ListTVGenre's contents to the proper format.
-
-            var tvGenresString = "";
-            for (var x = 0; x <= genrelist.Items.Count - 1; x++)
-            {
-                if (x == 0)
-                {
-                    tvGenresString = genrelist.Items[x].ToString();
-                }
-                else
-                {
-                    tvGenresString = tvGenresString + " / " + genrelist.Items[x].ToString();
-                }
-            }
-
-            return tvGenresString;
-        }
-
-        public void RefreshAllGenres()
-        {
-            var savedText = Option2.Text;
-            Option2.Items.Clear();
-            //Set an array with the columns you want returned
-            var selectArray = new[] { 1 };
-
-            //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM genre", selectArray);
-
-            //Now, read the output of the array.
-
-            //Loop through each of the Array items.
-            for (var x = 0; x <= returnArray.Length - 1; x++)
-            {
-                Option2.Items.Add(returnArray[x]);
-            }
-            Option2.Sorted = true;
-            Option2.Text = savedText;
-        }
-
-        public void RefreshAllStudios()
-        {
-            var savedText = Option2.Text;
-
-            //Clear all
-            Option2.Items.Clear();
-            //Form3.ListBox1.Items.Clear()
-            txtShowNetwork.Items.Clear();
-            txtMovieNetwork.Items.Clear();
-            //TODO: Form8.ListBox1.Items.Clear();
-
-            //Set an array with the columns you want returned
-            var selectArray = new[] { 1 };
-
-            //Shoot it over to the ReadRecord sub, 
-            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation, "SELECT * FROM studio", selectArray);
-
-            //Now, read the output of the array.
-
-            //Loop through each of the Array items.
-            for (var x = 0; x <= returnArray.Length - 1; x++)
-            {
-                Option2.Items.Add(returnArray[x]);
-                //Form3.ListBox1.Items.Add(ReturnArray[x])
-                txtShowNetwork.Items.Add(returnArray[x]);
-                txtMovieNetwork.Items.Add(returnArray[x]);
-                //TODO: Form8.ListBox1.Items.Add(returnArray[x]);
-            }
-
-            //Sort them all.
-            Option2.Sorted = true;
-            //Form3.ListBox1.Sorted = True
-            //TODO: Form8.ListBox1.Sorted = true;
-            txtShowNetwork.Sorted = true;
-            txtMovieNetwork.Sorted = true;
-            Option2.Text = savedText;
-
         }
 
         private void NetworkList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
@@ -977,7 +1075,7 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button3_Click(System.Object sender, System.EventArgs e)
+        private void BtnAddGenre_Click(System.Object sender, System.EventArgs e)
         {
             if (TVShowList.SelectedIndices.Count > 0)
             {
@@ -987,7 +1085,7 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button4_Click(System.Object sender, System.EventArgs e)
+        private void BtnDeleteGenre_Click(System.Object sender, System.EventArgs e)
         {
 
             if (ListTVGenres.SelectedIndex >= 0)
@@ -1005,29 +1103,9 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button1_Click(System.Object sender, System.EventArgs e)
+        private void BtnRefresh_Click(System.Object sender, System.EventArgs e)
         {
             RefreshAll();
-        }
-
-        public void RefreshAll()
-        {
-            if (!string.IsNullOrEmpty(Settings.Default.VideoDatabaseLocation) |
-                !string.IsNullOrEmpty(Settings.Default.MySqlConnectionString) & !string.IsNullOrEmpty(Settings.Default.PseudoTvSettingsLocation))
-            {
-                RefreshMovieList();
-                RefreshTvShows();
-                RefreshPlugins();
-                RefreshAllStudios();
-                RefreshNetworkList();
-                RefreshNetworkListMovies();
-                RefreshGenres();
-                TxtShowName.Text = "";
-                txtShowLocation.Text = "";
-                TVPosterPictureBox.ImageLocation = "";
-                MovieLocation.Text = "";
-                MoviePicture.ImageLocation = "";
-            }
         }
 
         private void GenresList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
@@ -1163,7 +1241,6 @@ namespace PseudoTV_Manager.Forms
 
         }
 
-
         private void SaveTVShow_Click(System.Object sender, System.EventArgs e)
         {
 
@@ -1175,7 +1252,7 @@ namespace PseudoTV_Manager.Forms
                 var showGenres = ConvertGenres(ListTVGenres);
                 tvShowName = tvShowName.Replace("'", "''");
                 //Grab the Network ID based on the name
-                var networkId = LookUpNetwork(txtShowNetwork.Text);
+                var networkId = LookUpNetwork(TxtShowNetwork.Text);
 
                 if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
                 {
@@ -1194,7 +1271,7 @@ namespace PseudoTV_Manager.Forms
 
                 PseudoTvUtils.DbExecute("UPDATE tvshow SET c00 = '" + tvShowName + "', c08 = '" + showGenres +
                                         "', c14 ='" +
-                                        txtShowNetwork.Text + "' WHERE idShow = '" + TVShowLabel.Text + "'");
+                                        TxtShowNetwork.Text + "' WHERE idShow = '" + TVShowLabel.Text + "'");
                 //TODO: VisualStyleElement.Status.Text = "Updated " + TxtShowName.Text + " Successfully";
 
                 if ((Settings.Default.KodiVersion >= (int)KodiVersion.Isengard))
@@ -1227,7 +1304,7 @@ namespace PseudoTV_Manager.Forms
 
                 //Now update the tv show table
 
-                var savedName = txtShowNetwork.Text;
+                var savedName = TxtShowNetwork.Text;
 
                 //Refresh Things
                 RefreshNetworkList();
@@ -1413,7 +1490,7 @@ namespace PseudoTV_Manager.Forms
                     }
                     else
                     {
-                        for (var x = 0; x <= returnArray.Length-1; x++)
+                        for (var x = 0; x <= returnArray.Length - 1; x++)
                         {
                             var showArray = new[] { 1 };
 
@@ -1451,7 +1528,7 @@ namespace PseudoTV_Manager.Forms
                     }
                     else
                     {
-                        for (var x = 0; x <= returnArrayMovies.Length-1; x++)
+                        for (var x = 0; x <= returnArrayMovies.Length - 1; x++)
                         {
                             var showArray = new[] { 2 };
 
@@ -1549,8 +1626,6 @@ namespace PseudoTV_Manager.Forms
 
             if (TVGuideList.SelectedIndices.Count > 0)
             {
-
-
                 //Reset the checked options.
                 ChkLogo.Checked = false;
                 chkDontPlayChannel.Checked = false;
@@ -1710,262 +1785,569 @@ namespace PseudoTV_Manager.Forms
                         var ruleValue = ruleSettings[1];
 
 
-                        if (ruleValue == "5")
+                        switch (ruleValue)
                         {
-                            chkDontPlayChannel.Checked = true;
-                        }
-                        else if (ruleValue == "10")
-                        {
-                            ChkRandom.Checked = true;
-                        }
-                        else if (ruleValue == "7")
-                        {
-                            ChkRealTime.Checked = true;
-                        }
-                        else if (ruleValue == "9")
-                        {
-                            ChkResume.Checked = true;
-                        }
-                        else if (ruleValue == "11")
-                        {
-                            ChkUnwatched.Checked = true;
-                        }
-                        else if (ruleValue == "4")
-                        {
-                            ChkWatched.Checked = true;
-                        }
-                        else if (ruleValue == "8")
-                        {
-                            ChkPause.Checked = true;
-                        }
-                        else if (ruleValue == "12")
-                        {
-                            ChkPlayInOrder.Checked = true;
+                            case "5":
+                                chkDontPlayChannel.Checked = true;
+                                break;
+                            case "10":
+                                ChkRandom.Checked = true;
+                                break;
+                            case "7":
+                                ChkRealTime.Checked = true;
+                                break;
+                            case "9":
+                                ChkResume.Checked = true;
+                                break;
+                            case "11":
+                                ChkUnwatched.Checked = true;
+                                break;
+                            case "4":
+                                ChkWatched.Checked = true;
+                                break;
+                            case "8":
+                                ChkPause.Checked = true;
+                                break;
+                            case "12":
+                                ChkPlayInOrder.Checked = true;
+                                break;
+                            default:
+                                //Okay, so it's not something requiring a single option.
+                                //Now loop through all the sub-options of each rule.
+                                var subOptions = new string[5];
 
-                        }
-                        else
-                        {
-                            //Okay, so it's not something requiring a single option.
-
-                            //Now loop through all the sub-options of each rule.
-                            var subOptions = new string[5];
-
-                            for (var z = 2; z <= ruleSettings.Length; z++)
-                            {
-                                var optionNum = Convert.ToInt32(ruleSettings[z].Split('^')[0]);
-                                var optionValue = ruleSettings[z].Split('^')[1];
+                                for (var z = 2; z <= ruleSettings.Length; z++)
+                                {
+                                    var optionNum = Convert.ToInt32(ruleSettings[z].Split('^')[0]);
+                                    var optionValue = ruleSettings[z].Split('^')[1];
 
 
-                                if (ruleValue == "13")
-                                {
-                                    //TODO: Optimize
-                                    ResetDays.Text = (Convert.ToInt32(optionValue) / 60).ToString();
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "1")
-                                {
-                                    ChannelName.Text = optionValue;
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "15" & optionValue == "Yes")
-                                {
-                                    ChkLogo.Checked = true;
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "14" & optionValue == "Yes")
-                                {
-                                    ChkIceLibrary.Checked = true;
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "17" & optionValue == "Yes")
-                                {
-                                    ChkExcludeBCT.Checked = true;
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "18" & optionValue == "Yes")
-                                {
-                                    ChkPopup.Checked = true;
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "2")
-                                {
-                                    NotShows.Items.Add(optionValue);
-                                    break; // TODO: might not be correct. Was : Exit For
-                                }
-                                else if (ruleValue == "6")
-                                {
-                                    //Add this option to a sub-item array to add later to the
-                                    //Object at the end
-                                    subOptions[optionNum - 1] = optionValue;
-
-                                    if (optionNum == 5)
+                                    switch (ruleValue)
                                     {
-                                        //last option.
-                                        //create + insert object
-                                        var itm = default(ListViewItem);
-                                        itm = new ListViewItem(subOptions);
-                                        //Add to list
-                                        InterleavedList.Items.Add(itm);
-                                        //Remove it from the loop.  We only need 4 options here.
-                                        break; // TODO: might not be correct. Was : Exit For
+                                        case "13":
+                                            //TODO: Optimize
+                                            ResetDays.Text = (Convert.ToInt32(optionValue)/60).ToString();
+                                            break;
+                                        case "1":
+                                            ChannelName.Text = optionValue;
+                                            break;
+                                        case "15":
+                                            ChkLogo.Checked = optionValue == "Yes";
+                                            break;
+                                        case "14":
+                                            ChkIceLibrary.Checked = optionValue == "Yes";
+                                            break;
+                                        case "17":
+                                            ChkExcludeBCT.Checked = optionValue == "Yes";
+                                            break;
+                                        case "18":
+                                            ChkPopup.Checked = optionValue == "Yes";
+                                            break;
+                                        case "2":
+                                            NotShows.Items.Add(optionValue);
+                                            break;
+                                        case "6":
+                                            //Add this option to a sub-item array to add later to the
+                                            //Object at the end
+                                            subOptions[optionNum - 1] = optionValue;
 
-                                    }
-                                    else
-                                    {
+                                            if (optionNum != 5) continue;
+                                        
+                                            //last option.
+                                            //create + insert object
+                                            var interleavedItm = new ListViewItem(subOptions);
+                                            //Add to list
+                                            InterleavedList.Items.Add(interleavedItm);
+                                            break;
+                                        case "3":
+                                            //Add this option to a sub-item array to add later to the
+                                            //Object at the end
+                                            subOptions[optionNum - 1] = optionValue;
+                                            if (optionNum == 4)
+                                            {
+                                                //last option.
+                                                //create + insert object
+                                                var schedulingItm = new ListViewItem(subOptions);
+                                                //Add to list
+
+                                                SchedulingList.Items.Add(schedulingItm);
+                                            }
+                                            break;
                                     }
                                 }
-                                else if (ruleValue == "3")
-                                {
-                                    //Add this option to a sub-item array to add later to the
-                                    //Object at the end
-                                    subOptions[optionNum - 1] = optionValue;
-                                    if (optionNum == 4)
-                                    {
-                                        //last option.
-                                        //create + insert object
-                                        var itm = new ListViewItem(subOptions);
-                                        //Add to list
-
-                                        SchedulingList.Items.Add(itm);
-                                        break; // TODO: might not be correct. Was : Exit For
-
-                                    }
-                                }
-
-                            }
+                                break;
                         }
                     }
-
 
                     RefreshTvGuideSublist(playListNumber, tvChannelTypeValue);
 
-                    if (option1 == 1)
+                    var index = 0;
+                    switch (option1)
                     {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-                        //SortTypeBox.SelectedIndex = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text
-                        var index = 0;
-                        index =
-                            MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
-                        MediaLimitBox.SelectedIndex = index;
-                    }
-                    else if (option1 == 2)
-                    {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-                        StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
-                        ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
-                    }
-                    else if (option1 == 3)
-                    {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-                        StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
-                        ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
-                        ShowDescBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text;
-                    }
-                    else if (option1 == 4)
-                    {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-                        YouTubeType.SelectedIndex =
-                            Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
-                        var index = 0;
-                        index =
-                            MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
-                        MediaLimitBox.SelectedIndex = index;
-                        SortTypeBox.SelectedIndex =
-                            Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
-                        if (YouTubeType.SelectedIndex == 6 | YouTubeType.SelectedIndex == 7)
-                        {
-                            var returnMulti = "";
-
-                            returnMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-
-                            if (returnMulti.Contains("|"))
+                        case 1:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            //SortTypeBox.SelectedIndex = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text
+                            index =
+                                MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
+                            MediaLimitBox.SelectedIndex = index;
+                            break;
+                        case 2:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
+                            ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
+                            break;
+                        case 3:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            StrmUrlBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
+                            ShowTitleBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text;
+                            ShowDescBox.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text;
+                            break;
+                        case 4:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            YouTubeType.SelectedIndex =
+                                Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
+                            index =
+                                MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
+                            MediaLimitBox.SelectedIndex = index;
+                            SortTypeBox.SelectedIndex =
+                                Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
+                            if (YouTubeType.SelectedIndex == 6 | YouTubeType.SelectedIndex == 7)
                             {
-                                var returnMultiSplit = returnMulti.Split('|');
+                                var returnMulti = "";
 
-                                for (var x = 0; x <= returnMultiSplit.Length; x++)
+                                returnMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+
+                                if (returnMulti.Contains("|"))
                                 {
-                                    NotShows.Items.Add(returnMultiSplit[x]);
+                                    var returnMultiSplit = returnMulti.Split('|');
+                                    for (var x = 0; x <= returnMultiSplit.Length - 1; x++)
+                                        NotShows.Items.Add(returnMultiSplit[x]);
+                                }
+                                else
+                                {
+                                    ShowDescBox.Visible = true;
+                                    ShowDescBox.Text = returnMulti;
                                 }
 
-
+                                YouTubeMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
                             }
-                            else
+
+                            break;
+                        case 5:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
+                            SubChannelType.SelectedIndex =
+                                Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
+                            index =
+                                MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
+                            MediaLimitBox.SelectedIndex = index;
+                            SortTypeBox.SelectedIndex =
+                                Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
+                            break;
+                        case 7:
+                            PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            SortTypeBox.SelectedIndex =
+                                Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
+                            index =
+                                MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
+                            MediaLimitBox.SelectedIndex = index;
+
+                            var returnPlugin = "";
+
+                            var selectArray = new[] { 0 };
+
+                            returnPlugin = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+
+                            var returnProperPlugin = returnPlugin.Remove(0, 9);
+
+                            var returnArray = PseudoTvUtils.ReadPluginRecord(Settings.Default.AddonDatabaseLocation,
+                                "SELECT name FROM addon WHERE addonID = '" + returnProperPlugin + "'", selectArray);
+
+                            var index2 = 0;
+                            index2 = PluginType.FindString(returnArray[0]);
+                            PluginType.SelectedIndex = index2;
+
+                            PluginNotInclude = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
+
+                            if (PluginNotInclude.Contains(","))
                             {
-                                ShowDescBox.Visible = true;
-                                ShowDescBox.Text = returnMulti;
+                                var pluginNotIncludeSplit = PluginNotInclude.Split(',');
 
+                                for (var x = 0; x <= pluginNotIncludeSplit.Length; x++)
+                                {
+                                    NotShows.Items.Add(pluginNotIncludeSplit[x]);
+                                }
                             }
-
-                            YouTubeMulti = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-
-                        }
-
-                    }
-                    else if (option1 == 5)
-                    {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
-                        SubChannelType.SelectedIndex =
-                            Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text) - 1;
-                        var index = 0;
-                        index =
-                            MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
-                        MediaLimitBox.SelectedIndex = index;
-                        SortTypeBox.SelectedIndex =
-                            Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
-                    }
-                    else if (option1 == 7)
-                    {
-                        PlayListLocation.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-                        SortTypeBox.SelectedIndex =
-                            Convert.ToInt32(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[8].Text);
-                        var index = 0;
-                        index =
-                            MediaLimitBox.FindString(TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[7].Text);
-                        MediaLimitBox.SelectedIndex = index;
-
-                        var returnPlugin = "";
-
-                        var selectArray = new[] { 0 };
-
-                        returnPlugin = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
-
-                        var returnProperPlugin = returnPlugin.Remove(0, 9);
-
-                        var returnArray = PseudoTvUtils.ReadPluginRecord(Settings.Default.AddonDatabaseLocation,
-                            "SELECT name FROM addon WHERE addonID = '" + returnProperPlugin + "'", selectArray);
-
-                        var index2 = 0;
-                        index2 = PluginType.FindString(returnArray[0]);
-                        PluginType.SelectedIndex = index2;
-
-                        PluginNotInclude = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[6].Text;
-
-                        if (PluginNotInclude.Contains(","))
-                        {
-                            var pluginNotIncludeSplit = PluginNotInclude.Split(',');
-
-                            for (var x = 0; x <= pluginNotIncludeSplit.Length; x++)
-                            {
-                                NotShows.Items.Add(pluginNotIncludeSplit[x]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Option2.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            break;
+                        default:
+                            Option2.Text = TVGuideList.Items[TVGuideList.SelectedIndices[0]].SubItems[2].Text;
+                            break;
                     }
                     TVGuideSubMenu.Sort();
                 }
             }
         }
 
-        private void Option2_SelectedIndexChanged(System.Object sender, System.EventArgs e)
+        private void MnuSettings_Click(System.Object sender, System.EventArgs e)
         {
-            if (PlayListType.SelectedIndex >= 0 & !string.IsNullOrEmpty(Option2.Text))
+            SettingsWindow settings = new SettingsWindow(this);
+            settings.Show();
+        }
+
+        private void DontShowToolStripMenuItem_Click(System.Object sender, System.EventArgs e)
+        {
+            if (TVGuideSubMenu.SelectedItems.Count > 0)
             {
-                RefreshTvGuideSublist(PlayListType.SelectedIndex, Option2.Text);
+                NotShows.Items.Add(TVGuideSubMenu.Items[TVGuideSubMenu.SelectedIndices[0]].SubItems[0].Text);
+                TVGuideSubMenu.Items[TVGuideSubMenu.SelectedIndices[0]].BackColor = Color.Red;
+            }
+        }
+
+        private void ListMoviePosters_SelectedIndexChanged(System.Object sender, System.EventArgs e)
+        {
+            var x = ListMoviePosters.SelectedIndex;
+
+            MoviePicture.ImageLocation = ListMoviePosters.Items[x].ToString();
+            MoviePicture.Refresh();
+
+        }
+
+        private void MoviePosterSelect_Click(System.Object sender, System.EventArgs e)
+        {
+            var x = ListMoviePosters.SelectedIndex;
+            var type = "poster";
+            var mediaType = "movie";
+
+
+            if (MovieLocation.TextLength >= 6)
+            {
+                if (MovieLocation.Text.Substring(0, 6) == "smb://")
+                {
+                    MovieLocation.Text = MovieLocation.Text.Replace("/", "\\");
+                    MovieLocation.Text = "\\\\" + MovieLocation.Text.Substring(6);
+                }
             }
 
+            var directoryName = "";
+            directoryName = Path.GetDirectoryName(MovieLocation.Text);
+
+            // Displays a SaveFileDialog so the user can save the Image
+            // assigned to TVPosterSelect.
+            var saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.InitialDirectory = directoryName;
+            saveFileDialog1.Filter = "JPeg Image|*.jpg";
+            saveFileDialog1.Title = "Save an Image File";
+            saveFileDialog1.FileName = "poster.jpg";
+            saveFileDialog1.ShowDialog();
+
+            var fileToSaveAs = System.IO.Path.Combine(saveFileDialog1.InitialDirectory, saveFileDialog1.FileName);
+            MoviePicture.Image.Save(fileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            PseudoTvUtils.DbExecute("UPDATE art SET url = '" + ListMoviePosters.Items[x].ToString() +
+                                    "' WHERE media_id = '" +
+                                    MovieIDLabel.Text + "' and media_type = '" + mediaType + "' and type = '" + type +
+                                    "'");
+            //TODO: VisualStyleElement.Status.Text = "Updated " + MovieLabel.Text + " " + MovieIDLabel.Text +
+            //                                " Successfully with " + ListMoviePosters.Items[x].ToString() + "";
+
+        }
+
+        private void MovieList_SelectedIndexChanged(System.Object sender, System.EventArgs e)
+        {
+
+        }
+
+        private void MovieNetworkList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
+        {
+            // Get the new sorting column. 
+            var newSortingColumn = MovieNetworkList.Columns[e.Column];
+            // Figure out the new sorting order. 
+            var sortOrder = default(System.Windows.Forms.SortOrder);
+            if (_mSortingColumn == null)
+            {
+                // New column. Sort ascending. 
+                sortOrder = SortOrder.Ascending;
+                // See if this is the same column. 
+            }
+            else
+            {
+                if (newSortingColumn.Equals(_mSortingColumn))
+                {
+                    // Same column. Switch the sort order. 
+                    if (_mSortingColumn.Text.StartsWith("> "))
+                    {
+                        sortOrder = SortOrder.Descending;
+                    }
+                    else
+                    {
+                        sortOrder = SortOrder.Ascending;
+                    }
+                }
+                else
+                {
+                    // New column. Sort ascending. 
+                    sortOrder = SortOrder.Ascending;
+                }
+                // Remove the old sort indicator. 
+                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
+            }
+            // Display the new sort order. 
+            _mSortingColumn = newSortingColumn;
+            if (sortOrder == SortOrder.Ascending)
+            {
+                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
+            }
+            else
+            {
+                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
+            }
+            // Create a comparer. 
+            MovieNetworkList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
+            // Sort. 
+            MovieNetworkList.Sort();
+        }
+
+        private void MovieNetworkList_SelectedIndexChanged(System.Object sender, System.EventArgs e)
+        {
+            MovieNetworkListSubList.Items.Clear();
+
+
+            if (MovieNetworkList.SelectedIndices.Count > 0)
+            {
+                var selectArray = new[] { 2 };
+
+
+                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
+                    "SELECT * FROM movie WHERE c18='" +
+                    MovieNetworkList.Items[MovieNetworkList.SelectedIndices[0]].SubItems[0].Text + "'", selectArray);
+
+                for (var x = 0; x <= returnArray.Length - 1; x++)
+                {
+                    MovieNetworkListSubList.Items.Add(returnArray[x]);
+                }
+
+            }
+        }
+
+        private void BtnRefreshGenres_Click(System.Object sender, System.EventArgs e)
+        {
+            LookUpGenre("aaccc");
+        }
+
+        private void YouTubeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (YouTubeType.SelectedIndex == 0)
+            {
+                Label6.Text = "Channel/User:";
+                var with32 = PlayListLocation;
+                with32.Location = new System.Drawing.Point(270, 120);
+                PlayListLocation.Visible = true;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+            }
+            else if (YouTubeType.SelectedIndex == 1)
+            {
+                Label6.Text = "Playlist:";
+                var with33 = PlayListLocation;
+                with33.Location = new System.Drawing.Point(220, 120);
+                PlayListLocation.Visible = true;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+            }
+            else if (YouTubeType.SelectedIndex == 2 | YouTubeType.SelectedIndex == 3)
+            {
+                Label6.Text = "Username:";
+                var with34 = PlayListLocation;
+                with34.Location = new System.Drawing.Point(245, 120);
+                PlayListLocation.Visible = true;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+            }
+            else if (YouTubeType.SelectedIndex == 4)
+            {
+                Label6.Text = "Search String:";
+                var with35 = PlayListLocation;
+                with35.Location = new System.Drawing.Point(270, 120);
+                PlayListLocation.Visible = true;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+            }
+            else if (YouTubeType.SelectedIndex == 6)
+            {
+                Label6.Text = "";
+                var with36 = PlayListLocation;
+                with36.Location = new System.Drawing.Point(295, 120);
+                PlayListLocation.Visible = false;
+                NotShows.Visible = true;
+                AddExcludeBtn.Visible = true;
+                DelExcludeBtn.Visible = true;
+                Label12.Text = "Add/Remove Playlists";
+                Label12.Visible = true;
+            }
+            else if (YouTubeType.SelectedIndex == 7)
+            {
+                Label6.Text = "";
+                var with37 = PlayListLocation;
+                with37.Location = new System.Drawing.Point(295, 120);
+                PlayListLocation.Visible = false;
+                NotShows.Visible = true;
+                AddExcludeBtn.Visible = true;
+                DelExcludeBtn.Visible = true;
+                Label12.Text = "Add/Remove Channels";
+                Label12.Visible = true;
+            }
+            else if (YouTubeType.SelectedIndex == 8)
+            {
+                Label6.Text = "GData Url:";
+                var with38 = PlayListLocation;
+                with38.Location = new System.Drawing.Point(245, 120);
+                PlayListLocation.Visible = true;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+                GDataDemoLink.Links.Remove(GDataDemoLink.Links[0]);
+                //TODO: Check this logic... it wants an int as the second param but in vb they were giving a bool?
+                GDataDemoLink.Links.Add(0, GDataDemoLink.Text == "GDataDemo" ? 1 : 0,
+                    "http://gdata.youtube.com/demo/index.html");
+                GDataDemoLink.Visible = true;
+            }
+            else
+            {
+                Label6.Text = "Nothing Here";
+                PlayListLocation.Visible = false;
+                NotShows.Visible = false;
+                AddExcludeBtn.Visible = false;
+                DelExcludeBtn.Visible = false;
+                Label12.Visible = false;
+            }
+
+        }
+
+        private void SubChannelType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 0)
+            {
+                Label6.Text = "LastFM User:";
+                var with39 = PlayListLocation;
+                with39.Location = new System.Drawing.Point(270, 120);
+            }
+            else if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 1)
+            {
+                Label6.Text = "Channel_##:";
+                var with40 = PlayListLocation;
+                with40.Location = new System.Drawing.Point(295, 120);
+            }
+        }
+
+        private void AddBanner_Click(object sender, EventArgs e)
+        {
+            //TODO:
+            //Form9.Visible = true;
+            //Form9.Focus();
+            //Form9.AddBannerPictureBox.ImageLocation =
+            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/banner.png";
+        }
+
+        private void AddPoster_Click(object sender, EventArgs e)
+        {
+            //TODO:
+            //Form10.Visible = true;
+            //Form10.Focus();
+            //Form10.AddPosterPictureBox.ImageLocation =
+            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/poster.png";
+        }
+
+        private void AddMoviePosterButton_Click(object sender, EventArgs e)
+        {
+            //TODO:
+            //Form11.Visible = true;
+            //Form11.Focus();
+            //Form11.AddMoviePosterPictureBox.ImageLocation =
+            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/poster.png";
+        }
+
+        private void GDataDemoLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
+            Process.Start(sInfo);
+        }
+
+        private void AddExcludeBtn_Click(object sender, EventArgs e)
+        {
+
+            if (PlayListType.SelectedIndex == 10)
+            {
+                var response = PseudoTvUtils.ShowInputDialog("Enter Playlist or User String").Input;
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    NotShows.Items.Add(response);
+                }
+
+                if (string.IsNullOrEmpty(YouTubeMulti))
+                {
+                    YouTubeMulti = response;
+                }
+                else
+                {
+                    YouTubeMulti = YouTubeMulti + "|" + response;
+                }
+            }
+            else
+            {
+                var response = PseudoTvUtils.ShowInputDialog("Enter Exclude String").Input;
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    NotShows.Items.Add(response);
+                }
+
+                if (string.IsNullOrEmpty(PluginNotInclude))
+                {
+                    PluginNotInclude = response;
+                }
+                else
+                {
+                    PluginNotInclude = PluginNotInclude + "," + response;
+                }
+            }
+
+        }
+
+        private void DelExclutn_Click(object sender, EventArgs e)
+        {
+            if (PlayListType.SelectedIndex == 10)
+            {
+                if (NotShows.SelectedItems.Count > 0)
+                {
+                    NotShows.Items.RemoveAt(NotShows.SelectedIndex);
+                }
+
+                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
+                var result = string.Join("|", items);
+
+                YouTubeMulti = result;
+            }
+            else
+            {
+                if (NotShows.SelectedItems.Count > 0)
+                {
+                    NotShows.Items.RemoveAt(NotShows.SelectedIndex);
+                }
+
+                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
+                var result = string.Join(",", items);
+
+                PluginNotInclude = result;
+            }
         }
 
         private void PlayListType_SelectedIndexChanged(System.Object sender, System.EventArgs e)
@@ -2273,27 +2655,6 @@ namespace PseudoTV_Manager.Forms
 
         }
 
-
-        private void Button5_Click(System.Object sender, System.EventArgs e)
-        {
-
-            if (PlayListType.Text == "Directory")
-            {
-                FolderBrowserDialog1.ShowDialog();
-                PlayListLocation.Text = FolderBrowserDialog1.SelectedPath;
-            }
-            else if (PlayListType.Text == "Playlist")
-            {
-                OpenFileDialog1.ShowDialog();
-
-                var filename = OpenFileDialog1.FileName;
-                var filenameSplit = filename.Split('\\');
-
-                PlayListLocation.Text = "special://profile/playlists/video/" +
-                                        filenameSplit[filenameSplit.Length];
-            }
-        }
-
         private void RefreshButton_Click(System.Object sender, System.EventArgs e)
         {
             //Loop through config file.
@@ -2345,7 +2706,67 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button2_Click(System.Object sender, System.EventArgs e)
+        private void BtnTvShowLocationBrowse_Click(System.Object sender, System.EventArgs e)
+        {
+            if (TVShowList.SelectedItems.Count > 0)
+            {
+                //RefreshAllStudios()
+                //TODO:
+                //Form3.Visible = true;
+                //Form3.Focus();
+            }
+        }
+        #endregion
+        public object ConvertGenres(ListBox genrelist)
+        {
+            //Converts the existing ListTVGenre's contents to the proper format.
+
+            var tvGenresString = "";
+            for (var x = 0; x <= genrelist.Items.Count - 1; x++)
+            {
+                if (x == 0)
+                {
+                    tvGenresString = genrelist.Items[x].ToString();
+                }
+                else
+                {
+                    tvGenresString = tvGenresString + " / " + genrelist.Items[x].ToString();
+                }
+            }
+
+            return tvGenresString;
+        }
+
+        private void Option2_SelectedIndexChanged(System.Object sender, System.EventArgs e)
+        {
+            if (PlayListType.SelectedIndex >= 0 & !string.IsNullOrEmpty(Option2.Text))
+            {
+                RefreshTvGuideSublist(PlayListType.SelectedIndex, Option2.Text);
+            }
+
+        }
+
+        private void Button5_Click(System.Object sender, System.EventArgs e)
+        {
+
+            if (PlayListType.Text == "Directory")
+            {
+                FolderBrowserDialog1.ShowDialog();
+                PlayListLocation.Text = FolderBrowserDialog1.SelectedPath;
+            }
+            else if (PlayListType.Text == "Playlist")
+            {
+                OpenFileDialog1.ShowDialog();
+
+                var filename = OpenFileDialog1.FileName;
+                var filenameSplit = filename.Split('\\');
+
+                PlayListLocation.Text = "special://profile/playlists/video/" +
+                                        filenameSplit[filenameSplit.Length];
+            }
+        }
+
+        private void BtnTvGuideSave_Click(System.Object sender, System.EventArgs e)
         {
             //Loop through config file.
             //Grab all comments MINUS the ones for selected #
@@ -2741,17 +3162,6 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-        private void Button6_Click(System.Object sender, System.EventArgs e)
-        {
-            if (TVShowList.SelectedItems.Count > 0)
-            {
-                //RefreshAllStudios()
-                //TODO:
-                //Form3.Visible = true;
-                //Form3.Focus();
-            }
-        }
-
         private void Button8_Click(System.Object sender, System.EventArgs e)
         {
             if (InterleavedList.SelectedItems.Count > 0)
@@ -2851,7 +3261,6 @@ namespace PseudoTV_Manager.Forms
             }
         }
 
-
         private void Button13_Click(System.Object sender, System.EventArgs e)
         {
 
@@ -2942,78 +3351,6 @@ namespace PseudoTV_Manager.Forms
             //TODO: Form5.Visible = true;
         }
 
-        private void MnuSettings_Click(System.Object sender, System.EventArgs e)
-        {
-            SettingsWindow settings = new SettingsWindow(this);
-            settings.Show();
-        }
-
-        private void DontShowToolStripMenuItem_Click(System.Object sender, System.EventArgs e)
-        {
-            if (TVGuideSubMenu.SelectedItems.Count > 0)
-            {
-                NotShows.Items.Add(TVGuideSubMenu.Items[TVGuideSubMenu.SelectedIndices[0]].SubItems[0].Text);
-                TVGuideSubMenu.Items[TVGuideSubMenu.SelectedIndices[0]].BackColor = Color.Red;
-            }
-        }
-
-        private void ListMoviePosters_SelectedIndexChanged(System.Object sender, System.EventArgs e)
-        {
-            var x = ListMoviePosters.SelectedIndex;
-
-            MoviePicture.ImageLocation = ListMoviePosters.Items[x].ToString();
-            MoviePicture.Refresh();
-
-        }
-
-        private void MoviePosterSelect_Click(System.Object sender, System.EventArgs e)
-        {
-            var x = ListMoviePosters.SelectedIndex;
-            var type = "poster";
-            var mediaType = "movie";
-
-
-            if (MovieLocation.TextLength >= 6)
-            {
-                if (MovieLocation.Text.Substring(0, 6) == "smb://")
-                {
-                    MovieLocation.Text = MovieLocation.Text.Replace("/", "\\");
-                    MovieLocation.Text = "\\\\" + MovieLocation.Text.Substring(6);
-                }
-            }
-
-            var directoryName = "";
-            directoryName = Path.GetDirectoryName(MovieLocation.Text);
-
-            // Displays a SaveFileDialog so the user can save the Image
-            // assigned to TVPosterSelect.
-            var saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.InitialDirectory = directoryName;
-            saveFileDialog1.Filter = "JPeg Image|*.jpg";
-            saveFileDialog1.Title = "Save an Image File";
-            saveFileDialog1.FileName = "poster.jpg";
-            saveFileDialog1.ShowDialog();
-
-            var fileToSaveAs = System.IO.Path.Combine(saveFileDialog1.InitialDirectory, saveFileDialog1.FileName);
-            MoviePicture.Image.Save(fileToSaveAs, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-            PseudoTvUtils.DbExecute("UPDATE art SET url = '" + ListMoviePosters.Items[x].ToString() +
-                                    "' WHERE media_id = '" +
-                                    MovieIDLabel.Text + "' and media_type = '" + mediaType + "' and type = '" + type +
-                                    "'");
-            //TODO: VisualStyleElement.Status.Text = "Updated " + MovieLabel.Text + " " + MovieIDLabel.Text +
-            //                                " Successfully with " + ListMoviePosters.Items[x].ToString() + "";
-
-        }
-
-
-        private void MovieList_SelectedIndexChanged(System.Object sender, System.EventArgs e)
-        {
-
-        }
-
-
-
         private void Button16_Click(System.Object sender, System.EventArgs e)
         {
             //TODO:
@@ -3037,123 +3374,6 @@ namespace PseudoTV_Manager.Forms
                 // SaveTVShow_Click(Nothing, Nothing)
                 RefreshGenres();
             }
-        }
-
-        public void RefreshNetworkListMovies()
-        {
-            MovieNetworkList.Items.Clear();
-
-            var selectArray = new[] { 2, 20 };
-
-            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
-                "SELECT * FROM movie ORDER BY c18 ASC",
-                selectArray);
-
-            //Loop through each returned Movie
-            for (var x = 0; x <= returnArray.Length - 1; x++)
-            {
-                if ((string.IsNullOrEmpty(returnArray[x])))
-                {
-                    continue;
-                }
-
-                string[] returnArraySplit = null;
-
-                string showName = null;
-                string showNetwork = null;
-
-                returnArraySplit = returnArray[x].Split('~');
-
-                showName = returnArraySplit[0];
-                //Updated ReturnArraySplit for ShowNetwork to reflect MyVideos78.db schema
-                showNetwork = returnArraySplit[1];
-
-                var networkListed = false;
-
-
-                for (var y = 0; y <= MovieNetworkList.Items.Count - 1; y++)
-                {
-                    if (MovieNetworkList.Items[y].SubItems[0].Text == showNetwork)
-                    {
-                        networkListed = true;
-                        MovieNetworkList.Items[y].SubItems[1].Text = MovieNetworkList.Items[y].SubItems[1].Text + 1;
-                    }
-
-                }
-
-                if (networkListed == false)
-                {
-                    var itm = default(ListViewItem);
-                    var str = new string[2];
-
-                    str[0] = showNetwork;
-                    str[1] = "1";
-
-                    itm = new ListViewItem(str);
-
-                    //Add the item to the TV show list.
-                    MovieNetworkList.Items.Add(itm);
-
-                }
-
-            }
-
-        }
-
-        public void RefreshNetworkList()
-        {
-            NetworkList.Items.Clear();
-
-            var selectArray = new[] { 1, 15 };
-
-            var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
-                "SELECT * FROM tvshow ORDER BY c14 ASC",
-                selectArray);
-
-            //Loop through each returned TV show.
-
-            for (var x = 0; x <= returnArray.Length - 1; x++)
-            {
-
-                string[] returnArraySplit = null;
-
-                string showName = null;
-                string showNetwork = null;
-
-                returnArraySplit = returnArray[x].Split('~');
-
-                showName = returnArraySplit[0];
-                showNetwork = returnArraySplit[1];
-
-                var networkListed = false;
-
-                for (var y = 0; y <= NetworkList.Items.Count - 1; y++)
-                {
-                    if (NetworkList.Items[y].SubItems[0].Text == showNetwork)
-                    {
-                        networkListed = true;
-                        NetworkList.Items[y].SubItems[1].Text = NetworkList.Items[y].SubItems[1].Text + 1;
-                    }
-
-                }
-
-                if (networkListed == false)
-                {
-                    var itm = default(ListViewItem);
-                    var str = new string[2];
-
-                    str[0] = showNetwork;
-                    str[1] = "1";
-
-                    itm = new ListViewItem(str);
-
-                    //Add the item to the TV show list.
-                    NetworkList.Items.Add(itm);
-
-                }
-
-            }
-
         }
 
         private void Button17_Click(System.Object sender, System.EventArgs e)
@@ -3240,301 +3460,6 @@ namespace PseudoTV_Manager.Forms
                 //TODO:
                 //Form8.Visible = true;
                 //Form8.Focus();
-            }
-        }
-
-        private void MovieNetworkList_ColumnClick(object sender, System.Windows.Forms.ColumnClickEventArgs e)
-        {
-            // Get the new sorting column. 
-            var newSortingColumn = MovieNetworkList.Columns[e.Column];
-            // Figure out the new sorting order. 
-            var sortOrder = default(System.Windows.Forms.SortOrder);
-            if (_mSortingColumn == null)
-            {
-                // New column. Sort ascending. 
-                sortOrder = SortOrder.Ascending;
-                // See if this is the same column. 
-            }
-            else
-            {
-                if (newSortingColumn.Equals(_mSortingColumn))
-                {
-                    // Same column. Switch the sort order. 
-                    if (_mSortingColumn.Text.StartsWith("> "))
-                    {
-                        sortOrder = SortOrder.Descending;
-                    }
-                    else
-                    {
-                        sortOrder = SortOrder.Ascending;
-                    }
-                }
-                else
-                {
-                    // New column. Sort ascending. 
-                    sortOrder = SortOrder.Ascending;
-                }
-                // Remove the old sort indicator. 
-                _mSortingColumn.Text = _mSortingColumn.Text.Substring(2);
-            }
-            // Display the new sort order. 
-            _mSortingColumn = newSortingColumn;
-            if (sortOrder == SortOrder.Ascending)
-            {
-                _mSortingColumn.Text = "> " + _mSortingColumn.Text;
-            }
-            else
-            {
-                _mSortingColumn.Text = "< " + _mSortingColumn.Text;
-            }
-            // Create a comparer. 
-            MovieNetworkList.ListViewItemSorter = new ListViewSorter(e.Column, sortOrder);
-            // Sort. 
-            MovieNetworkList.Sort();
-        }
-
-        private void MovieNetworkList_SelectedIndexChanged(System.Object sender, System.EventArgs e)
-        {
-            MovieNetworkListSubList.Items.Clear();
-
-
-            if (MovieNetworkList.SelectedIndices.Count > 0)
-            {
-                var selectArray = new[] { 2 };
-
-
-                var returnArray = PseudoTvUtils.DbReadRecord(Settings.Default.VideoDatabaseLocation,
-                    "SELECT * FROM movie WHERE c18='" +
-                    MovieNetworkList.Items[MovieNetworkList.SelectedIndices[0]].SubItems[0].Text + "'", selectArray);
-
-                for (var x = 0; x <= returnArray.Length - 1; x++)
-                {
-                    MovieNetworkListSubList.Items.Add(returnArray[x]);
-                }
-
-            }
-        }
-
-        private void Button19_Click(System.Object sender, System.EventArgs e)
-        {
-            LookUpGenre("aaccc");
-        }
-
-        private void YouTubeType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (YouTubeType.SelectedIndex == 0)
-            {
-                Label6.Text = "Channel/User:";
-                var with32 = PlayListLocation;
-                with32.Location = new System.Drawing.Point(270, 120);
-                PlayListLocation.Visible = true;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-            }
-            else if (YouTubeType.SelectedIndex == 1)
-            {
-                Label6.Text = "Playlist:";
-                var with33 = PlayListLocation;
-                with33.Location = new System.Drawing.Point(220, 120);
-                PlayListLocation.Visible = true;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-            }
-            else if (YouTubeType.SelectedIndex == 2 | YouTubeType.SelectedIndex == 3)
-            {
-                Label6.Text = "Username:";
-                var with34 = PlayListLocation;
-                with34.Location = new System.Drawing.Point(245, 120);
-                PlayListLocation.Visible = true;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-            }
-            else if (YouTubeType.SelectedIndex == 4)
-            {
-                Label6.Text = "Search String:";
-                var with35 = PlayListLocation;
-                with35.Location = new System.Drawing.Point(270, 120);
-                PlayListLocation.Visible = true;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-            }
-            else if (YouTubeType.SelectedIndex == 6)
-            {
-                Label6.Text = "";
-                var with36 = PlayListLocation;
-                with36.Location = new System.Drawing.Point(295, 120);
-                PlayListLocation.Visible = false;
-                NotShows.Visible = true;
-                AddExcludeBtn.Visible = true;
-                DelExcludeBtn.Visible = true;
-                Label12.Text = "Add/Remove Playlists";
-                Label12.Visible = true;
-            }
-            else if (YouTubeType.SelectedIndex == 7)
-            {
-                Label6.Text = "";
-                var with37 = PlayListLocation;
-                with37.Location = new System.Drawing.Point(295, 120);
-                PlayListLocation.Visible = false;
-                NotShows.Visible = true;
-                AddExcludeBtn.Visible = true;
-                DelExcludeBtn.Visible = true;
-                Label12.Text = "Add/Remove Channels";
-                Label12.Visible = true;
-            }
-            else if (YouTubeType.SelectedIndex == 8)
-            {
-                Label6.Text = "GData Url:";
-                var with38 = PlayListLocation;
-                with38.Location = new System.Drawing.Point(245, 120);
-                PlayListLocation.Visible = true;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-                GDataDemoLink.Links.Remove(GDataDemoLink.Links[0]);
-                //TODO: Check this logic... it wants an int as the second param but in vb they were giving a bool?
-                GDataDemoLink.Links.Add(0, GDataDemoLink.Text == "GDataDemo" ? 1 : 0,
-                    "http://gdata.youtube.com/demo/index.html");
-                GDataDemoLink.Visible = true;
-            }
-            else
-            {
-                Label6.Text = "Nothing Here";
-                PlayListLocation.Visible = false;
-                NotShows.Visible = false;
-                AddExcludeBtn.Visible = false;
-                DelExcludeBtn.Visible = false;
-                Label12.Visible = false;
-            }
-
-        }
-
-        private void SubChannelType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 0)
-            {
-                Label6.Text = "LastFM User:";
-                var with39 = PlayListLocation;
-                with39.Location = new System.Drawing.Point(270, 120);
-            }
-            else if (PlayListType.SelectedIndex == 13 & SubChannelType.SelectedIndex == 1)
-            {
-                Label6.Text = "Channel_##:";
-                var with40 = PlayListLocation;
-                with40.Location = new System.Drawing.Point(295, 120);
-            }
-        }
-
-        private void AddBanner_Click(object sender, EventArgs e)
-        {
-            //TODO:
-            //Form9.Visible = true;
-            //Form9.Focus();
-            //Form9.AddBannerPictureBox.ImageLocation =
-            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/banner.png";
-        }
-
-        private void AddPoster_Click(object sender, EventArgs e)
-        {
-            //TODO:
-            //Form10.Visible = true;
-            //Form10.Focus();
-            //Form10.AddPosterPictureBox.ImageLocation =
-            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/poster.png";
-        }
-
-
-        private void AddMoviePosterButton_Click(object sender, EventArgs e)
-        {
-            //TODO:
-            //Form11.Visible = true;
-            //Form11.Focus();
-            //Form11.AddMoviePosterPictureBox.ImageLocation =
-            //    "http://github.com/Lunatixz/script.pseudotv.live/raw/development/resources/images/poster.png";
-        }
-
-        private void GDataDemoLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            var sInfo = new ProcessStartInfo(e.Link.LinkData.ToString());
-            Process.Start(sInfo);
-        }
-
-        private void AddExcludeBtn_Click(object sender, EventArgs e)
-        {
-
-            if (PlayListType.SelectedIndex == 10)
-            {
-                var response = PseudoTvUtils.ShowInputDialog("Enter Playlist or User String").Input;
-
-                if (!string.IsNullOrEmpty(response))
-                {
-                    NotShows.Items.Add(response);
-                }
-
-                if (string.IsNullOrEmpty(YouTubeMulti))
-                {
-                    YouTubeMulti = response;
-                }
-                else
-                {
-                    YouTubeMulti = YouTubeMulti + "|" + response;
-                }
-            }
-            else
-            {
-                var response = PseudoTvUtils.ShowInputDialog("Enter Exclude String").Input;
-
-                if (!string.IsNullOrEmpty(response))
-                {
-                    NotShows.Items.Add(response);
-                }
-
-                if (string.IsNullOrEmpty(PluginNotInclude))
-                {
-                    PluginNotInclude = response;
-                }
-                else
-                {
-                    PluginNotInclude = PluginNotInclude + "," + response;
-                }
-            }
-
-        }
-
-        private void DelExclutn_Click(object sender, EventArgs e)
-        {
-            if (PlayListType.SelectedIndex == 10)
-            {
-                if (NotShows.SelectedItems.Count > 0)
-                {
-                    NotShows.Items.RemoveAt(NotShows.SelectedIndex);
-                }
-
-                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
-                var result = string.Join("|", items);
-
-                YouTubeMulti = result;
-            }
-            else
-            {
-                if (NotShows.SelectedItems.Count > 0)
-                {
-                    NotShows.Items.RemoveAt(NotShows.SelectedIndex);
-                }
-
-                var items = NotShows.Items.OfType<object>().Select(item => item.ToString()).ToArray();
-                var result = string.Join(",", items);
-
-                PluginNotInclude = result;
             }
         }
     }

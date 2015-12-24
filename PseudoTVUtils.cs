@@ -26,15 +26,15 @@ namespace PseudoTV_Manager
                 {
                     return KodiVersion.Gotham;
                 }
-                else if ((dbNumber < 91))
+                if ((dbNumber < 91))
                 {
                     return KodiVersion.Helix;
                 }
-                else if ((dbNumber < 94))
+                if ((dbNumber < 94))
                 {
                     return KodiVersion.Isengard;
                 }
-                else if ((dbNumber > 93))
+                if ((dbNumber > 93))
                 {
                     return KodiVersion.Jarvis;
                 }
@@ -436,39 +436,31 @@ namespace PseudoTV_Manager
 
 
                 for (var y = 0; y <= ColumnArray.Length; y++)
-                {
-                    if (y > 0)
-                    {
-                        StringResponse = StringResponse + "~" + sqlReader[ColumnArray[y]];
-                    }
-                    else
-                    {
-                        StringResponse = sqlReader[ColumnArray[y]].ToString();
-                    }
-                }
+                    StringResponse = y > 0 ? 
+                        StringResponse + "~" + sqlReader[ColumnArray[y]] : 
+                        sqlReader[ColumnArray[y]].ToString();
 
                 ArrayResponse[x] = StringResponse;
 
                 x = x + 1;
-
             }
             sqlCommand.Dispose();
             sqlConnect.Close();
-
 
             return ArrayResponse;
         }
 
         public static InputDialogResponse ShowInputDialog(string question, string inputTxt = null)
         {
-            System.Drawing.Size size = new System.Drawing.Size(200, 70);
-            Form inputBox = new Form();
+            var size = new System.Drawing.Size(200, 70);
+            var inputBox = new Form
+            {
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
+                ClientSize = size,
+                Text = inputTxt ?? question
+            };
 
-            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            inputBox.ClientSize = size;
-            inputBox.Text = inputTxt ?? question;
-
-            System.Windows.Forms.TextBox textBox = new TextBox
+            var textBox = new TextBox
             {
                 Size = new System.Drawing.Size(size.Width - 10, 23),
                 Location = new System.Drawing.Point(5, 5),
@@ -476,7 +468,7 @@ namespace PseudoTV_Manager
             };
             inputBox.Controls.Add(textBox);
 
-            Button okButton = new Button
+            var okButton = new Button
             {
                 DialogResult = System.Windows.Forms.DialogResult.OK,
                 Name = "okButton",
@@ -486,7 +478,7 @@ namespace PseudoTV_Manager
             };
             inputBox.Controls.Add(okButton);
 
-            Button cancelButton = new Button
+            var cancelButton = new Button
             {
                 DialogResult = System.Windows.Forms.DialogResult.Cancel,
                 Name = "cancelButton",
@@ -499,7 +491,7 @@ namespace PseudoTV_Manager
             inputBox.AcceptButton = okButton;
             inputBox.CancelButton = cancelButton;
 
-            DialogResult result = inputBox.ShowDialog();
+            var result = inputBox.ShowDialog();
 
             return new InputDialogResponse
             {

@@ -57,7 +57,7 @@ namespace PseudoTV_Manager.Forms
             this.Button10 = new System.Windows.Forms.Button();
             this.Button8 = new System.Windows.Forms.Button();
             this.Button7 = new System.Windows.Forms.Button();
-            this.Button2 = new System.Windows.Forms.Button();
+            this.BtnTvGuideSave = new System.Windows.Forms.Button();
             this.NotShows = new System.Windows.Forms.ListBox();
             this.Label12 = new System.Windows.Forms.Label();
             this.SchedulingList = new System.Windows.Forms.ListView();
@@ -109,14 +109,10 @@ namespace PseudoTV_Manager.Forms
             this.FolderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.Status = new System.Windows.Forms.ToolStripStatusLabel();
             this.OpenFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.MnuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.Label24 = new System.Windows.Forms.Label();
             this.Label23 = new System.Windows.Forms.Label();
             this.Label22 = new System.Windows.Forms.Label();
             this.PeppyDonate = new System.Windows.Forms.Label();
-            this.MnuSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuStrip1 = new System.Windows.Forms.MenuStrip();
             this.HelpLink = new System.Windows.Forms.LinkLabel();
             this.Label21 = new System.Windows.Forms.Label();
             this.Label13 = new System.Windows.Forms.Label();
@@ -127,10 +123,9 @@ namespace PseudoTV_Manager.Forms
             this.HelpList = new System.Windows.Forms.ComboBox();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.Button16 = new System.Windows.Forms.Button();
-            this.Button4 = new System.Windows.Forms.Button();
+            this.BtnDeleteGenre = new System.Windows.Forms.Button();
             this.TabControl1 = new System.Windows.Forms.TabControl();
             this.TabPage1 = new System.Windows.Forms.TabPage();
-            this.Button20 = new System.Windows.Forms.Button();
             this.AddPoster = new System.Windows.Forms.Button();
             this.AddBanner = new System.Windows.Forms.Button();
             this.TVPosterSelect = new System.Windows.Forms.Button();
@@ -140,10 +135,10 @@ namespace PseudoTV_Manager.Forms
             this.Label20 = new System.Windows.Forms.Label();
             this.Label18 = new System.Windows.Forms.Label();
             this.ListTVPosters = new System.Windows.Forms.ListBox();
-            this.Button19 = new System.Windows.Forms.Button();
-            this.Button6 = new System.Windows.Forms.Button();
-            this.txtShowNetwork = new System.Windows.Forms.ComboBox();
-            this.Button3 = new System.Windows.Forms.Button();
+            this.BtnRefreshGenres = new System.Windows.Forms.Button();
+            this.BtnTvShowLocationBrowse = new System.Windows.Forms.Button();
+            this.TxtShowNetwork = new System.Windows.Forms.ComboBox();
+            this.BtnAddGenre = new System.Windows.Forms.Button();
             this.ListTVGenres = new System.Windows.Forms.ListBox();
             this.TVPosterPictureBox = new System.Windows.Forms.PictureBox();
             this.TVShowLabel = new System.Windows.Forms.Label();
@@ -154,7 +149,7 @@ namespace PseudoTV_Manager.Forms
             this.Label3 = new System.Windows.Forms.Label();
             this.Label2 = new System.Windows.Forms.Label();
             this.Label1 = new System.Windows.Forms.Label();
-            this.Button1 = new System.Windows.Forms.Button();
+            this.BtnRefresh = new System.Windows.Forms.Button();
             this.TVShowList = new System.Windows.Forms.ListView();
             this.TabPage5 = new System.Windows.Forms.TabPage();
             this.AddMoviePosterButton = new System.Windows.Forms.Button();
@@ -168,11 +163,14 @@ namespace PseudoTV_Manager.Forms
             this.MovieLocation = new System.Windows.Forms.TextBox();
             this.MovieLabel = new System.Windows.Forms.Label();
             this.Button15 = new System.Windows.Forms.Button();
+            this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MnuSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.MnuExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.TabPage4.SuspendLayout();
             this.TabPage3.SuspendLayout();
             this.TabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MoviePicture)).BeginInit();
-            this.MenuStrip1.SuspendLayout();
             this.TabPage6.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.TabControl1.SuspendLayout();
@@ -180,6 +178,7 @@ namespace PseudoTV_Manager.Forms
             ((System.ComponentModel.ISupportInitialize)(this.TVBannerPictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TVPosterPictureBox)).BeginInit();
             this.TabPage5.SuspendLayout();
+            this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // DelExcludeBtn
@@ -230,7 +229,7 @@ namespace PseudoTV_Manager.Forms
             this.TabPage4.Controls.Add(this.Button10);
             this.TabPage4.Controls.Add(this.Button8);
             this.TabPage4.Controls.Add(this.Button7);
-            this.TabPage4.Controls.Add(this.Button2);
+            this.TabPage4.Controls.Add(this.BtnTvGuideSave);
             this.TabPage4.Controls.Add(this.NotShows);
             this.TabPage4.Controls.Add(this.Label12);
             this.TabPage4.Controls.Add(this.SchedulingList);
@@ -266,7 +265,7 @@ namespace PseudoTV_Manager.Forms
             this.TabPage4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.TabPage4.Location = new System.Drawing.Point(4, 22);
             this.TabPage4.Name = "TabPage4";
-            this.TabPage4.Size = new System.Drawing.Size(992, 662);
+            this.TabPage4.Size = new System.Drawing.Size(992, 874);
             this.TabPage4.TabIndex = 3;
             this.TabPage4.Text = "TV Guide";
             // 
@@ -420,7 +419,7 @@ namespace PseudoTV_Manager.Forms
             this.StrmUrl.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.StrmUrl.AutoSize = true;
             this.StrmUrl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
-            this.StrmUrl.Location = new System.Drawing.Point(154, 142);
+            this.StrmUrl.Location = new System.Drawing.Point(154, 248);
             this.StrmUrl.Name = "StrmUrl";
             this.StrmUrl.Size = new System.Drawing.Size(106, 20);
             this.StrmUrl.TabIndex = 43;
@@ -524,14 +523,15 @@ namespace PseudoTV_Manager.Forms
             this.Button7.UseVisualStyleBackColor = true;
             this.Button7.Visible = false;
             // 
-            // Button2
+            // BtnTvGuideSave
             // 
-            this.Button2.Location = new System.Drawing.Point(105, 610);
-            this.Button2.Name = "Button2";
-            this.Button2.Size = new System.Drawing.Size(48, 22);
-            this.Button2.TabIndex = 32;
-            this.Button2.Text = "Save";
-            this.Button2.UseVisualStyleBackColor = true;
+            this.BtnTvGuideSave.Location = new System.Drawing.Point(105, 610);
+            this.BtnTvGuideSave.Name = "BtnTvGuideSave";
+            this.BtnTvGuideSave.Size = new System.Drawing.Size(48, 22);
+            this.BtnTvGuideSave.TabIndex = 32;
+            this.BtnTvGuideSave.Text = "Save";
+            this.BtnTvGuideSave.UseVisualStyleBackColor = true;
+            this.BtnTvGuideSave.Click += new System.EventHandler(this.BtnTvGuideSave_Click);
             // 
             // NotShows
             // 
@@ -980,7 +980,7 @@ namespace PseudoTV_Manager.Forms
             this.TabPage3.Controls.Add(this.GenresList);
             this.TabPage3.Location = new System.Drawing.Point(4, 22);
             this.TabPage3.Name = "TabPage3";
-            this.TabPage3.Size = new System.Drawing.Size(992, 662);
+            this.TabPage3.Size = new System.Drawing.Size(992, 874);
             this.TabPage3.TabIndex = 2;
             this.TabPage3.Text = "Genres";
             // 
@@ -1050,12 +1050,6 @@ namespace PseudoTV_Manager.Forms
             // 
             this.OpenFileDialog1.FileName = "OpenFileDialog1";
             // 
-            // MnuExit
-            // 
-            this.MnuExit.Name = "MnuExit";
-            this.MnuExit.Size = new System.Drawing.Size(116, 22);
-            this.MnuExit.Text = "Exit";
-            // 
             // Label24
             // 
             this.Label24.AutoSize = true;
@@ -1099,39 +1093,6 @@ namespace PseudoTV_Manager.Forms
             this.PeppyDonate.Size = new System.Drawing.Size(104, 24);
             this.PeppyDonate.TabIndex = 3;
             this.PeppyDonate.Text = "Peppy6582";
-            // 
-            // MnuSettings
-            // 
-            this.MnuSettings.Name = "MnuSettings";
-            this.MnuSettings.Size = new System.Drawing.Size(116, 22);
-            this.MnuSettings.Text = "Settings";
-            this.MnuSettings.Click += new System.EventHandler(this.MnuSettings_Click);
-            // 
-            // FileToolStripMenuItem
-            // 
-            this.FileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MnuSettings,
-            this.MnuExit});
-            this.FileToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.FileToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.FileToolStripMenuItem.Name = "FileToolStripMenuItem";
-            this.FileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.FileToolStripMenuItem.Text = "&File";
-            // 
-            // MenuStrip1
-            // 
-            this.MenuStrip1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.MenuStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.MenuStrip1.GripMargin = new System.Windows.Forms.Padding(0);
-            this.MenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.FileToolStripMenuItem});
-            this.MenuStrip1.Location = new System.Drawing.Point(1, -6);
-            this.MenuStrip1.Name = "MenuStrip1";
-            this.MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.MenuStrip1.Size = new System.Drawing.Size(45, 24);
-            this.MenuStrip1.TabIndex = 5;
-            this.MenuStrip1.Text = "MenuStrip1";
             // 
             // HelpLink
             // 
@@ -1237,10 +1198,10 @@ namespace PseudoTV_Manager.Forms
             this.StatusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.StatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Status});
-            this.StatusStrip1.Location = new System.Drawing.Point(0, 681);
+            this.StatusStrip1.Location = new System.Drawing.Point(0, 713);
             this.StatusStrip1.Name = "StatusStrip1";
             this.StatusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 15, 0);
-            this.StatusStrip1.Size = new System.Drawing.Size(1154, 22);
+            this.StatusStrip1.Size = new System.Drawing.Size(1002, 22);
             this.StatusStrip1.TabIndex = 4;
             this.StatusStrip1.Text = "StatusStrip1";
             // 
@@ -1252,28 +1213,28 @@ namespace PseudoTV_Manager.Forms
             this.Button16.TabIndex = 18;
             this.Button16.Text = "Add";
             this.Button16.UseVisualStyleBackColor = true;
+            this.Button16.Click += new System.EventHandler(this.Button16_Click);
             // 
-            // Button4
+            // BtnDeleteGenre
             // 
-            this.Button4.Location = new System.Drawing.Point(481, 136);
-            this.Button4.Name = "Button4";
-            this.Button4.Size = new System.Drawing.Size(39, 21);
-            this.Button4.TabIndex = 15;
-            this.Button4.Text = "Del";
-            this.Button4.UseVisualStyleBackColor = true;
+            this.BtnDeleteGenre.Location = new System.Drawing.Point(481, 136);
+            this.BtnDeleteGenre.Name = "BtnDeleteGenre";
+            this.BtnDeleteGenre.Size = new System.Drawing.Size(39, 21);
+            this.BtnDeleteGenre.TabIndex = 15;
+            this.BtnDeleteGenre.Text = "Del";
+            this.BtnDeleteGenre.UseVisualStyleBackColor = true;
+            this.BtnDeleteGenre.Click += new System.EventHandler(this.BtnDeleteGenre_Click);
             // 
             // TabControl1
             // 
-            this.TabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.TabControl1.Controls.Add(this.TabPage1);
             this.TabControl1.Controls.Add(this.TabPage5);
             this.TabControl1.Controls.Add(this.TabPage2);
             this.TabControl1.Controls.Add(this.TabPage3);
             this.TabControl1.Controls.Add(this.TabPage4);
             this.TabControl1.Controls.Add(this.TabPage6);
-            this.TabControl1.Location = new System.Drawing.Point(0, 21);
+            this.TabControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.TabControl1.Location = new System.Drawing.Point(0, 25);
             this.TabControl1.MaximumSize = new System.Drawing.Size(1000, 900);
             this.TabControl1.MinimumSize = new System.Drawing.Size(1000, 688);
             this.TabControl1.Name = "TabControl1";
@@ -1284,7 +1245,6 @@ namespace PseudoTV_Manager.Forms
             // TabPage1
             // 
             this.TabPage1.BackColor = System.Drawing.Color.Gray;
-            this.TabPage1.Controls.Add(this.Button20);
             this.TabPage1.Controls.Add(this.AddPoster);
             this.TabPage1.Controls.Add(this.AddBanner);
             this.TabPage1.Controls.Add(this.TVPosterSelect);
@@ -1294,11 +1254,11 @@ namespace PseudoTV_Manager.Forms
             this.TabPage1.Controls.Add(this.Label20);
             this.TabPage1.Controls.Add(this.Label18);
             this.TabPage1.Controls.Add(this.ListTVPosters);
-            this.TabPage1.Controls.Add(this.Button19);
-            this.TabPage1.Controls.Add(this.Button6);
-            this.TabPage1.Controls.Add(this.txtShowNetwork);
-            this.TabPage1.Controls.Add(this.Button4);
-            this.TabPage1.Controls.Add(this.Button3);
+            this.TabPage1.Controls.Add(this.BtnRefreshGenres);
+            this.TabPage1.Controls.Add(this.BtnTvShowLocationBrowse);
+            this.TabPage1.Controls.Add(this.TxtShowNetwork);
+            this.TabPage1.Controls.Add(this.BtnDeleteGenre);
+            this.TabPage1.Controls.Add(this.BtnAddGenre);
             this.TabPage1.Controls.Add(this.ListTVGenres);
             this.TabPage1.Controls.Add(this.TVPosterPictureBox);
             this.TabPage1.Controls.Add(this.TVShowLabel);
@@ -1309,7 +1269,7 @@ namespace PseudoTV_Manager.Forms
             this.TabPage1.Controls.Add(this.Label3);
             this.TabPage1.Controls.Add(this.Label2);
             this.TabPage1.Controls.Add(this.Label1);
-            this.TabPage1.Controls.Add(this.Button1);
+            this.TabPage1.Controls.Add(this.BtnRefresh);
             this.TabPage1.Controls.Add(this.TVShowList);
             this.TabPage1.Location = new System.Drawing.Point(4, 22);
             this.TabPage1.Name = "TabPage1";
@@ -1317,16 +1277,6 @@ namespace PseudoTV_Manager.Forms
             this.TabPage1.Size = new System.Drawing.Size(992, 662);
             this.TabPage1.TabIndex = 0;
             this.TabPage1.Text = "TV Shows";
-            // 
-            // Button20
-            // 
-            this.Button20.Location = new System.Drawing.Point(387, 104);
-            this.Button20.Name = "Button20";
-            this.Button20.Size = new System.Drawing.Size(75, 23);
-            this.Button20.TabIndex = 28;
-            this.Button20.Text = "Button20";
-            this.Button20.UseVisualStyleBackColor = true;
-            this.Button20.Visible = false;
             // 
             // AddPoster
             // 
@@ -1336,6 +1286,7 @@ namespace PseudoTV_Manager.Forms
             this.AddPoster.TabIndex = 27;
             this.AddPoster.Text = "Add";
             this.AddPoster.UseVisualStyleBackColor = true;
+            this.AddPoster.Click += new System.EventHandler(this.AddPoster_Click);
             // 
             // AddBanner
             // 
@@ -1345,6 +1296,7 @@ namespace PseudoTV_Manager.Forms
             this.AddBanner.TabIndex = 26;
             this.AddBanner.Text = "Add";
             this.AddBanner.UseVisualStyleBackColor = true;
+            this.AddBanner.Click += new System.EventHandler(this.AddBanner_Click);
             // 
             // TVPosterSelect
             // 
@@ -1354,6 +1306,7 @@ namespace PseudoTV_Manager.Forms
             this.TVPosterSelect.TabIndex = 25;
             this.TVPosterSelect.Text = "Save image";
             this.TVPosterSelect.UseVisualStyleBackColor = true;
+            this.TVPosterSelect.Click += new System.EventHandler(this.TVPosterSelect_Click);
             // 
             // TVBannerSelect
             // 
@@ -1363,6 +1316,7 @@ namespace PseudoTV_Manager.Forms
             this.TVBannerSelect.TabIndex = 24;
             this.TVBannerSelect.Text = "Save image";
             this.TVBannerSelect.UseVisualStyleBackColor = true;
+            this.TVBannerSelect.Click += new System.EventHandler(this.TVBannerSelect_Click);
             // 
             // TVBannerPictureBox
             // 
@@ -1410,44 +1364,47 @@ namespace PseudoTV_Manager.Forms
             this.ListTVPosters.Size = new System.Drawing.Size(351, 134);
             this.ListTVPosters.TabIndex = 19;
             // 
-            // Button19
+            // BtnRefreshGenres
             // 
-            this.Button19.Enabled = false;
-            this.Button19.Location = new System.Drawing.Point(365, 136);
-            this.Button19.Name = "Button19";
-            this.Button19.Size = new System.Drawing.Size(62, 21);
-            this.Button19.TabIndex = 18;
-            this.Button19.Text = "Refresh";
-            this.Button19.UseVisualStyleBackColor = true;
-            this.Button19.Visible = false;
+            this.BtnRefreshGenres.Enabled = false;
+            this.BtnRefreshGenres.Location = new System.Drawing.Point(365, 136);
+            this.BtnRefreshGenres.Name = "BtnRefreshGenres";
+            this.BtnRefreshGenres.Size = new System.Drawing.Size(62, 21);
+            this.BtnRefreshGenres.TabIndex = 18;
+            this.BtnRefreshGenres.Text = "Refresh";
+            this.BtnRefreshGenres.UseVisualStyleBackColor = true;
+            this.BtnRefreshGenres.Visible = false;
+            this.BtnRefreshGenres.Click += new System.EventHandler(this.BtnRefreshGenres_Click);
             // 
-            // Button6
+            // BtnTvShowLocationBrowse
             // 
-            this.Button6.Location = new System.Drawing.Point(610, 73);
-            this.Button6.Name = "Button6";
-            this.Button6.Size = new System.Drawing.Size(29, 24);
-            this.Button6.TabIndex = 17;
-            this.Button6.Text = "...";
-            this.Button6.UseVisualStyleBackColor = true;
+            this.BtnTvShowLocationBrowse.Location = new System.Drawing.Point(610, 73);
+            this.BtnTvShowLocationBrowse.Name = "BtnTvShowLocationBrowse";
+            this.BtnTvShowLocationBrowse.Size = new System.Drawing.Size(29, 24);
+            this.BtnTvShowLocationBrowse.TabIndex = 17;
+            this.BtnTvShowLocationBrowse.Text = "...";
+            this.BtnTvShowLocationBrowse.UseVisualStyleBackColor = true;
+            this.BtnTvShowLocationBrowse.Click += new System.EventHandler(this.BtnTvShowLocationBrowse_Click);
             // 
-            // txtShowNetwork
+            // TxtShowNetwork
             // 
-            this.txtShowNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.txtShowNetwork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtShowNetwork.FormattingEnabled = true;
-            this.txtShowNetwork.Location = new System.Drawing.Point(324, 39);
-            this.txtShowNetwork.Name = "txtShowNetwork";
-            this.txtShowNetwork.Size = new System.Drawing.Size(280, 28);
-            this.txtShowNetwork.TabIndex = 16;
+            this.TxtShowNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.TxtShowNetwork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtShowNetwork.FormattingEnabled = true;
+            this.TxtShowNetwork.Location = new System.Drawing.Point(324, 39);
+            this.TxtShowNetwork.Name = "TxtShowNetwork";
+            this.TxtShowNetwork.Size = new System.Drawing.Size(280, 28);
+            this.TxtShowNetwork.TabIndex = 16;
             // 
-            // Button3
+            // BtnAddGenre
             // 
-            this.Button3.Location = new System.Drawing.Point(433, 136);
-            this.Button3.Name = "Button3";
-            this.Button3.Size = new System.Drawing.Size(39, 21);
-            this.Button3.TabIndex = 14;
-            this.Button3.Text = "Add";
-            this.Button3.UseVisualStyleBackColor = true;
+            this.BtnAddGenre.Location = new System.Drawing.Point(433, 136);
+            this.BtnAddGenre.Name = "BtnAddGenre";
+            this.BtnAddGenre.Size = new System.Drawing.Size(39, 21);
+            this.BtnAddGenre.TabIndex = 14;
+            this.BtnAddGenre.Text = "Add";
+            this.BtnAddGenre.UseVisualStyleBackColor = true;
+            this.BtnAddGenre.Click += new System.EventHandler(this.BtnAddGenre_Click);
             // 
             // ListTVGenres
             // 
@@ -1472,9 +1429,9 @@ namespace PseudoTV_Manager.Forms
             this.TVShowLabel.AutoSize = true;
             this.TVShowLabel.Location = new System.Drawing.Point(730, 22);
             this.TVShowLabel.Name = "TVShowLabel";
-            this.TVShowLabel.Size = new System.Drawing.Size(39, 13);
+            this.TVShowLabel.Size = new System.Drawing.Size(73, 13);
             this.TVShowLabel.TabIndex = 11;
-            this.TVShowLabel.Text = "Label5";
+            this.TVShowLabel.Text = "TvShowLabel";
             this.TVShowLabel.Visible = false;
             // 
             // SaveTVShow
@@ -1543,14 +1500,15 @@ namespace PseudoTV_Manager.Forms
             this.Label1.TabIndex = 2;
             this.Label1.Text = "Show";
             // 
-            // Button1
+            // BtnRefresh
             // 
-            this.Button1.Location = new System.Drawing.Point(3, 615);
-            this.Button1.Name = "Button1";
-            this.Button1.Size = new System.Drawing.Size(57, 20);
-            this.Button1.TabIndex = 1;
-            this.Button1.Text = "Refresh";
-            this.Button1.UseVisualStyleBackColor = true;
+            this.BtnRefresh.Location = new System.Drawing.Point(3, 615);
+            this.BtnRefresh.Name = "BtnRefresh";
+            this.BtnRefresh.Size = new System.Drawing.Size(57, 20);
+            this.BtnRefresh.TabIndex = 1;
+            this.BtnRefresh.Text = "Refresh";
+            this.BtnRefresh.UseVisualStyleBackColor = true;
+            this.BtnRefresh.Click += new System.EventHandler(this.BtnRefresh_Click);
             // 
             // TVShowList
             // 
@@ -1598,6 +1556,7 @@ namespace PseudoTV_Manager.Forms
             this.AddMoviePosterButton.TabIndex = 29;
             this.AddMoviePosterButton.Text = "Add";
             this.AddMoviePosterButton.UseVisualStyleBackColor = true;
+            this.AddMoviePosterButton.Click += new System.EventHandler(this.AddMoviePosterButton_Click);
             // 
             // MoviePosterSelect
             // 
@@ -1607,6 +1566,7 @@ namespace PseudoTV_Manager.Forms
             this.MoviePosterSelect.TabIndex = 28;
             this.MoviePosterSelect.Text = "Save image";
             this.MoviePosterSelect.UseVisualStyleBackColor = true;
+            this.MoviePosterSelect.Click += new System.EventHandler(this.MoviePosterSelect_Click);
             // 
             // Label19
             // 
@@ -1635,15 +1595,16 @@ namespace PseudoTV_Manager.Forms
             this.Button18.TabIndex = 25;
             this.Button18.Text = "...";
             this.Button18.UseVisualStyleBackColor = true;
+            this.Button18.Click += new System.EventHandler(this.Button18_Click);
             // 
             // MovieIDLabel
             // 
             this.MovieIDLabel.AutoSize = true;
             this.MovieIDLabel.Location = new System.Drawing.Point(590, 12);
             this.MovieIDLabel.Name = "MovieIDLabel";
-            this.MovieIDLabel.Size = new System.Drawing.Size(45, 13);
+            this.MovieIDLabel.Size = new System.Drawing.Size(73, 13);
             this.MovieIDLabel.TabIndex = 24;
-            this.MovieIDLabel.Text = "Label16";
+            this.MovieIDLabel.Text = "MovieIDLabel";
             this.MovieIDLabel.Visible = false;
             // 
             // Button17
@@ -1654,6 +1615,7 @@ namespace PseudoTV_Manager.Forms
             this.Button17.TabIndex = 23;
             this.Button17.Text = "Save";
             this.Button17.UseVisualStyleBackColor = true;
+            this.Button17.Click += new System.EventHandler(this.Button17_Click);
             // 
             // txtMovieNetwork
             // 
@@ -1689,16 +1651,53 @@ namespace PseudoTV_Manager.Forms
             this.Button15.TabIndex = 19;
             this.Button15.Text = "Del";
             this.Button15.UseVisualStyleBackColor = true;
+            this.Button15.Click += new System.EventHandler(this.Button15_Click);
+            // 
+            // FileToolStripMenuItem
+            // 
+            this.FileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MnuSettings,
+            this.MnuExit});
+            this.FileToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.FileToolStripMenuItem.Name = "FileToolStripMenuItem";
+            this.FileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.FileToolStripMenuItem.Text = "&File";
+            // 
+            // MnuSettings
+            // 
+            this.MnuSettings.Name = "MnuSettings";
+            this.MnuSettings.Size = new System.Drawing.Size(116, 22);
+            this.MnuSettings.Text = "Settings";
+            this.MnuSettings.Click += new System.EventHandler(this.MnuSettings_Click);
+            // 
+            // MnuExit
+            // 
+            this.MnuExit.Name = "MnuExit";
+            this.MnuExit.Size = new System.Drawing.Size(116, 22);
+            this.MnuExit.Text = "Exit";
+            // 
+            // MenuStrip
+            // 
+            this.MenuStrip.GripMargin = new System.Windows.Forms.Padding(0);
+            this.MenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.FileToolStripMenuItem});
+            this.MenuStrip.Location = new System.Drawing.Point(0, 0);
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.MenuStrip.Size = new System.Drawing.Size(1002, 24);
+            this.MenuStrip.TabIndex = 5;
+            this.MenuStrip.Text = "MenuStrip1";
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1154, 703);
-            this.Controls.Add(this.MenuStrip1);
-            this.Controls.Add(this.StatusStrip1);
+            this.ClientSize = new System.Drawing.Size(1002, 735);
+            this.Controls.Add(this.MenuStrip);
             this.Controls.Add(this.TabControl1);
+            this.Controls.Add(this.StatusStrip1);
             this.Name = "MainWindow";
             this.Text = "PseudoTV Live Manager";
             this.Load += new System.EventHandler(this.MainWindow_Load);
@@ -1707,8 +1706,6 @@ namespace PseudoTV_Manager.Forms
             this.TabPage3.ResumeLayout(false);
             this.TabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MoviePicture)).EndInit();
-            this.MenuStrip1.ResumeLayout(false);
-            this.MenuStrip1.PerformLayout();
             this.TabPage6.ResumeLayout(false);
             this.TabPage6.PerformLayout();
             this.StatusStrip1.ResumeLayout(false);
@@ -1720,6 +1717,8 @@ namespace PseudoTV_Manager.Forms
             ((System.ComponentModel.ISupportInitialize)(this.TVPosterPictureBox)).EndInit();
             this.TabPage5.ResumeLayout(false);
             this.TabPage5.PerformLayout();
+            this.MenuStrip.ResumeLayout(false);
+            this.MenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1763,7 +1762,7 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.Button Button10;
         internal System.Windows.Forms.Button Button8;
         internal System.Windows.Forms.Button Button7;
-        internal System.Windows.Forms.Button Button2;
+        internal System.Windows.Forms.Button BtnTvGuideSave;
         internal System.Windows.Forms.ListBox NotShows;
         internal System.Windows.Forms.Label Label12;
         internal System.Windows.Forms.ListView SchedulingList;
@@ -1815,14 +1814,10 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.FolderBrowserDialog FolderBrowserDialog1;
         internal System.Windows.Forms.ToolStripStatusLabel Status;
         internal System.Windows.Forms.OpenFileDialog OpenFileDialog1;
-        internal System.Windows.Forms.ToolStripMenuItem MnuExit;
         internal System.Windows.Forms.Label Label24;
         internal System.Windows.Forms.Label Label23;
         internal System.Windows.Forms.Label Label22;
         internal System.Windows.Forms.Label PeppyDonate;
-        internal System.Windows.Forms.ToolStripMenuItem MnuSettings;
-        internal System.Windows.Forms.ToolStripMenuItem FileToolStripMenuItem;
-        internal System.Windows.Forms.MenuStrip MenuStrip1;
         internal System.Windows.Forms.LinkLabel HelpLink;
         internal System.Windows.Forms.Label Label21;
         internal System.Windows.Forms.Label Label13;
@@ -1830,10 +1825,9 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.ComboBox HelpList;
         internal System.Windows.Forms.StatusStrip StatusStrip1;
         internal System.Windows.Forms.Button Button16;
-        internal System.Windows.Forms.Button Button4;
+        internal System.Windows.Forms.Button BtnDeleteGenre;
         internal System.Windows.Forms.TabControl TabControl1;
         internal System.Windows.Forms.TabPage TabPage1;
-        internal System.Windows.Forms.Button Button20;
         internal System.Windows.Forms.Button AddPoster;
         internal System.Windows.Forms.Button AddBanner;
         internal System.Windows.Forms.Button TVPosterSelect;
@@ -1843,10 +1837,10 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.Label Label20;
         internal System.Windows.Forms.Label Label18;
         internal System.Windows.Forms.ListBox ListTVPosters;
-        internal System.Windows.Forms.Button Button19;
-        internal System.Windows.Forms.Button Button6;
-        internal System.Windows.Forms.ComboBox txtShowNetwork;
-        internal System.Windows.Forms.Button Button3;
+        internal System.Windows.Forms.Button BtnRefreshGenres;
+        internal System.Windows.Forms.Button BtnTvShowLocationBrowse;
+        internal System.Windows.Forms.ComboBox TxtShowNetwork;
+        internal System.Windows.Forms.Button BtnAddGenre;
         internal System.Windows.Forms.ListBox ListTVGenres;
         internal System.Windows.Forms.PictureBox TVPosterPictureBox;
         internal System.Windows.Forms.Label TVShowLabel;
@@ -1857,7 +1851,7 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.Label Label3;
         internal System.Windows.Forms.Label Label2;
         internal System.Windows.Forms.Label Label1;
-        internal System.Windows.Forms.Button Button1;
+        internal System.Windows.Forms.Button BtnRefresh;
         internal System.Windows.Forms.ListView TVShowList;
         internal System.Windows.Forms.TabPage TabPage5;
         internal System.Windows.Forms.Button AddMoviePosterButton;
@@ -1874,6 +1868,10 @@ namespace PseudoTV_Manager.Forms
         internal System.Windows.Forms.Label label27;
         internal System.Windows.Forms.Label label26;
         internal System.Windows.Forms.Label label25;
+        internal System.Windows.Forms.ToolStripMenuItem FileToolStripMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem MnuSettings;
+        internal System.Windows.Forms.ToolStripMenuItem MnuExit;
+        internal System.Windows.Forms.MenuStrip MenuStrip;
     }
 }
 
